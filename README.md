@@ -1,23 +1,29 @@
-# Jasper Reportsによる帳票出力を勉強するためのSpringBoot Apサンプル
+# Jasper Reportsによる帳票出力を勉強するためのSpring Boot APサンプル
 
 ## 帳票様式の確認・編集について
-* Jasper Studioを使って帳票様式を確認・編集したい場合には、以下の手順を実施します。
-* Jasper Studioは、Eclipseベースの帳票デザインツールです。
+* Jasper Studioを使って帳票様式を確認・編集したい場合は、Jasper Studioをインストールしてください。Jasper Studioは、Eclipseベースの帳票デザインツールです。 
 
-* [Jaspersoft Comunity Edtion ダウンロードサイト](https://community.jaspersoft.com/download-jaspersoft/community-edition/)からダウンロードします。
-    * 会社のアドレスや情報を入れないと、Jaspersoft Studio等ダウンロードできない
+* Jasper Studioのダウンロード方法
+    * [Jaspersoft Comunity Edtion ダウンロードサイト](https://community.jaspersoft.com/download-jaspersoft/community-edition/)からダウンロードします。
+        * 会社のアドレスや情報を入れないと、Jaspersoft Studio等ダウンロードできないようです。
         * Jaspersoftは個人との取引をしないということらしく、gmail等でアカウントと作ってしまうと[Access Deny](https://community.jaspersoft.com/access-denied/)になってしまうようです。
 
-* 使い方については[JasperSoftのコミュニティ](https://community.jaspersoft.com/documentation/)からドキュメントがダウンロードできます。
-    * [Jasper StudioのHTMLドキュメントはこちら](https://community.jaspersoft.com/documentation/tibco-jasperreports-server-user-guide/v630/jaspersoft-studio-user-guide)
+* ツールの使い方
+    * [JasperSoftのコミュニティのドキュメントサイト](https://community.jaspersoft.com/documentation/)からドキュメントがダウンロードできます。
+        * [Jasper StudioのHTMLドキュメントはこちら](https://community.jaspersoft.com/documentation/tibco-jasperreports-server-user-guide/v630/jaspersoft-studio-user-guide)
 
-* 現状、[参考情報](#参考情報)にあるサンプルAPのサイトの様式をJapsper Studioで開きなおして、最新のver7.x系のフォーマットに変換したものを使っています。
-    * 今後、自分で帳票様式を作成して試してサンプルAPを充実化させていく予定です。
+* サンプルAPの帳票様式について
+    * まずは、ライブラリの利用方法の勉強のため、自分で作成せず、[参考情報](#参考情報)にあるサンプルAPのサイトの様式（jrxmlファイル）を利用させていただいていただきました。
+        * 今後、自分でJasper Studioを使って帳票様式を作成してみて勉強しながら、サンプルAPを充実化させていく予定です。
+
+    * 様式ファイル（jrxmlファイル）は、Japsper Studio7.x.xから以前のバージョンとフォーマットが違うため、JasperReportsのライブラリも7.x.xを使うには、Jasper Studio7.x.xで作ったものである必要があるようです。
+        * 既存のものはver6.x.x以前の形式だったので、Japsper Studio7.x.xで開きなおして、最新のver7.x系のフォーマットに変換したものを使っています。
+  
 
 ## サンプルAPの起動方法
 * Spring Boot APを起動します。
     * Spring Tool Suite（Eclipse）の場合
-        * `JasperReportsSampleApplication.java`を右クリックして、`Run As` -> `Spring Boot Application`または`Java Application`を選択します。
+        * `JasperReportsSampleApplication.java`を右クリックして、`Run As` -> `Spring Boot Application`（または`Java Application`）を選択します。
         
     * コマンドラインの場合
         * プロジェクトのルートディレクトリに移動して、以下のコマンドを実行します。
@@ -25,16 +31,17 @@
             mvnw spring-boot:run
             ```
 
-* ブラウザで以下のURLにアクセス
+* ブラウザで以下のURLにアクセスします。
     * http://localhost:8080/
 
-    * メニュー画面より帳票名のリンクをクリック
-        * 商品一覧
-            * 「items.pdf」という名前のPDFファイルがダウンロードされます。
+* トップ画面より、帳票名のリンクをクリックすると、PDFがダウンロード、表示されます。
+    * 商品一覧
+        * 「items.pdf」という名前のPDFファイルがダウンロードされます。
 
-            * 出力される帳票のイメージ
-                ![items.pdf](image/items-report.png)
-        * TODO: 今後、帳票を追加していく予定        
+        * 出力される帳票のイメージ
+            ![items.pdf](image/items-report.png)
+
+    * TODO: 今後、帳票を追加していく予定です
 
 
 ## 参考情報
