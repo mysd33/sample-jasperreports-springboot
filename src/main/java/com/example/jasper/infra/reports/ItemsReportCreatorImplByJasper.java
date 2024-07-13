@@ -44,8 +44,8 @@ public class ItemsReportCreatorImplByJasper implements ItemsReportCreator {
 		// TODO: JasperReports APIを使った共通的な実装手順を、AP基盤機能に切り出す検討
 		JasperReport jasperReport;
 
-		// コンパイル済の帳票様式がある場合はそれを利用する
 		try {
+			// コンパイル済の帳票様式がある場合はそれを利用する
 			jasperReport = (JasperReport) JRLoader.loadObject(ResourceUtils.getFile(JASPER_FILE_PATH));
 		} catch (FileNotFoundException | JRException e) {
 			try {

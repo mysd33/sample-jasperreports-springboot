@@ -28,7 +28,7 @@
 
 
 ## 帳票様式の確認・編集方法
-* Jasper Studioを使って帳票様式を確認・編集したい場合は、Jasper Studioをインストールしてください。Jasper Studioは、Eclipseベースの帳票デザインツールです。 
+* 帳票様式を確認・編集したい場合は、Jasper Studioをインストールしてください。Jasper Studioは、Eclipseベースの帳票デザインツールです。 
 
 * Jasper Studioのダウンロード方法
     * [Jaspersoft Comunity Edtion ダウンロードサイト](https://community.jaspersoft.com/download-jaspersoft/community-edition/)からダウンロードします。
@@ -49,6 +49,8 @@
 ## ライブラリの利用方法
 * pom.xmlにライブラリの依存関係を追加
     * APで、JasperReportのライブラリを使用するには、まずpom.xmlで依存ライブラリを追加します。サンプルAPでは最新の7.x.xを利用しています。
+    * [サンプルAPの例](pom.xml)
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project …>
@@ -87,10 +89,58 @@
 ```
 
 * JasperのAPIの利用方法
-    * とっかかりとして[参考情報](#参考情報)にあるサイトのサンプルAPを参考に、AP内でJasperReportのAPIを利用するといです。
-    * 公式のサンプルコードやリファレンスは[JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports?tab=readme-ov-file#jasperreports---free-java-reporting-library)を確認しまほう。
+    * 公式のサンプルコードやリファレンスは[JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports?tab=readme-ov-file#jasperreports---free-java-reporting-library)を確認します。
+
+    * とっかかりとして[参考情報](#参考情報)にあるサイトのサンプルAPを参考に、AP内でJasperReportのAPIを利用するとよいです。
+    * サンプルAPだと、以下を確認するとよいです。
+        * [サンプルAPの例](src/main/java/com/example/jasper/infra/reports/ItemsReportCreatorImplByJasper.java)
+        * 以下、抜粋
+        
+    ```java
+    private static final String TITLE = "title";	
+	private static final String REPORT_NAME = "商品一覧";
+	private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
+	private static final String JASPER_FILE_PATH = "item-report.jasper";
+    
+    // 商品一覧の帳票の作成例    
+	@Override
+	public InputStream createItemListReport(List<Item> items) {        
+    	JasperReport jasperReport;		
+		try {
+            // コンパイル済の帳票様式がある場合はそれを利用する     
+			jasperReport = (JasperReport) JRLoader.loadObject(ResourceUtils.getFile(JASPER_FILE_PATH));
+		} catch (FileNotFoundException | JRException e) {
+			try {
+				// コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルする
+				File jrxmlFile = ResourceUtils.getFile(JRXML_FILE_PATH);
+				jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+			} catch (FileNotFoundException | JRException e1) {
+                …
+			}
+		}
+		// 商品リストを、データソース（JRBeanCollectionDataSource）に指定
+		JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(items);
+		Map<String, Object> parameters = new HashMap<>();
+		// タイトルをパラメータに指定
+		parameters.put(TITLE, REPORT_NAME);
+
+		try {
+			// 帳票様式に帳票データを渡して、帳票を作成する
+			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+			// そのままバイト配列に出力する実装例
+			// PDF形式で出力
+			byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
+			return new ByteArrayInputStream(reportContent);
+            
+		} catch (JRException e) { // | IOException e) {
+            …
+		}
+    }
+    ```    
 
 * 日本語を出力する方法
+    * デフォルトのフォントだと日本語出力できないので、日本語フォントをダウンロードして指定する必要があります。
     * 日本語を利用する場合は、日本語フォントをダウンロードします。
         * [IPAフォント](https://moji.or.jp/ipafont/ipafontdownload/)
     * src/main/resources配下の任意のフォルダに、フォントファイルを配置します。
