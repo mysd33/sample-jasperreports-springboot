@@ -12,6 +12,7 @@
 
             * 出力される帳票のイメージ
                 ![items.pdf](image/items-report.png)
+        * TODO: 今後、帳票を追加していく予定        
 
 ## 参考情報
 * [JasperReports Comunity Edtion ダウンロードサイト](https://community.jaspersoft.com/download-jaspersoft/community-edition/)
@@ -26,7 +27,9 @@
 
 * [JaspterReportのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports)
 
-* [JasperReportでの日本語フォントの利用の記事](https://qiita.com/morya/items/26e1519b9ca813ed399a)
+* 日本語フォントの対応
+    * [JasperReportでの日本語フォントの利用の記事](https://qiita.com/morya/items/26e1519b9ca813ed399a)
+    * [IPAフォント](https://moji.or.jp/ipafont/ipafontdownload/)
 
 * Japser Reportを使ったチュートリアル、サンプル
     * サンプル1
