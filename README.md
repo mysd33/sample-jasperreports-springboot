@@ -98,7 +98,7 @@
 * [Workbrain JAPAN](https://www.workbrainjapan.net/jasperreports-solution)
     * JasperReportsを扱っている、帳票・レポート作成ソリューションがある模様
 
-* [JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperr eports)
+* [JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports)
 
 * 日本語フォントの対応
     * [JasperReportでの日本語フォントの利用の記事](https://qiita.com/morya/items/26e1519b9ca813ed399a)
