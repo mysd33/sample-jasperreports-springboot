@@ -1,47 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
-  http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-  name="item-report" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20"
-  topMargin="20" bottomMargin="20">
-
-  <parameter name="title" class="java.lang.String" isForPrompting="false"/>
-  <field name="id" class="java.lang.Long"/>
-  <field name="name" class="java.lang.String"/>
-  <title>
-    <band height="30" splitType="Stretch">
-      <textField>
-        <reportElement x="200" y="0" width="200" height="30"/>
-        <textElement>
-          <font fontName="ipaexg"/>
-        </textElement>
-        <textFieldExpression class="java.lang.String"><![CDATA[$P{title}]]></textFieldExpression>
-      </textField>
-    </band>
-  </title>
-  <detail>
-    <band height="20" splitType="Stretch">
-      <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-        <reportElement x="100" y="0" width="100" height="20" />
-        <box>
-          <pen lineWidth="1.0" lineColor="#000"/>
-        </box>        
-        <textElement>
-          <font fontName="ipaexg"/>
-        </textElement>        
-        <textFieldExpression class="java.lang.Long"><![CDATA[$F{id}]]></textFieldExpression>
-      </textField>
-      <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-        <reportElement x="200" y="0" width="200" height="20"/>
-        <box>
-          <pen lineWidth="1.0" lineColor="#000"/>
-        </box>
-        <textElement>
-          <font fontName="ipaexg"/>
-        </textElement>        
-        <textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
-      </textField>
-    </band>
-  </detail>
+<!-- Created with Jaspersoft Studio version 7.0.0.final using JasperReports Library version 7.0.0-b478feaa9aab4375eba71de77b4ca138ad2f62aa  -->
+<jasperReport name="item-report" language="java" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="daf535b5-d9f5-474c-a5db-3e87f53b5a8f">
+	<parameter name="title" forPrompting="false" class="java.lang.String"/>
+	<field name="id" class="java.lang.Long"/>
+	<field name="name" class="java.lang.String"/>
+	<title height="30" splitType="Stretch">
+		<element kind="textField" uuid="9e775723-62fc-42c4-ba2e-5d56a3f2a54d" x="200" y="0" width="200" height="30" fontName="ipaexg">
+			<expression><![CDATA[$P{title}]]></expression>
+		</element>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<element kind="textField" uuid="4b4106be-5b73-4339-abb2-98c186c92aee" x="100" y="0" width="100" height="20" fontName="ipaexg" textAdjust="StretchHeight" blankWhenNull="true">
+				<expression><![CDATA[$F{id}]]></expression>
+				<box>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="f20bae3a-7f5e-4e38-b79e-cd7e5c503f96" x="200" y="0" width="200" height="20" fontName="ipaexg" textAdjust="StretchHeight" blankWhenNull="true">
+				<expression><![CDATA[$F{name}]]></expression>
+				<box>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+				</box>
+			</element>
+		</band>
+	</detail>
 </jasperReport>
