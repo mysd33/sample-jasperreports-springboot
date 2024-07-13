@@ -90,6 +90,19 @@
     * とっかかりとして[参考情報](#参考情報)にあるサイトのサンプルAPを参考に、AP内でJasperReportのAPIを利用するといです。
     * 公式のサンプルコードやリファレンスは[JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports?tab=readme-ov-file#jasperreports---free-java-reporting-library)を確認しまほう。
 
+* 日本語を出力する方法
+    * 日本語を利用する場合は、日本語フォントをダウンロードします。
+        * [IPAフォント](https://moji.or.jp/ipafont/ipafontdownload/)
+    * src/main/resources配下の任意のフォルダに、フォントファイルを配置します。
+        * [サンプルAPのフォルダ](src/main/resources/fonts/)のttfファイル
+    * src/main/resources配下の任意のフォルダに、フォントを定義するファイルを作成します。
+        * [サンプルAPの例](src/main/resources/fonts/fontsfamily-ipa.xml)
+    * この定義ファイルのfontFamilyのname属性の値と同じものを、様式ファイルのフォント名（fontName）にしておきます。
+        * [サンプルAPの例](src/main/resources/reports/item-report.jrxml)
+        * TODO: デザイナ（Jasper Studio）側のカスタムフォント設定も調査する
+    * src/main/resources配下に、jasperreports_extension.propertiesファイルを作成し、フォントを指定します。
+        * [サンプルAPの例](src/main/resources/jasperreports_extension.properties)
+
 ## 参考情報
 * [Jaspersoft community editionの公式サイト](https://www.jaspersoft.com/products/jaspersoft-community)
 
