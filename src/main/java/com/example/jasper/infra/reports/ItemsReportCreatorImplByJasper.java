@@ -33,9 +33,8 @@ import net.sf.jasperreports.engine.util.JRLoader;
  */
 @Repository
 public class ItemsReportCreatorImplByJasper implements ItemsReportCreator {
-	private static final String TITLE = "title";
-	// TODO: 日本語出力への対応（フォント？）
-	private static final String REPORT_NAME = "Item Report";
+	private static final String TITLE = "title";	
+	private static final String REPORT_NAME = "商品一覧";
 	private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
 	private static final String JASPER_FILE_PATH = "item-report.jasper";
 

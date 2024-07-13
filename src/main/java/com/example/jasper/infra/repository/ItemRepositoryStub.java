@@ -16,10 +16,10 @@ public class ItemRepositoryStub implements ItemsRepository {
 	@Override
 	public List<Item> findAll() {
 		return List.of(//
-				Item.builder().id(1001L).name("milk").build(), //
-				Item.builder().id(1002L).name("juice").build(), //
-				Item.builder().id(1003L).name("poteto").build(), //
-				Item.builder().id(1004L).name("beaf").build(), //
-				Item.builder().id(1005L).name("poak").build());
+				Item.builder().id(1001L).name("牛乳").build(), //
+				Item.builder().id(1002L).name("ジュース").build(), //
+				Item.builder().id(1003L).name("じゃがいも").build(), //
+				Item.builder().id(1004L).name("牛肉").build(), //
+				Item.builder().id(1005L).name("豚肉").build());
 	}
 }

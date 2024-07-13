@@ -4,18 +4,17 @@
 * Spring Boot APを起動
 
 * ブラウザで以下のURLにアクセス
-  * http://localhost:8080/reports/items
+    * http://localhost:8080/
 
-* 「items.pdf」という名前のPDFファイルがダウンロードされる
+    * メニュー画面より帳票名のリンクをクリック
+        * 商品一覧
+            * 「items.pdf」という名前のPDFファイルがダウンロードされます。
 
-    * 出力される帳票の例
-    
-    ![items.pdf](image/items-report.png)
-
+            * 出力される帳票のイメージ
+                ![items.pdf](image/items-report.png)
 
 ## 参考情報
 * [JasperReports Comunity Edtion ダウンロードサイト](https://community.jaspersoft.com/download-jaspersoft/community-edition/)
-
     * 会社のアドレスや情報を入れないと、Jaspersoft Studio等ダウンロードできない模様
         * JasperReportsは個人との取引をしないということらしい。gmail等で作ってしまうと、Access Denyになってしまう模様
             * https://community.jaspersoft.com/access-denied/
@@ -26,6 +25,8 @@
     * JasperReportsを扱っている、帳票・レポート作成ソリューションがある模様
 
 * [JaspterReportのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports)
+
+* [JasperReportでの日本語フォントの利用の記事](https://qiita.com/morya/items/26e1519b9ca813ed399a)
 
 * Japser Reportを使ったチュートリアル、サンプル
     * サンプル1

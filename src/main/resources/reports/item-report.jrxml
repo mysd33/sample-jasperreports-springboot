@@ -13,7 +13,9 @@
     <band height="30" splitType="Stretch">
       <textField>
         <reportElement x="200" y="0" width="200" height="30"/>
-        <textElement/>
+        <textElement>
+          <font fontName="ipaexg"/>
+        </textElement>
         <textFieldExpression class="java.lang.String"><![CDATA[$P{title}]]></textFieldExpression>
       </textField>
     </band>
@@ -24,8 +26,10 @@
         <reportElement x="100" y="0" width="100" height="20" />
         <box>
           <pen lineWidth="1.0" lineColor="#000"/>
-        </box>
-        <textElement/>
+        </box>        
+        <textElement>
+          <font fontName="ipaexg"/>
+        </textElement>        
         <textFieldExpression class="java.lang.Long"><![CDATA[$F{id}]]></textFieldExpression>
       </textField>
       <textField isStretchWithOverflow="true" isBlankWhenNull="true">
@@ -33,7 +37,9 @@
         <box>
           <pen lineWidth="1.0" lineColor="#000"/>
         </box>
-        <textElement/>
+        <textElement>
+          <font fontName="ipaexg"/>
+        </textElement>        
         <textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
       </textField>
     </band>
