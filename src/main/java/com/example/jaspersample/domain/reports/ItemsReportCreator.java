@@ -1,9 +1,9 @@
-package com.example.jasper.domain.reports;
+package com.example.jaspersample.domain.reports;
 
 import java.io.InputStream;
 import java.util.List;
 
-import com.example.jasper.domain.model.Item;
+import com.example.jaspersample.domain.model.Item;
 
 /**
  * 商品に関する帳票作成のインタフェース

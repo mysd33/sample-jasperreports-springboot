@@ -1,4 +1,4 @@
-package com.example.jasper.infra.reports;
+package com.example.jaspersample.infra.reports;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -16,8 +16,8 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
-import com.example.jasper.domain.model.Item;
-import com.example.jasper.domain.reports.ItemsReportCreator;
+import com.example.jaspersample.domain.model.Item;
+import com.example.jaspersample.domain.reports.ItemsReportCreator;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;

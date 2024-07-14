@@ -1,4 +1,4 @@
-package com.example.jasper.app.web.items;
+package com.example.jaspersample.app.web.items;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.jasper.domain.service.items.ItemsService;
+import com.example.jaspersample.domain.service.items.ItemsService;
 
 import lombok.RequiredArgsConstructor;
 

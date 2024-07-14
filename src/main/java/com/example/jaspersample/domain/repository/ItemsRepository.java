@@ -1,8 +1,8 @@
-package com.example.jasper.domain.repository;
+package com.example.jaspersample.domain.repository;
 
 import java.util.List;
 
-import com.example.jasper.domain.model.Item;
+import com.example.jaspersample.domain.model.Item;
 
 /**
  * 商品リポジトリ

@@ -93,8 +93,8 @@
 
     * とっかかりとして[参考情報](#参考情報)にあるサイトのサンプルAPを参考に、AP内でJasperReportのAPIを利用するとよいです。
     * サンプルAPだと、以下を確認するとよいです。
-        * [サンプルAPの例](src/main/java/com/example/jasper/infra/reports/ItemsReportCreatorImplByJasper.java)
-        * 以下、抜粋
+        * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/ItemsReportCreatorImplByJasper.java)
+       * 以下、抜粋
         
     ```java
     private static final String TITLE = "title";	

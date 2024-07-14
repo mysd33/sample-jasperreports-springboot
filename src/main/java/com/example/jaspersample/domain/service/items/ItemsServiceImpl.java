@@ -1,13 +1,13 @@
-package com.example.jasper.domain.service.items;
+package com.example.jaspersample.domain.service.items;
 
 import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.jasper.domain.model.Item;
-import com.example.jasper.domain.reports.ItemsReportCreator;
-import com.example.jasper.domain.repository.ItemsRepository;
+import com.example.jaspersample.domain.model.Item;
+import com.example.jaspersample.domain.reports.ItemsReportCreator;
+import com.example.jaspersample.domain.repository.ItemsRepository;
 
 import lombok.RequiredArgsConstructor;
 

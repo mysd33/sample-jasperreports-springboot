@@ -1,9 +1,9 @@
-package com.example.jasper.domain.service.items;
+package com.example.jaspersample.domain.service.items;
 
 import java.io.InputStream;
 import java.util.List;
 
-import com.example.jasper.domain.model.Item;
+import com.example.jaspersample.domain.model.Item;
 
 /**
  * 商品サービス

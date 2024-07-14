@@ -1,11 +1,11 @@
-package com.example.jasper.infra.repository;
+package com.example.jaspersample.infra.repository;
 
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.example.jasper.domain.model.Item;
-import com.example.jasper.domain.repository.ItemsRepository;
+import com.example.jaspersample.domain.model.Item;
+import com.example.jaspersample.domain.repository.ItemsRepository;
 
 /**
  * ItemsRepositoryのスタブ

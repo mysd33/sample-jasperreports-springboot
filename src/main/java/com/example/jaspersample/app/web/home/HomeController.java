@@ -1,4 +1,4 @@
-package com.example.jasper.app.web.home;
+package com.example.jaspersample.app.web.home;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

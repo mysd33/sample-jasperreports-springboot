@@ -1,4 +1,4 @@
-package com.example.jasper.domain.model;
+package com.example.jaspersample.domain.model;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.example.jasper;
+package com.example.jaspersample;
 
 import org.springframework.context.annotation.Configuration;
 
