@@ -93,54 +93,101 @@
 
     * とっかかりとして[参考情報](#参考情報)にあるサイトのサンプルAPを参考に、AP内でJasperReportのAPIを利用するとよいです。
     * サンプルAPだと、以下を確認するとよいです。
-        * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/ItemsReportCreatorImplByJasper.java)
-       * 以下、抜粋
+        * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/ItemsReportCreatorImplByJasperAPISimple.java)
+        * 以下、抜粋
         
     ```java
     private static final String TITLE = "title";	
-	private static final String REPORT_NAME = "商品一覧";
-	private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
-	private static final String JASPER_FILE_PATH = "item-report.jasper";
-    
+    private static final String REPORT_NAME = "商品一覧";
+    private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
+    private static final String JASPER_FILE_PATH = "item-report.jasper";
+
     // 商品一覧の帳票の作成例    
-	@Override
-	public InputStream createItemListReport(List<Item> items) {        
-    	JasperReport jasperReport;		
-		try {
+    @Override
+    public InputStream createItemListReport(List<Item> items) {        
+        JasperReport jasperReport;		
+        try {
             // コンパイル済の帳票様式がある場合はそれを利用する     
-			jasperReport = (JasperReport) JRLoader.loadObject(ResourceUtils.getFile(JASPER_FILE_PATH));
-		} catch (FileNotFoundException | JRException e) {
-			try {
-				// コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルする
-				File jrxmlFile = ResourceUtils.getFile(JRXML_FILE_PATH);
-				jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
-			} catch (FileNotFoundException | JRException e1) {
+            jasperReport = (JasperReport) JRLoader.loadObject(ResourceUtils.getFile(JASPER_FILE_PATH));
+        } catch (FileNotFoundException | JRException e) {
+            try {
+                // コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルする
+                File jrxmlFile = ResourceUtils.getFile(JRXML_FILE_PATH);
+                jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+                // コンパイル済の帳票様式を保存する
+                JRSaver.saveObject(jasperReport, JASPER_FILE_PATH);
+            } catch (FileNotFoundException | JRException e1) {
                 …
-			}
-		}
-		// 商品リストを、データソース（JRBeanCollectionDataSource）に指定
-		JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(items);
-		Map<String, Object> parameters = new HashMap<>();
-		// タイトルをパラメータに指定
-		parameters.put(TITLE, REPORT_NAME);
+            }
+        }
+        // 商品リストを、データソース（JRBeanCollectionDataSource）に指定
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(items);
+        Map<String, Object> parameters = new HashMap<>();
+        // タイトルをパラメータに指定
+        parameters.put(TITLE, REPORT_NAME);
 
-		try {
-			// 帳票様式に帳票データを渡して、帳票を作成する
-			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+        try {
+            // 帳票様式に帳票データを渡して、帳票を作成する
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-			// そのままバイト配列に出力する実装例
-			// PDF形式で出力
-			byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
-			return new ByteArrayInputStream(reportContent);
+            // そのままバイト配列に出力する実装例
+            // PDF形式で出力
+            byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
+            return new ByteArrayInputStream(reportContent);
             
-		} catch (JRException e) { // | IOException e) {
+        } catch (JRException e) { // | IOException e) {
             …
-		}
+        }
     }
     ```    
 
-* 日本語を出力する方法
-    * デフォルトのフォントだと日本語出力できないので、日本語フォントをダウンロードして指定する必要があります。
+* フレームワークによる帳票出力機能の例
+    * 上の例では、毎回帳票ごとにJasperReportのAPIを使って帳票を作成するため、帳票出力をもっと簡単に行うためのフレームワーク機能を実装している。
+        * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/ItemsReportCreatorImpl.java)
+        * 以下、抜粋
+
+    ```java
+    @Repository
+    // AbstractJasperReportCreatorを継承
+    // 型パラメータに帳票作成に必要なデータの型を指定
+    public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Item>> implements ItemsReportCreator {
+        private static final String TITLE = "title";
+        private static final String REPORT_NAME = "商品一覧";
+        private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
+
+        @Override
+        public InputStream createItemListReport(List<Item> items) {
+            // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すだけでPDF帳票作成が完了する
+            return createPDFReport(items);
+        }
+
+        // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
+        @Override
+        protected File getJRXMLFile() throws FileNotFoundException {
+            return ResourceUtils.getFile(JRXML_FILE_PATH);
+        }
+
+        // AbstractJasperReportCreatorのabstractメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す
+        @Override
+        protected Map<String, Object> getParameters(List<Item> data) {
+            Map<String, Object> parameters = new HashMap<>();
+            // タイトルをパラメータに指定
+            parameters.put(TITLE, REPORT_NAME);
+            return parameters;
+        }
+
+        // AbstractJasperReportCreatorのabstractメソッドgetDataSourceを実装して、データソースを返す
+        @Override
+        protected JRDataSource getDataSource(List<Item> data) {
+            return new JRBeanCollectionDataSource(data);
+        }
+
+    }
+    ```
+
+
+## 日本語を出力する方法
+* デフォルトのフォントだと日本語出力できないので、日本語フォントをダウンロードして指定する必要があります。
     * 日本語を利用する場合は、日本語フォントをダウンロードします。
         * [IPAフォント](https://moji.or.jp/ipafont/ipafontdownload/)
     * src/main/resources配下の任意のフォルダに、フォントファイルを配置します。

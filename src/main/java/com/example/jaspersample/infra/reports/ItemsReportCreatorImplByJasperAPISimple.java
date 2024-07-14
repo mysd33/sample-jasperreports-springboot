@@ -27,12 +27,17 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.engine.util.JRSaver;
 
 /**
- * JasperReportsを使ったItemsReportCreator実装クラス
+ * JasperReportsのAPIをべた書きして使用したItemsReportCreator実装クラス<br>
+ * 
+ * JasperReportsのAPIの基本的な使い方を理解するために残しているが、
+ * 通常は、フレームワーク機能を使ったItemsReportCreatorImplを利用する
+ * 
  */
-@Repository
-public class ItemsReportCreatorImplByJasper implements ItemsReportCreator {
+//@Repository
+public class ItemsReportCreatorImplByJasperAPISimple implements ItemsReportCreator {
 	private static final String TITLE = "title";	
 	private static final String REPORT_NAME = "商品一覧";
 	private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
@@ -40,8 +45,6 @@ public class ItemsReportCreatorImplByJasper implements ItemsReportCreator {
 
 	@Override
 	public InputStream createItemListReport(List<Item> items) {
-
-		// TODO: JasperReports APIを使った共通的な実装手順を、AP基盤機能に切り出す検討
 		JasperReport jasperReport;
 
 		try {
@@ -52,6 +55,8 @@ public class ItemsReportCreatorImplByJasper implements ItemsReportCreator {
 				// コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルする
 				File jrxmlFile = ResourceUtils.getFile(JRXML_FILE_PATH);
 				jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+				// コンパイル済の帳票様式を保存する
+				JRSaver.saveObject(jasperReport, JASPER_FILE_PATH);
 			} catch (FileNotFoundException | JRException e1) {
 				// TODO: 実際にはSystemExceptionでスロー
 				throw new RuntimeException("帳票テンプレートの読み込みに失敗しました", e1);
