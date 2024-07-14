@@ -11,6 +11,9 @@ import com.example.jaspersample.domain.repository.ItemsRepository;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * ItemsServiceの実装クラス
+ */
 @Service
 @RequiredArgsConstructor
 public class ItemsServiceImpl implements ItemsService {

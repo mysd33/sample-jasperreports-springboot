@@ -11,7 +11,7 @@ import com.example.jaspersample.domain.repository.ItemsRepository;
  * ItemsRepositoryのスタブ
  */
 @Repository
-public class ItemRepositoryStub implements ItemsRepository {
+public class ItemsRepositoryStub implements ItemsRepository {
 
 	@Override
 	public List<Item> findAll() {

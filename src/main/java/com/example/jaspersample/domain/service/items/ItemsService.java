@@ -19,6 +19,8 @@ public interface ItemsService {
 
 	/**
 	 * 商品一覧帳票を生成する
+	 * 
+	 * @return 商品一覧帳票の入力ストリーム
 	 */
 	InputStream createItemsReport();
 

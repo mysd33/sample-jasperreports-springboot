@@ -26,6 +26,11 @@
         * 出力される帳票のイメージ
             ![items.pdf](image/items-report.png)
 
+    * 取引一覧
+        * 「transactions.pdf」という名前のPDFファイルがダウンロードされます。
+
+        * 出力される帳票のイメージ
+            ![transactions.pdf](image/transactions-report.png)
 
 ## 帳票様式の確認・編集方法
 * 帳票様式を確認・編集したい場合は、Jasper Studioをインストールしてください。Jasper Studioは、Eclipseベースの帳票デザインツールです。 
@@ -147,7 +152,7 @@
         * 以下、抜粋
 
     ```java
-    @Repository
+    @Component
     // AbstractJasperReportCreatorを継承
     // 型パラメータに帳票作成に必要なデータの型を指定
     public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Item>> implements ItemsReportCreator {

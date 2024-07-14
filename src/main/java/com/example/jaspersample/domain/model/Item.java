@@ -3,6 +3,9 @@ package com.example.jaspersample.domain.model;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * 商品情報
+ */
 @Data
 @Builder
 public class Item {

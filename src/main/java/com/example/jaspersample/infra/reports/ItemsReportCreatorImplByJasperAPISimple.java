@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import com.example.jaspersample.domain.model.Item;
@@ -36,7 +36,7 @@ import net.sf.jasperreports.engine.util.JRSaver;
  * 通常は、フレームワーク機能を使ったItemsReportCreatorImplを利用する
  * 
  */
-//@Repository
+//@Component
 public class ItemsReportCreatorImplByJasperAPISimple implements ItemsReportCreator {
 	private static final String TITLE = "title";	
 	private static final String REPORT_NAME = "商品一覧";

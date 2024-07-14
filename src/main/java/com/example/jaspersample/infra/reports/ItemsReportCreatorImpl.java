@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import com.example.fw.reports.AbstractJasperReportCreator;
@@ -22,7 +22,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
  * 
  * 帳票出力のフレームワーク機能を利用して実装している
  */
-@Repository
+@Component
 // AbstractJasperReportCreatorを継承
 // 型パラメータに帳票作成に必要なデータの型を指定
 public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Item>> implements ItemsReportCreator {
