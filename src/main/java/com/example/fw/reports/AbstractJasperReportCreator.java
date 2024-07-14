@@ -3,11 +3,13 @@ package com.example.fw.reports;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Map;
 
-import org.springframework.util.ResourceUtils;
-
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -24,30 +26,51 @@ import net.sf.jasperreports.engine.util.JRSaver;
  * @param <T> 帳票データの型
  */
 public abstract class AbstractJasperReportCreator<T> {
+	// コンパイル済の帳票様式を保存する一時ディレクトリ名
+	private static final String TEMP_JASPER_DIR = "jasper";
+	private final Path jasperPath;
+
+	public AbstractJasperReportCreator() {
+		// コンパイル済の帳票様式を保存する一時ディレクトリを作成する
+		String tempDir = System.getProperty("java.io.tmpdir");
+		jasperPath = Path.of(tempDir, TEMP_JASPER_DIR);
+		System.out.println("jasperPath: " + jasperPath);
+		// 一時ディレクトリが存在しない場合は作成する
+		jasperPath.toFile().mkdirs();
+	}
+
+	@PostConstruct
+	public void init() throws FileNotFoundException, JRException {
+		// あらかじめjrxmlの帳票様式ファイルをコンパイルしておく
+		File jrxmlFile = getJRXMLFile();
+		File jasperFile = getJasperFile();
+		JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+		// コンパイル済の帳票様式を保存する
+		JRSaver.saveObject(jasperReport, jasperFile);
+	}
+
+	@PreDestroy
+	public void destroy() throws FileNotFoundException {
+		// jasperファイルを削除する
+		File jasperFile = getJasperFile();
+		jasperFile.delete();
+	}
+
 	/**
 	 * 帳票を作成する
 	 * 
 	 * @return 帳票のバイト配列
 	 */
 	public InputStream createPDFReport(T data) {
-		JasperReport jasperReport;
 
+		JasperReport jasperReport;
 		try {
 			// コンパイル済の帳票様式がある場合はそれを利用する
 			File jasperFile = getJasperFile();
 			jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
 		} catch (FileNotFoundException | JRException e) {
-			// TODO: @PostConstruct等で、コンパイル済にする修正を検討
-			try {
-				// コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルする
-				File jrxmlFile = getJRXMLFile();
-				jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
-				// コンパイル済の帳票様式を保存する
-				JRSaver.saveObject(jasperReport, getJasperFile().getAbsolutePath());
-			} catch (FileNotFoundException | JRException e1) {
-				// TODO: 実際にはSystemExceptionでスロー
-				throw new RuntimeException("帳票テンプレートの読み込みに失敗しました", e1);
-			}
+			// TODO: 実際にはSystemExceptionでスロー
+			throw new RuntimeException("コンパイル済帳票テンプレートの読み込みに失敗しました", e);
 		}
 		Map<String, Object> parameters = getParameters(data);
 		JRDataSource dataSource = getDataSource(data);
@@ -107,11 +130,8 @@ public abstract class AbstractJasperReportCreator<T> {
 	protected File getJasperFile() throws FileNotFoundException {
 		File jrxmlFile = getJRXMLFile();
 		String jasperFileName = jrxmlFile.getName().replace(".jrxml", ".jasper");
-		// 一時ディレクトリを取得
-		
-		
-		//TODO: ReadOnlyコンテナになることも想定し、一時ディレクトリ（/tmpディレクトリ）に保存するように修正
-		return ResourceUtils.getFile(jasperFileName);
+		// 一時フォルダにあるファイルパスを返却
+		return jasperPath.resolve(jasperFileName).toFile();
 	}
 
 }
