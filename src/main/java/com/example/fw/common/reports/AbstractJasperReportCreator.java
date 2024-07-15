@@ -160,7 +160,7 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * @throws FileNotFoundException jrxmlファイルが見つからない場合
 	 */
 	private JasperReport compileJRXML() throws JRException, FileNotFoundException {
-		// TODO: 取引一覧の帳票コンパイル時に以下のメッセージが出てしまう模様なので、実装方法を様子見
+		// TODO: JDK21の場合は、帳票コンパイル時に以下のメッセージが出てしまうため、様子見（JDK17では出力されない）
 		// 「n.s.j.engine.design.JRJdk13Compiler : ノート:
 		// クラス・パスに1つ以上のプロセッサが見つかったため、注釈処理が有効化されています。少なくとも1つのプロセッサが名前(-processor)で指定されるか、
 		// 検索パス(--processor-path、--processor-module-path)が指定されるか、注釈処理が明示的に有効化(-proc:only、-proc:full)されている場合を除き、
