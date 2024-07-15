@@ -180,7 +180,7 @@
     * 帳票出力のフレームワーク機能の実装例は[こちら](src/main/java/com/example/fw/common/reports/)
     
 * フレームワーク機能を利用した帳票出力の例を示します。
-    * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/ItemsReportCreatorImpl.java)
+    * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorImpl.java)
     
     * 以下、抜粋
 
