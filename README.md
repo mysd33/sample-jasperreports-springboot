@@ -45,7 +45,7 @@
         * [Jasper StudioのHTMLドキュメントはこちら](https://community.jaspersoft.com/documentation/jaspersoft%C2%AE-studio/tibco-jaspersoft-studio-user-guide/v900/jss-user-_-getting-started/)
 
 * サンプルAPの帳票様式について
-    * まずは、ライブラリの利用方法の勉強のため、自分で作成せず、[参考情報](#参考情報)にあるサンプルAPのサイトの様式（jrxmlファイル）を利用させていただきました。
+    * まずは、ライブラリの利用方法の勉強のため、自分でゼロから作成せず、[参考情報](#参考情報)にあるサンプルAPのサイトの様式（jrxmlファイル）を利用し修正して使用させていただきました。
         * 今後、自分でJasper Studioを使って帳票様式を作成してみて勉強しながら、サンプルAPを充実化させていく予定です。
 
     * 様式ファイル（jrxmlファイル）は、Japsper Studio7.x.xから以前のバージョンとフォーマットが違うため、JasperReportsのライブラリも7.x.xを使うには、Jasper Studio7.x.xで作ったものである必要があるようです。
@@ -54,7 +54,8 @@
 ## ライブラリの利用方法
 * pom.xmlにライブラリの依存関係を追加
     * APで、JasperReportのライブラリを使用するには、まずpom.xmlで依存ライブラリを追加します。サンプルAPでは最新の7.x.xを利用しています。
-    * [サンプルAPの例](pom.xml)
+        * SpringBootではlogback実装で動作するため、commons-loggingのjarを除外しておきます。
+    * [サンプルAPの例](pom.xml)    
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -147,9 +148,9 @@
     ```    
 
 * フレームワークによる帳票出力機能の例
-    * 上の例では、毎回帳票ごとにJasperReportのAPIを使って帳票を作成するため、JasperReportをあまり意識せず簡単に実装可能とする帳票出力のフレームワーク機能を実装している。
+    * 上の例では、毎回帳票ごとにJasperReportのAPIを使って帳票を作成するため、JasperReportをあまり意識せず簡単に実装可能とする帳票出力のフレームワーク機能を実装しています。
         * 帳票出力のフレームワーク機能の実装例は[こちら](src/main/java/com/example/fw/common/reports/)
-    * フレームワーク機能を利用した帳票出力の例を示す。
+    * フレームワーク機能を利用した帳票出力の例を示します。
         * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/ItemsReportCreatorImpl.java)
         * 以下、抜粋
 
