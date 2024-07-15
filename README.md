@@ -147,12 +147,14 @@
     ```    
 
 * フレームワークによる帳票出力機能の例
-    * 上の例では、毎回帳票ごとにJasperReportのAPIを使って帳票を作成するため、帳票出力をもっと簡単に行うためのフレームワーク機能を実装している。
+    * 上の例では、毎回帳票ごとにJasperReportのAPIを使って帳票を作成するため、JasperReportをあまり意識せず簡単に実装可能とする帳票出力のフレームワーク機能を実装している。
+        * 帳票出力のフレームワーク機能の実装例は[こちら](src/main/java/com/example/fw/common/reports/)
+    * フレームワーク機能を利用した帳票出力の例を示す。
         * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/ItemsReportCreatorImpl.java)
         * 以下、抜粋
 
     ```java
-    @Component
+    @ReportCreator
     // AbstractJasperReportCreatorを継承
     // 型パラメータに帳票作成に必要なデータの型を指定
     public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Item>> implements ItemsReportCreator {
