@@ -21,13 +21,13 @@
 * 今後、帳票を追加していく予定です
 
     * 商品一覧
-        * 「items.pdf」という名前のPDFファイルがダウンロードされます。
+        * 「商品一覧.pdf」という名前のPDFファイルがダウンロードされます。
 
         * 出力される帳票のイメージ
             ![items.pdf](image/items-report.png)
 
     * 取引一覧
-        * 「transactions.pdf」という名前のPDFファイルがダウンロードされます。
+        * 「取引一覧.pdf」という名前のPDFファイルがダウンロードされます。
 
         * 出力される帳票のイメージ
             ![transactions.pdf](image/transactions-report.png)
