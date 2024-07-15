@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import com.example.fw.common.reports.AbstractJasperReportCreator;
+import com.example.fw.common.reports.ReportCreator;
 import com.example.jaspersample.domain.model.Transaction;
 import com.example.jaspersample.domain.reports.TransactionsReportCreator;
 
@@ -22,7 +22,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
  * 
  * 帳票出力のフレームワーク機能を利用して実装している
  */
-@Component
+@ReportCreator
 public class TransactionsReportCreatorImpl extends AbstractJasperReportCreator<List<Transaction>>
 		implements TransactionsReportCreator {
 	private static final String TITLE = "title";

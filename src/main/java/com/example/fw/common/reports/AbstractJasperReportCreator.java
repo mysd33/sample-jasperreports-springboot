@@ -87,7 +87,7 @@ public abstract class AbstractJasperReportCreator<T> {
 				// 将来のリリースのjavacでは注釈処理が無効化される可能性があります。-Xlint:オプションを使用すると、このメッセージを非表示にできます。-proc:noneを使用すると、注釈処理を無効化できます。」
 
 			} catch (FileNotFoundException | JRException e1) {
-				throw new SystemException(e1, CommonFrameworkMessageIds.I_CM_FW_0003);
+				throw new SystemException(e1, CommonFrameworkMessageIds.E_CM_FW_9003);
 			}
 		}
 		Map<String, Object> parameters = getParameters(data);
@@ -113,7 +113,7 @@ public abstract class AbstractJasperReportCreator<T> {
 			// 一時ファイルのInputStreamを返す
 			// return new BufferedInputStream(new FileInputStream(tempFilePath.toFile()));
 		} catch (JRException e) { // | IOException e) {
-			throw new SystemException(e, CommonFrameworkMessageIds.I_CM_FW_0004);
+			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9004);
 		}
 	}
 
