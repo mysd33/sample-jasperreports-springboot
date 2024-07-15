@@ -50,7 +50,16 @@
 
     * 様式ファイル（jrxmlファイル）は、Japsper Studio7.x.xから以前のバージョンとフォーマットが違うため、JasperReportsのライブラリも7.x.xを使うには、Jasper Studio7.x.xで作ったものである必要があるようです。
         * 既存のものはver6.x.x以前の形式だったので、Japsper Studio7.x.xで開きなおして、最新のver7.x系のフォーマットに変換したものを使っています。
-  
+
+## Jasper Reportsの概念
+* Jaspersoft Studioのマニュアルにある[Concepts of JasperReports - Data Sources and Print Formats](https://community.jaspersoft.com/documentation/jaspersoft%C2%AE-studio/tibco-jaspersoft-studio-user-guide/v900/jss-user-_-data-sources-print-formats/#jss-user_basicnotions_2905227221_1018389)の記載が分かりやすいです。
+    * JasperReportsは、Jaspersoft Studioでデザインした帳票をjrxmlというXML形式で保存します。    
+    * Javaのコードでは、jrxmlファイルをコンパイルしjasperファイルを生成します。
+    * Jasperファイルに、帳票様式に定義したパラメータデータ(Map)と、帳票様式が参照するデータソース（JavaBeanのコレクションデータやDB等のJRDataSourceインタフェース）を帳票出力するデータとして渡すことで、帳票オブジェクト(JasperPrint)を作成します。
+    * 帳票オブジェクト(JasperPrint)を、PDFやExcel等の形式にエクスポーすることで、帳票を出力します。
+
+![JasperReportsの概念](https://content.invisioncic.com/i328763/monthly_2024_01/jss-jr-schema-xlsx.png.d4c7b77249240ab0a87151e5feb6f011.png)  
+
 ## ライブラリの利用方法
 * pom.xmlにライブラリの依存関係を追加
     * APで、JasperReportのライブラリを使用するには、まずpom.xmlで依存ライブラリを追加します。サンプルAPでは最新の7.x.xを利用しています。
@@ -94,7 +103,7 @@
 </project>        
 ```
 
-* JasperのAPIの利用方法
+* Jasper ReportsのAPIの利用方法
     * 公式のサンプルコードやリファレンスは[JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports?tab=readme-ov-file#jasperreports---free-java-reporting-library)を確認します。
 
     * とっかかりとして[参考情報](#参考情報)にあるサイトのサンプルAPを参考に、AP内でJasperReportのAPIを利用するとよいです。
