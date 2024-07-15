@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
-import com.example.fw.common.logging.MonitoringLogger;
 import com.example.fw.common.message.CommonFrameworkMessageIds;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
 
@@ -28,6 +27,8 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSaver;
+
+// TODO: SubReportの対応を検討
 
 /**
  * Jasper Reportsを使用して、帳票作成のための基底クラス
@@ -46,19 +47,13 @@ public abstract class AbstractJasperReportCreator<T> {
 	}
 
 	@PostConstruct
-	public void init() throws FileNotFoundException, JRException {
+	public void init() {
 		// コンパイル済の帳票様式を保存する一時ディレクトリを作成する
 		String tempDir = System.getProperty("java.io.tmpdir");
 		jasperPath = Path.of(tempDir, config.getJasperFileTmpdir());
 		// 一時ディレクトリが存在しない場合は作成する
 		jasperPath.toFile().mkdirs();
 		appLogger.debug("jasperPath: {}", jasperPath);
-		// あらかじめjrxmlの帳票様式ファイルをコンパイルしておく
-		File jrxmlFile = getJRXMLFile();
-		File jasperFile = getJasperFile();
-		JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
-		// コンパイル済の帳票様式を保存する
-		JRSaver.saveObject(jasperReport, jasperFile);
 	}
 
 	@PreDestroy
@@ -74,23 +69,38 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * @return 帳票のバイト配列
 	 */
 	public InputStream createPDFReport(final T data) {
-
 		JasperReport jasperReport;
 		try {
-			// コンパイル済の帳票様式がある場合はそれを利用する
 			File jasperFile = getJasperFile();
+			// コンパイル済の帳票様式がある場合はそれを利用する
 			jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
 		} catch (FileNotFoundException | JRException e) {
-			throw new SystemException(e, CommonFrameworkMessageIds.I_CM_FW_0003);
+			try {
+				// コンパイル済の帳票様式がない場合はコンパイル処理するように実装する
+				jasperReport = compileJRXML();
+
+				// TODO: @PostConstructで、あらかじめコンパイル処理するように実装したところ、、複数帳票出力クラスがある場合に
+				// 以下のメッセージが出てしまうため、サンプルAPと同様に、初回実行時になければコンパイル処理するように実装するように戻している。
+				// 「n.s.j.engine.design.JRJdk13Compiler : ノート:
+				// クラス・パスに1つ以上のプロセッサが見つかったため、注釈処理が有効化されています。少なくとも1つのプロセッサが名前(-processor)で指定されるか、
+				// 検索パス(--processor-path、--processor-module-path)が指定されるか、注釈処理が明示的に有効化(-proc:only、-proc:full)されている場合を除き、
+				// 将来のリリースのjavacでは注釈処理が無効化される可能性があります。-Xlint:オプションを使用すると、このメッセージを非表示にできます。-proc:noneを使用すると、注釈処理を無効化できます。」
+
+			} catch (FileNotFoundException | JRException e1) {
+				throw new SystemException(e1, CommonFrameworkMessageIds.I_CM_FW_0003);
+			}
 		}
 		Map<String, Object> parameters = getParameters(data);
 		JRDataSource dataSource = getDataSource(data);
 		try {
 			// 帳票様式に帳票データを渡して、帳票を作成する
+			// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperFillManager.html
 			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-			// そのままバイト配列に出力する実装例
 			// PDF形式で出力
+			// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperExportManager.html
+
+			// そのままバイト配列に出力する実装例
 			byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
 			return new ByteArrayInputStream(reportContent);
 
@@ -142,6 +152,25 @@ public abstract class AbstractJasperReportCreator<T> {
 		String jasperFileName = jrxmlFile.getName().replace(".jrxml", ".jasper");
 		// 一時フォルダにあるファイルパスを返却
 		return jasperPath.resolve(jasperFileName).toFile();
+	}
+
+	/**
+	 * jrxmlの帳票様式ファイルをコンパイルする
+	 * 
+	 * @return コンパイル済の帳票様式
+	 * @throws JRException           様式のコンパイルエラーまたはコンパイル済の帳票の保存時のエラー
+	 * @throws FileNotFoundException jrxmlファイルが見つからない場合
+	 */
+	private JasperReport compileJRXML() throws JRException, FileNotFoundException {
+		File jrxmlFile = getJRXMLFile();
+		File jasperFile = getJasperFile();
+		// jrxmlの帳票様式ファイルをコンパイルする
+		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperCompileManager.html
+		JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+		// コンパイル済の帳票様式を保存する
+		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/util/JRSaver.html
+		JRSaver.saveObject(jasperReport, jasperFile);
+		return jasperReport;
 	}
 
 }
