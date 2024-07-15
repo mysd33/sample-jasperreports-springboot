@@ -24,20 +24,23 @@
         * 「商品一覧.pdf」という名前のPDFファイルがダウンロードされます。
         * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイル（jrxmlファイル）を利用し修正して使用させていただきました。
         * 出力される帳票のイメージ
-            ![items.pdf](image/items-report.png)
+
+        ![items.pdf](image/items-report.png)
 
     * 取引一覧
         * 「取引一覧.pdf」という名前のPDFファイルがダウンロードされます。
         * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイルを利用し修正して使用させていただきました。
             * 某帳票製品の帳票サンプルを参考にして、同じようにデザインできるか試してみました。
         * 出力される帳票のイメージ
-            ![transactions.pdf](image/transactions-report.png)
+
+        ![transactions.pdf](image/transactions-report.png)
     
     * 請求書
         * 「請求書.pdf」という名前のPDFファイルがダウンロードされます。
         * 自分でゼロから作成した様式ファイルです。
         * 出力される帳票のイメージ
-            ![invoice.pdf](image/invoice-report.png)
+        
+        ![invoice.pdf](image/invoice-report.png)
 
 ## 帳票様式の確認・編集方法
 * 帳票様式を確認・編集したい場合は、Jasper Studioをインストールしてください。Jasper Studioは、Eclipseベースの帳票デザインツールです。 
