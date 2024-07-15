@@ -24,6 +24,7 @@
         * 「商品一覧.pdf」という名前のPDFファイルがダウンロードされます。
             * 実際の[PDFファイル](pdf/商品一覧.pdf)
         * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイル（jrxmlファイル）を利用し修正して使用させていただきました。
+            * 実際の[帳票様式(jrml)ファイル](src/main/resources/reports/item-report.jrxml)
         * 出力される帳票のイメージ
 
         ![items.pdf](image/items-report.png)        
@@ -32,6 +33,7 @@
         * 「取引一覧.pdf」という名前のPDFファイルがダウンロードされます。
             * 実際の[PDFファイル](pdf/取引一覧.pdf)
         * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイルを利用し修正して使用させていただきました。
+            * 実際の[帳票様式(jrml)ファイル](src/main/resources/reports/transaction-report.jrxml)
         * 出力される帳票のイメージ
 
         ![transactions.pdf](image/transactions-report.png)
@@ -40,7 +42,8 @@
         * 「請求書.pdf」という名前のPDFファイルがダウンロードされます。
             * 実際の[PDFファイル](pdf/請求書.pdf)
         * 自分でゼロから作成した様式ファイルです。
-            * 某帳票製品の帳票サンプルを参考にして、同じようにデザインできるか試してみました。
+            * 実際の[帳票様式(jrml)ファイル](src/main/resources/reports/invoice-report.jrxml)
+            * 某帳票製品の帳票サンプルを参考にして、同じようにデザインできるか試してみました。            
         * 出力される帳票のイメージ
         * 読み取りパスワード「1234」で設定しています。ファイルを開く際にパスワードを入力するようになります。
         
@@ -59,7 +62,7 @@
         * [Jasper StudioのHTMLドキュメントはこちら](https://community.jaspersoft.com/documentation/jaspersoft%C2%AE-studio/tibco-jaspersoft-studio-user-guide/v900/jss-user-_-getting-started/)
 
 * 古いバージョンの帳票様式について
-    * 最初は、ライブラリの利用方法の勉強のため、自分でゼロから作成せず、[参考情報](#参考情報)にあるサンプルコードの様式ファイル（jrxmlファイル）を利用し修正して使用させていただきました。。
+    * 最初は、ライブラリの利用方法の勉強のため、自分でゼロから作成せず、[参考情報](#参考情報)にあるサンプルコードの様式ファイル（jrxmlファイル）を利用し修正して使用させていただきました。
     * [参考情報](#参考情報)のサンプルコードの様式ファイル（jrxmlファイル）は、Japsper Studio7.x.xから以前のバージョンとフォーマットが違うため、JasperReportsのライブラリも7.x.xを使うには、Jasper Studio7.x.xで作ったものである必要があるようです。
         * 既存のものはver6.x.x以前の形式だったので、Japsper Studio7.x.xで開きなおして、最新のver7.x系のフォーマットに変換したものを使っています。
 
