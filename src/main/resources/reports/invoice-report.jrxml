@@ -56,12 +56,11 @@
 		<element kind="textField" uuid="26a63280-3ced-4707-add4-32f815e2f28a" x="341" y="135" width="206" height="16" fontName="ipaexm">
 			<expression><![CDATA["電話："+$P{billingSourceTel}]]></expression>
 		</element>
-	</title>
-	<pageHeader height="53" splitType="Stretch">
-		<element kind="textField" uuid="ede35ec2-dd1c-4d0c-95ed-7ed577a0ee0e" x="341" y="-20" width="206" height="16" fontName="ipaexm">
+		<element kind="textField" uuid="ede35ec2-dd1c-4d0c-95ed-7ed577a0ee0e" x="341" y="151" width="206" height="16" fontName="ipaexm">
 			<expression><![CDATA["担当者："+$P{billingSourceManager}]]></expression>
 		</element>
-	</pageHeader>
+	</title>
+	<pageHeader height="28" splitType="Stretch"/>
 	<columnHeader height="61" splitType="Stretch"/>
 	<detail>
 		<band height="125" splitType="Stretch"/>
