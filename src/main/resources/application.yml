@@ -1,3 +1,8 @@
 spring:
   application:
     name: sample-jasperreports-springboot
+  profiles:
+    active:
+    - dev
+    - log_default  #logging in default format
+#    - log_container  #logging in json format    

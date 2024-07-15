@@ -3,13 +3,22 @@ package com.example.fw.common.reports;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.example.fw.common.exception.SystemException;
+import com.example.fw.common.logging.ApplicationLogger;
+import com.example.fw.common.logging.LoggerFactory;
+import com.example.fw.common.logging.MonitoringLogger;
+import com.example.fw.common.message.CommonFrameworkMessageIds;
+import com.example.fw.common.reports.config.ReportsConfigurationProperties;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -25,22 +34,25 @@ import net.sf.jasperreports.engine.util.JRSaver;
  * 
  * @param <T> 帳票データの型
  */
+@Slf4j
 public abstract class AbstractJasperReportCreator<T> {
-	// コンパイル済の帳票様式を保存する一時ディレクトリ名
-	private static final String TEMP_JASPER_DIR = "jasper";
-	private final Path jasperPath;
+	private static final ApplicationLogger appLogger = LoggerFactory.getApplicationLogger(log);
+	private Path jasperPath;
+	private ReportsConfigurationProperties config;
 
-	public AbstractJasperReportCreator() {
-		// コンパイル済の帳票様式を保存する一時ディレクトリを作成する
-		String tempDir = System.getProperty("java.io.tmpdir");
-		jasperPath = Path.of(tempDir, TEMP_JASPER_DIR);
-		//System.out.println("jasperPath: " + jasperPath);
-		// 一時ディレクトリが存在しない場合は作成する
-		jasperPath.toFile().mkdirs();
+	@Autowired
+	public void setConfig(ReportsConfigurationProperties config) {
+		this.config = config;
 	}
 
 	@PostConstruct
 	public void init() throws FileNotFoundException, JRException {
+		// コンパイル済の帳票様式を保存する一時ディレクトリを作成する
+		String tempDir = System.getProperty("java.io.tmpdir");
+		jasperPath = Path.of(tempDir, config.getJasperFileTmpdir());
+		// 一時ディレクトリが存在しない場合は作成する
+		jasperPath.toFile().mkdirs();
+		appLogger.debug("jasperPath: {}", jasperPath);
 		// あらかじめjrxmlの帳票様式ファイルをコンパイルしておく
 		File jrxmlFile = getJRXMLFile();
 		File jasperFile = getJasperFile();
@@ -69,8 +81,7 @@ public abstract class AbstractJasperReportCreator<T> {
 			File jasperFile = getJasperFile();
 			jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
 		} catch (FileNotFoundException | JRException e) {
-			// TODO: 実際にはSystemExceptionでスロー
-			throw new RuntimeException("コンパイル済帳票テンプレートの読み込みに失敗しました", e);
+			throw new SystemException(e, CommonFrameworkMessageIds.I_CM_FW_0003);
 		}
 		Map<String, Object> parameters = getParameters(data);
 		JRDataSource dataSource = getDataSource(data);
@@ -92,8 +103,7 @@ public abstract class AbstractJasperReportCreator<T> {
 			// 一時ファイルのInputStreamを返す
 			// return new BufferedInputStream(new FileInputStream(tempFilePath.toFile()));
 		} catch (JRException e) { // | IOException e) {
-			// TODO: 実際にはSystemExceptionでスロー
-			throw new RuntimeException("帳票の作成に失敗しました", e);
+			throw new SystemException(e, CommonFrameworkMessageIds.I_CM_FW_0004);
 		}
 	}
 
