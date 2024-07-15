@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
+import com.example.fw.common.logging.MonitoringLogger;
 import com.example.fw.common.message.CommonFrameworkMessageIds;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
 
@@ -38,8 +39,9 @@ import net.sf.jasperreports.engine.util.JRSaver;
 @Slf4j
 public abstract class AbstractJasperReportCreator<T> {
 	private static final ApplicationLogger appLogger = LoggerFactory.getApplicationLogger(log);
-	private Path jasperPath;
+	private static final MonitoringLogger monitoringLogger = LoggerFactory.getMonitoringLogger(log);
 	private ReportsConfigurationProperties config;
+	private Path jasperPath;
 
 	@Autowired
 	public void setConfig(ReportsConfigurationProperties config) {
@@ -47,13 +49,21 @@ public abstract class AbstractJasperReportCreator<T> {
 	}
 
 	@PostConstruct
-	public void init() {
+	public void init() throws FileNotFoundException, JRException {
 		// コンパイル済の帳票様式を保存する一時ディレクトリを作成する
 		String tempDir = System.getProperty("java.io.tmpdir");
 		jasperPath = Path.of(tempDir, config.getJasperFileTmpdir());
 		// 一時ディレクトリが存在しない場合は作成する
 		jasperPath.toFile().mkdirs();
 		appLogger.debug("jasperPath: {}", jasperPath);
+		// あらかじめ帳票様式ファイルをコンパイルする
+		try {
+			compileJRXML();
+		} catch (FileNotFoundException | JRException e) {
+			monitoringLogger.error(CommonFrameworkMessageIds.E_CM_FW_9003, e);
+			throw e;
+		}
+
 	}
 
 	@PreDestroy
@@ -69,29 +79,17 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * @return 帳票のバイト配列
 	 */
 	public InputStream createPDFReport(final T data) {
-		JasperReport jasperReport;
-		try {
-			File jasperFile = getJasperFile();
-			// コンパイル済の帳票様式がある場合はそれを利用する
-			jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
-		} catch (FileNotFoundException | JRException e) {
-			try {
-				// コンパイル済の帳票様式がない場合はコンパイル処理するように実装する
-				jasperReport = compileJRXML();
-
-				// TODO: @PostConstructで、あらかじめコンパイル処理するように実装したところ、、複数帳票出力クラスがある場合に
-				// 以下のメッセージが出てしまうため、サンプルAPと同様に、初回実行時になければコンパイル処理するように実装するように戻している。
-				// 「n.s.j.engine.design.JRJdk13Compiler : ノート:
-				// クラス・パスに1つ以上のプロセッサが見つかったため、注釈処理が有効化されています。少なくとも1つのプロセッサが名前(-processor)で指定されるか、
-				// 検索パス(--processor-path、--processor-module-path)が指定されるか、注釈処理が明示的に有効化(-proc:only、-proc:full)されている場合を除き、
-				// 将来のリリースのjavacでは注釈処理が無効化される可能性があります。-Xlint:オプションを使用すると、このメッセージを非表示にできます。-proc:noneを使用すると、注釈処理を無効化できます。」
-
-			} catch (FileNotFoundException | JRException e1) {
-				throw new SystemException(e1, CommonFrameworkMessageIds.E_CM_FW_9003);
-			}
-		}
 		Map<String, Object> parameters = getParameters(data);
 		JRDataSource dataSource = getDataSource(data);
+		JasperReport jasperReport = null;
+		try {
+			File jasperFile = getJasperFile();
+			// コンパイル済の帳票様式を読み込む
+			jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
+		} catch (FileNotFoundException | JRException e) {
+			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9004);
+		}
+
 		try {
 			// 帳票様式に帳票データを渡して、帳票を作成する
 			// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperFillManager.html
@@ -113,7 +111,7 @@ public abstract class AbstractJasperReportCreator<T> {
 			// 一時ファイルのInputStreamを返す
 			// return new BufferedInputStream(new FileInputStream(tempFilePath.toFile()));
 		} catch (JRException e) { // | IOException e) {
-			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9004);
+			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9005);
 		}
 	}
 
@@ -162,14 +160,22 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * @throws FileNotFoundException jrxmlファイルが見つからない場合
 	 */
 	private JasperReport compileJRXML() throws JRException, FileNotFoundException {
+		// TODO: 取引一覧の帳票コンパイル時に以下のメッセージが出てしまう模様なので、実装方法を様子見
+		// 「n.s.j.engine.design.JRJdk13Compiler : ノート:
+		// クラス・パスに1つ以上のプロセッサが見つかったため、注釈処理が有効化されています。少なくとも1つのプロセッサが名前(-processor)で指定されるか、
+		// 検索パス(--processor-path、--processor-module-path)が指定されるか、注釈処理が明示的に有効化(-proc:only、-proc:full)されている場合を除き、
+		// 将来のリリースのjavacでは注釈処理が無効化される可能性があります。-Xlint:オプションを使用すると、このメッセージを非表示にできます。-proc:noneを使用すると、注釈処理を無効化できます。」
+
 		File jrxmlFile = getJRXMLFile();
 		File jasperFile = getJasperFile();
+		appLogger.debug("帳票様式のコンパイル:{}", jrxmlFile.getAbsolutePath());
 		// jrxmlの帳票様式ファイルをコンパイルする
 		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperCompileManager.html
 		JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
 		// コンパイル済の帳票様式を保存する
 		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/util/JRSaver.html
 		JRSaver.saveObject(jasperReport, jasperFile);
+		appLogger.debug("コンパイル結果ファイル:{}", jasperFile.getAbsolutePath());
 		return jasperReport;
 	}
 
