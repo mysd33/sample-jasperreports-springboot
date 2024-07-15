@@ -203,9 +203,11 @@
         * [サンプルAPの例](src/main/resources/fonts/fontsfamily-ipa.xml)
     * この定義ファイルのfontFamilyのname属性の値と同じものを、様式ファイルのフォント名（fontName）にしておきます。
         * [サンプルAPの例](src/main/resources/reports/item-report.jrxml)
-        * TODO: デザイナ（Jasper Studio）側のカスタムフォント設定も調査する
     * src/main/resources配下に、jasperreports_extension.propertiesファイルを作成し、フォントを指定します。
         * [サンプルAPの例](src/main/resources/jasperreports_extension.properties)
+* Jasper Studioで帳票様式を作成する場合は、フォントを指定する方法は、[Jasper Studioのドキュメント](https://community.jaspersoft.com/documentation/jaspersoft%C2%AE-studio/tibco-jaspersoft-studio-user-guide/v900/jss-user-_-fonts-intro-reference/)を参照してください。
+    *  Window > Preferences > Jaspersoft Studio > Fonts. でフォントを追加する設定ができます。
+
 
 ## 参考情報
 * [Jaspersoft community editionの公式サイト](https://www.jaspersoft.com/products/jaspersoft-community)
