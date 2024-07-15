@@ -37,13 +37,12 @@ public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order>
 
 	@Override
 	protected Map<String, Object> getParameters(Order data) {
+		// 鏡部分のデータをパラメータとして設定
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("orderId", data.getId());		
 		parameters.put("customerZip", data.getCustomer().getZip());
 		parameters.put("customerAddress", data.getCustomer().getAddress());
 		parameters.put("customerName", data.getCustomer().getName());
-		//TODO: 合計金額を計算
-		parameters.put("totalAmount", 27510000);
 		parameters.put("billingSourceName", data.getBillingSource().getName());
 		parameters.put("billingSourceZip", data.getBillingSource().getZip());
 		parameters.put("billingSourceAddress", data.getBillingSource().getAddress());

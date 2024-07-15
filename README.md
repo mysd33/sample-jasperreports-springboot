@@ -22,15 +22,22 @@
 
     * 商品一覧
         * 「商品一覧.pdf」という名前のPDFファイルがダウンロードされます。
-
+        * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイル（jrxmlファイル）を利用し修正して使用させていただきました。
         * 出力される帳票のイメージ
             ![items.pdf](image/items-report.png)
 
     * 取引一覧
         * 「取引一覧.pdf」という名前のPDFファイルがダウンロードされます。
-
+        * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイルを利用し修正して使用させていただきました。
+            * 某帳票製品の帳票サンプルを参考にして、同じようにデザインできるか試してみました。
         * 出力される帳票のイメージ
             ![transactions.pdf](image/transactions-report.png)
+    
+    * 請求書
+        * 「請求書.pdf」という名前のPDFファイルがダウンロードされます。
+        * 自分でゼロから作成した様式ファイルです。
+        * 出力される帳票のイメージ
+            ![invoice.pdf](image/invoice-report.png)
 
 ## 帳票様式の確認・編集方法
 * 帳票様式を確認・編集したい場合は、Jasper Studioをインストールしてください。Jasper Studioは、Eclipseベースの帳票デザインツールです。 
@@ -44,11 +51,9 @@
     * [JasperSoftのコミュニティのドキュメントサイト](https://community.jaspersoft.com/documentation/)からドキュメントがダウンロードできます。
         * [Jasper StudioのHTMLドキュメントはこちら](https://community.jaspersoft.com/documentation/jaspersoft%C2%AE-studio/tibco-jaspersoft-studio-user-guide/v900/jss-user-_-getting-started/)
 
-* サンプルAPの帳票様式について
-    * まずは、ライブラリの利用方法の勉強のため、自分でゼロから作成せず、[参考情報](#参考情報)にあるサンプルAPのサイトの様式（jrxmlファイル）を利用し修正して使用させていただきました。
-        * 今後、自分でJasper Studioを使って帳票様式を作成してみて勉強しながら、サンプルAPを充実化させていく予定です。
-
-    * 様式ファイル（jrxmlファイル）は、Japsper Studio7.x.xから以前のバージョンとフォーマットが違うため、JasperReportsのライブラリも7.x.xを使うには、Jasper Studio7.x.xで作ったものである必要があるようです。
+* 古いバージョンの帳票様式について
+    * 最初は、ライブラリの利用方法の勉強のため、自分でゼロから作成せず、[参考情報](#参考情報)にあるサンプルコードの様式ファイル（jrxmlファイル）を利用し修正して使用させていただきました。。
+    * [参考情報](#参考情報)のサンプルコードの様式ファイル（jrxmlファイル）は、Japsper Studio7.x.xから以前のバージョンとフォーマットが違うため、JasperReportsのライブラリも7.x.xを使うには、Jasper Studio7.x.xで作ったものである必要があるようです。
         * 既存のものはver6.x.x以前の形式だったので、Japsper Studio7.x.xで開きなおして、最新のver7.x系のフォーマットに変換したものを使っています。
 
 ## Jasper Reportsの概念

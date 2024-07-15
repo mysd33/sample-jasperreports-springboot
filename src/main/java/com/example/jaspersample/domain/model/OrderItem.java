@@ -24,6 +24,7 @@ public class OrderItem {
 	// 金額
 	private int amount;
 	// 備考
-	private String note;
-	
+	@Builder.Default
+	private String note = "";
+
 }
