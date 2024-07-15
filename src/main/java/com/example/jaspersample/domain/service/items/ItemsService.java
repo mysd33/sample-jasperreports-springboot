@@ -5,7 +5,7 @@ import java.util.List;
 import com.example.jaspersample.domain.model.Item;
 
 /**
- * 商品サービス
+ * 商品サービスインタフェース
  */
 public interface ItemsService {
 

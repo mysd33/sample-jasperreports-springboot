@@ -14,13 +14,12 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
-//@Transactional
+// @Transactional
 public class ItemsServiceImpl implements ItemsService {
 	private final ItemsRepository itemRepository;
 
-
 	@Override
-	//@Transactional(readOnly = true)
+	// @Transactional(readOnly = true)
 	public List<Item> findAll() {
 		return itemRepository.findAll();
 	}

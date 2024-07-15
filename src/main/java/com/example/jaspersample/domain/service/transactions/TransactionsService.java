@@ -5,7 +5,7 @@ import java.util.List;
 import com.example.jaspersample.domain.model.Transaction;
 
 /**
- * 取引サービス
+ * 取引サービスインタフェース
  */
 public interface TransactionsService {
 	/**

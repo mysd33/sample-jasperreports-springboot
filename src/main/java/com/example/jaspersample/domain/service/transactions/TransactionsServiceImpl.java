@@ -17,11 +17,11 @@ import lombok.RequiredArgsConstructor;
 //@Transactional
 public class TransactionsServiceImpl implements TransactionsService {
 	private final TransactionsRepository transactionRepository;
-	
+
 	@Override
-	//@Transactional(readOnly = true)
+	// @Transactional(readOnly = true)
 	public List<Transaction> findAll() {
 		return transactionRepository.findAll();
 	}
-	
+
 }
