@@ -1,9 +1,14 @@
 package com.example.fw.common.reports;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -28,6 +33,10 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSaver;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.pdf.JRPdfExporter;
+import net.sf.jasperreports.pdf.SimplePdfExporterConfiguration;
 
 // TODO: SubReportの対応を検討
 
@@ -44,7 +53,7 @@ public abstract class AbstractJasperReportCreator<T> {
 	private Path jasperPath;
 
 	@Autowired
-	public void setConfig(ReportsConfigurationProperties config) {
+	public void setConfig(final ReportsConfigurationProperties config) {
 		this.config = config;
 	}
 
@@ -76,9 +85,21 @@ public abstract class AbstractJasperReportCreator<T> {
 	/**
 	 * 帳票を作成する
 	 * 
-	 * @return 帳票のバイト配列
+	 * @param data 帳票データ
+	 * @return PDFファイルのInputStreamデータ
 	 */
 	public InputStream createPDFReport(final T data) {
+		return createPDFReport(data, PDFOptions.builder().build());
+	}
+
+	/**
+	 * 帳票を作成する
+	 * 
+	 * @param data    帳票データ
+	 * @param options PDF出力時のオプション設定
+	 * @return PDFファイルのInputStreamデータ
+	 */
+	public InputStream createPDFReport(final T data, final PDFOptions options) {
 		Map<String, Object> parameters = getParameters(data);
 		JRDataSource dataSource = getDataSource(data);
 		JasperReport jasperReport = null;
@@ -99,17 +120,7 @@ public abstract class AbstractJasperReportCreator<T> {
 			// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperExportManager.html
 
 			// そのままバイト配列に出力する実装例
-			byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
-			return new ByteArrayInputStream(reportContent);
-
-			// メモリを極力使わないよう、PDFのファイルサイズが大きい場合も考慮し一時ファイルに出力してInputStreamを返す実装例
-			// Path tempFilePath = Files.createTempFile("item-report", ".pdf");
-			// tempFilePath.toFile().deleteOnExit();
-			// PDF形式で出力
-			// JasperExportManager.exportReportToPdfFile(jasperPrint,
-			// tempFilePath.toString());
-			// 一時ファイルのInputStreamを返す
-			// return new BufferedInputStream(new FileInputStream(tempFilePath.toFile()));
+			return exportPDF(jasperPrint, options);
 		} catch (JRException e) { // | IOException e) {
 			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9005);
 		}
@@ -177,6 +188,58 @@ public abstract class AbstractJasperReportCreator<T> {
 		JRSaver.saveObject(jasperReport, jasperFile);
 		appLogger.debug("コンパイル結果ファイル:{}", jasperFile.getAbsolutePath());
 		return jasperReport;
+	}
+
+	/**
+	 * PDF形式で帳票を出力する
+	 * 
+	 * @param jasperPrint JasperPrintオブジェクト
+	 * @param options     PDF出力時のオプション設定
+	 * 
+	 * @return PDFファイルのInputStreamデータ
+	 * @throws JRException JasperReportsでPDFのエクスポートに失敗した場合
+	 */
+	private InputStream exportPDF(final JasperPrint jasperPrint, PDFOptions options) throws JRException {
+		// 通常のPDF出力の実装例
+		// byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
+		// return new ByteArrayInputStream(reportContent);
+
+		// PDFのパスワード等を指定する場合には、直接JRPdfExporterインスタンスを作成しないとダメそう
+		// https://javadoc.io/doc/net.sf.jasperreports/jasperreports-pdf/latest/net/sf/jasperreports/pdf/JRPdfExporter.html
+		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/pdf/PdfExporterConfiguration.html#getUserPassword()
+		JRPdfExporter exporter = new JRPdfExporter();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		if (options.isEncrypted()) {
+			// PDFのパスワード等を指定する場合の設定
+			SimplePdfExporterConfiguration configuration = new SimplePdfExporterConfiguration();
+			configuration.setEncrypted(true);
+			configuration.setUserPassword(options.getUserPassword());
+			configuration.setOwnerPassword(options.getOwnerPassword());
+			exporter.setConfiguration(configuration);
+		}
+		exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
+		exporter.exportReport();
+		return new ByteArrayInputStream(baos.toByteArray());
+	}
+
+	// 現状未使用だが、実装例として残しておき、必要な場合、こちらに切り替えることも検討
+	/**
+	 * PDF形式で帳票を出力する際、ファイルサイズが大きい場合の実装例
+	 * 
+	 * @return PDFファイルのInputStreamデータ
+	 * @throws JRException JasperReportsでPDFのエクスポートに失敗した場合
+	 * @throws IOException
+	 */
+	private InputStream exportPDFForLargeFile(final JasperPrint jasperPrint) throws JRException, IOException {
+		// メモリを極力使わないよう、PDFのファイルサイズが大きい場合も考慮し一時ファイルに出力してInputStreamを返す実装例
+		Path tempFilePath = Files.createTempFile("item-report", ".pdf");
+		tempFilePath.toFile().deleteOnExit();
+		// PDF形式で出力
+		JasperExportManager.exportReportToPdfFile(jasperPrint, tempFilePath.toString());
+		// 一時ファイルのInputStreamを返す
+		return new BufferedInputStream(new FileInputStream(tempFilePath.toFile()));
 	}
 
 }

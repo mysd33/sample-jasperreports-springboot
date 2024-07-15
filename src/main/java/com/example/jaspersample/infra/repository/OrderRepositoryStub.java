@@ -20,8 +20,7 @@ public class OrderRepositoryStub implements OrderRepository {
 	public Order findOne(String id) {
 		return Order.builder()//
 				.id(id)
-				// TODO: 注文情報を設定
-				.customer(Customer.builder().name("○○株式会社").zip("160-0023").address("東京都新宿区7-7-7").build())
+				.customer(Customer.builder().name("○○株式会社").zip("160-0023").address("東京都新宿区7-7-7").pdfPassword("1234").build())
 				.billingSource(BillingSource.builder().name("××株式会社").zip("160-0023").address("東京都新宿区7-8-8")
 						.tel("03-XXXX-XXXX").manager("請求太郎").build())
 				.orderItems(List.of(//

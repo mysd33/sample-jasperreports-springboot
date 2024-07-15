@@ -32,7 +32,7 @@ public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Ite
 
 	@Override
 	public InputStream createItemsReport(List<Item> items) {
-		// AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すだけでPDF帳票作成が完了する
+        // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
 		return createPDFReport(items);
 	}
 

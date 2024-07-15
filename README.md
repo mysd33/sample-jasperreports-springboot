@@ -22,23 +22,27 @@
 
     * 商品一覧
         * 「商品一覧.pdf」という名前のPDFファイルがダウンロードされます。
+            * 実際の[PDFファイル](pdf/商品一覧.pdf)
         * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイル（jrxmlファイル）を利用し修正して使用させていただきました。
         * 出力される帳票のイメージ
 
-        ![items.pdf](image/items-report.png)
+        ![items.pdf](image/items-report.png)        
 
     * 取引一覧
         * 「取引一覧.pdf」という名前のPDFファイルがダウンロードされます。
+            * 実際の[PDFファイル](pdf/取引一覧.pdf)
         * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイルを利用し修正して使用させていただきました。
             * 某帳票製品の帳票サンプルを参考にして、同じようにデザインできるか試してみました。
         * 出力される帳票のイメージ
 
         ![transactions.pdf](image/transactions-report.png)
-    
+            
     * 請求書
         * 「請求書.pdf」という名前のPDFファイルがダウンロードされます。
+            * 実際の[PDFファイル](pdf/請求書.pdf)
         * 自分でゼロから作成した様式ファイルです。
         * 出力される帳票のイメージ
+        * 読み取りパスワード「1234」で設定しています。ファイルを開く際にパスワードを入力するようになります。
         
         ![invoice.pdf](image/invoice-report.png)
 
@@ -95,7 +99,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- ver7.xより、機能ごとExtensionに分離されたので、追加定義が必要 -->
+		<!-- ver7.xより、機能ごとExtensionに分離されたので、PDFExtensionの追加定義が必要 -->
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports-pdf</artifactId>
@@ -107,6 +111,12 @@
 				</exclusion>
 			</exclusions>			
 		</dependency>
+		<!-- PDFのパスワード設定する場合に、bouncycastleを利用するため追加定義が必要 -->
+		<dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>        
    	</dependencies>
 </project>        
 ```
@@ -179,15 +189,18 @@
     @ReportCreator
     // AbstractJasperReportCreatorを継承
     // 型パラメータに帳票作成に必要なデータの型を指定
-    public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Item>> implements ItemsReportCreator {
-        private static final String TITLE = "title";
-        private static final String REPORT_NAME = "商品一覧";
-        private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
+    public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order> implements BillingReportCreator {
+        private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report.jrxml";
 
+        // 業務APが定義する帳票出力処理
         @Override
-        public InputStream createItemListReport(List<Item> items) {
-            // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すだけでPDF帳票作成が完了する
-            return createPDFReport(items);
+        public InputStream createInvoice(Order order) {
+            // PDFの読み取りパスワードのオプション設定例
+            PDFOptions options = PDFOptions.builder()//
+                    .userPassword(order.getCustomer().getPdfPassword())//
+                    .build();
+            // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
+            return createPDFReport(order, options);
         }
 
         // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
@@ -198,17 +211,26 @@
 
         // AbstractJasperReportCreatorのabstractメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す
         @Override
-        protected Map<String, Object> getParameters(List<Item> data) {
+        protected Map<String, Object> getParameters(Order data) {
+            // 帳票の鏡部分のデータをパラメータとして設定した例
             Map<String, Object> parameters = new HashMap<>();
-            // タイトルをパラメータに指定
-            parameters.put(TITLE, REPORT_NAME);
+            parameters.put("orderId", data.getId());
+            parameters.put("customerZip", data.getCustomer().getZip());
+            parameters.put("customerAddress", data.getCustomer().getAddress());
+            parameters.put("customerName", data.getCustomer().getName());
+            parameters.put("billingSourceName", data.getBillingSource().getName());
+            parameters.put("billingSourceZip", data.getBillingSource().getZip());
+            parameters.put("billingSourceAddress", data.getBillingSource().getAddress());
+            parameters.put("billingSourceTel", data.getBillingSource().getTel());
+            parameters.put("billingSourceManager", data.getBillingSource().getManager());
             return parameters;
         }
 
         // AbstractJasperReportCreatorのabstractメソッドgetDataSourceを実装して、データソースを返す
         @Override
-        protected JRDataSource getDataSource(List<Item> data) {
-            return new JRBeanCollectionDataSource(data);
+        protected JRDataSource getDataSource(Order data) {
+            // 帳票の一覧部分に出力する注文明細のデータを設定した例
+            return new JRBeanCollectionDataSource(data.getOrderItems());
         }
 
     }
@@ -245,6 +267,7 @@
 * 日本語フォントの対応
     * [JasperReportでの日本語フォントの利用の記事](https://qiita.com/morya/items/26e1519b9ca813ed399a)
     * [IPAフォント](https://moji.or.jp/ipafont/ipafontdownload/)
+    * [Jasper Reportsのフォント拡張の記事](https://jasperreports.sourceforge.net/sample.reference/fonts/README.html#fontextensions)
 
 * Japser Reportsを使ったチュートリアル、サンプル
     * サンプル1

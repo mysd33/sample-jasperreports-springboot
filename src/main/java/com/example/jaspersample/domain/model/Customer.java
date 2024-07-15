@@ -21,5 +21,6 @@ public class Customer {
 	private String zip;
 	// 住所
 	private String address;
-	
+	// PDFパスワード
+	private String pdfPassword;
 }
