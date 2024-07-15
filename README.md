@@ -53,7 +53,7 @@
 
 ## Jasper Reportsの概念
 * Jaspersoft Studioのマニュアルにある[Concepts of JasperReports - Data Sources and Print Formats](https://community.jaspersoft.com/documentation/jaspersoft%C2%AE-studio/tibco-jaspersoft-studio-user-guide/v900/jss-user-_-data-sources-print-formats/#jss-user_basicnotions_2905227221_1018389)の記載が分かりやすいです。
-    * JasperReportsは、Jaspersoft Studioでデザインした帳票をjrxmlというXML形式で保存します。    
+    * JasperReportsでは、Jaspersoft Studioでデザインした帳票をjrxmlというXML形式で保存します。    
     * Javaのコードでは、jrxmlファイルをコンパイルしjasperファイルを生成します。
     * Jasperファイルに、帳票様式に定義したパラメータデータ(Map)と、帳票様式が参照するデータソース（JavaBeanのコレクションデータやDB等のJRDataSourceインタフェース）を帳票出力するデータとして渡すことで、帳票オブジェクト(JasperPrint)を作成します。
     * 帳票オブジェクト(JasperPrint)を、PDFやExcel等の形式にエクスポーすることで、帳票を出力します。
@@ -156,14 +156,18 @@
     }
     ```    
 
-* フレームワークによる帳票出力機能の例
-    * 上の例では、毎回帳票ごとにJasperReportのAPIを使って帳票を作成するため、JasperReportをあまり意識せず簡単に実装可能とする帳票出力のフレームワーク機能を実装しています。
-        * 帳票出力のフレームワーク機能の実装例は[こちら](src/main/java/com/example/fw/common/reports/)
-    * フレームワーク機能を利用した帳票出力の例を示します。
-        * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/ItemsReportCreatorImpl.java)
-        * 以下、抜粋
+## 帳票出力のソフトウェアフレームワーク機能
+* 上の例では、毎回帳票ごとにJasperReportのAPIを使って帳票を作成することになります。
+* 業務AP側では、JasperReportのAPIをあまり意識せずに簡単に実装可能にしたいため、このサンプルAPでは、帳票出力のフレームワーク機能を実装しています。
+    * 帳票出力のフレームワーク機能の実装例は[こちら](src/main/java/com/example/fw/common/reports/)
+    
+* フレームワーク機能を利用した帳票出力の例を示します。
+    * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/ItemsReportCreatorImpl.java)
+    
+    * 以下、抜粋
 
     ```java
+    // @ReportCreatorを付与し、Bean定義
     @ReportCreator
     // AbstractJasperReportCreatorを継承
     // 型パラメータに帳票作成に必要なデータの型を指定
@@ -204,10 +208,10 @@
 
 
 ## 日本語を出力する方法
-* デフォルトのフォントだと日本語出力できないので、日本語フォントをダウンロードして指定する必要があります。
-    * 日本語を利用する場合は、日本語フォントをダウンロードします。
+* デフォルトのフォントだと日本語出力できないので、日本語フォントを利用できるように、AP側では、以下の設定をする必要があります。
+    * 日本語フォントをダウンロードします。
         * [IPAフォント](https://moji.or.jp/ipafont/ipafontdownload/)
-    * src/main/resources配下の任意のフォルダに、フォントファイルを配置します。
+    * APの、src/main/resources配下の任意のフォルダに、フォントファイルを配置します。
         * [サンプルAPのフォルダ](src/main/resources/fonts/)のttfファイル
     * src/main/resources配下の任意のフォルダに、フォントを定義するファイルを作成します。
         * [サンプルAPの例](src/main/resources/fonts/fontsfamily-ipa.xml)
@@ -215,9 +219,10 @@
         * [サンプルAPの例](src/main/resources/reports/item-report.jrxml)
     * src/main/resources配下に、jasperreports_extension.propertiesファイルを作成し、フォントを指定します。
         * [サンプルAPの例](src/main/resources/jasperreports_extension.properties)
-* Jasper Studioで帳票様式を作成する場合は、フォントを指定する方法は、[Jasper Studioのドキュメント](https://community.jaspersoft.com/documentation/jaspersoft%C2%AE-studio/tibco-jaspersoft-studio-user-guide/v900/jss-user-_-fonts-intro-reference/)を参照してください。
-    *  Window > Preferences > Jaspersoft Studio > Fonts. でフォントを追加する設定ができます。
 
+* Jasper Studioで帳票様式を作成する際に、追加したフォントを選択できるようにするには、[Jasper Studioのドキュメント](https://community.jaspersoft.com/documentation/jaspersoft%C2%AE-studio/tibco-jaspersoft-studio-user-guide/v900/jss-user-_-fonts-intro-reference/)を参考に以下の設定をします。
+    * Window > Preferences > Jaspersoft Studio > Fonts. でフォントを追加する。
+    * フォントファミリー名は、上記の定義ファイルのfontFamilyのname属性の値と同じものを指定します。
 
 ## 参考情報
 * [Jaspersoft community editionの公式サイト](https://www.jaspersoft.com/products/jaspersoft-community)
