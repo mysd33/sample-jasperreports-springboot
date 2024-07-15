@@ -10,7 +10,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
-import com.example.fw.reports.AbstractJasperReportCreator;
+import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.jaspersample.domain.model.Item;
 import com.example.jaspersample.domain.reports.ItemsReportCreator;
 
@@ -31,7 +31,7 @@ public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Ite
 	private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
 
 	@Override
-	public InputStream createItemListReport(List<Item> items) {
+	public InputStream createItemsReport(List<Item> items) {
 		// AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すだけでPDF帳票作成が完了する
 		return createPDFReport(items);
 	}

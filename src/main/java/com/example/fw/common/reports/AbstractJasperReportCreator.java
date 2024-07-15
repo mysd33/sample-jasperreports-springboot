@@ -1,4 +1,4 @@
-package com.example.fw.reports;
+package com.example.fw.common.reports;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -61,7 +61,7 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * 
 	 * @return 帳票のバイト配列
 	 */
-	public InputStream createPDFReport(T data) {
+	public InputStream createPDFReport(final T data) {
 
 		JasperReport jasperReport;
 		try {
@@ -111,7 +111,7 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * @param data 帳票データ
 	 * @return パラメータ
 	 */
-	protected abstract Map<String, Object> getParameters(T data);
+	protected abstract Map<String, Object> getParameters(final T data);
 
 	/**
 	 * 帳票作成に必要なデータソースを取得する
@@ -119,7 +119,7 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * @param data 帳票データ
 	 * @return データソース
 	 */
-	protected abstract JRDataSource getDataSource(T data);
+	protected abstract JRDataSource getDataSource(final T data);
 
 	/**
 	 * コンパイル済の帳票様式ファイル(jasperファイル)を取得する

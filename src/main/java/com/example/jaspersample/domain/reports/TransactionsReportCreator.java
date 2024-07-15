@@ -15,7 +15,7 @@ public interface TransactionsReportCreator {
 	 * 
 	 * @param items 帳票に出力する取引リスト
 	 * 
-	 * @return 取引一覧帳票の入力ストリーム
+	 * @return 取引一覧帳票の入力ストリームデータ
 	 */
-	InputStream createTransactionListReport(List<Transaction> items);
+	InputStream createTransactionsReport(List<Transaction> items);
 }

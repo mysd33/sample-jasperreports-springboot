@@ -15,7 +15,7 @@ public interface ItemsReportCreator {
 	 * 
 	 * @param items 帳票に出力する商品リスト
 	 * 
-	 * @return 商品一覧帳票の入力ストリーム
+	 * @return 商品一覧帳票の入力ストリームデータ
 	 */
-	InputStream createItemListReport(List<Item> items);
+	InputStream createItemsReport(List<Item> items);
 }

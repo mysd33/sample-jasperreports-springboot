@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 取引情報
+ * 取引情報のエンティティクラス
  */
 @Data
 @Builder

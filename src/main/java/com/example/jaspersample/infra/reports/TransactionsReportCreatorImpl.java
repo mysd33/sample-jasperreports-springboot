@@ -10,7 +10,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
-import com.example.fw.reports.AbstractJasperReportCreator;
+import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.jaspersample.domain.model.Transaction;
 import com.example.jaspersample.domain.reports.TransactionsReportCreator;
 
@@ -30,7 +30,7 @@ public class TransactionsReportCreatorImpl extends AbstractJasperReportCreator<L
 	private static final String JRXML_FILE_PATH = "classpath:reports/transaction-report.jrxml";
 
 	@Override
-	public InputStream createTransactionListReport(List<Transaction> items) {
+	public InputStream createTransactionsReport(List<Transaction> items) {
 		return createPDFReport(items);
 	}
 

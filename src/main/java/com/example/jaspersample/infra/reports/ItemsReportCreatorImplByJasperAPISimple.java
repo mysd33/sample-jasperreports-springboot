@@ -44,7 +44,7 @@ public class ItemsReportCreatorImplByJasperAPISimple implements ItemsReportCreat
 	private static final String JASPER_FILE_PATH = "item-report.jasper";
 
 	@Override
-	public InputStream createItemListReport(List<Item> items) {
+	public InputStream createItemsReport(List<Item> items) {
 		JasperReport jasperReport;
 
 		try {

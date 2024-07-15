@@ -1,6 +1,5 @@
 package com.example.jaspersample.domain.service.transactions;
 
-import java.io.InputStream;
 import java.util.List;
 
 import com.example.jaspersample.domain.model.Transaction;
@@ -15,10 +14,4 @@ public interface TransactionsService {
 	 */
 	List<Transaction> findAll();
 
-	/**
-	 * 取引一覧の帳票を生成する
-	 * 
-	 * @return 取引一覧帳票の入力ストリーム
-     */
-	InputStream createTransactionsReport();
 }
