@@ -23,7 +23,8 @@
     * 商品一覧
         * 「商品一覧.pdf」という名前のPDFファイルがダウンロードされます。
             * 実際の[PDFファイル](pdf/商品一覧.pdf)
-        * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイル（jrxmlファイル）を利用し修正して使用させていただきました。
+        * 様式ファイル
+            * [参考情報](#参考情報)にあるサンプルコードの様式ファイル（jrxmlファイル）を利用し修正して使用させていただきました。
             * 実際の[帳票様式(jrml)ファイル](src/main/resources/reports/item-report.jrxml)
         * 出力される帳票のイメージ
 
@@ -32,7 +33,8 @@
     * 取引一覧
         * 「取引一覧.pdf」という名前のPDFファイルがダウンロードされます。
             * 実際の[PDFファイル](pdf/取引一覧.pdf)
-        * 様式ファイル[参考情報](#参考情報)にあるサンプルコードの様式ファイルを利用し修正して使用させていただきました。
+        * 様式ファイル
+            * [参考情報](#参考情報)にあるサンプルコードの様式ファイルを利用し修正して使用させていただきました。
             * 実際の[帳票様式(jrml)ファイル](src/main/resources/reports/transaction-report.jrxml)
         * 出力される帳票のイメージ
 
@@ -262,8 +264,8 @@
 
 * [NRIのOpenStandiaが提供するJaspersoft情報](https://openstandia.jp/oss_info/jaspersoft/)
 
-* [Workbrain JAPAN](https://www.workbrainjapan.net/jasperreports-solution)
-    * JasperReportsを扱っている、帳票・レポート作成ソリューションがある模様
+* [Workbrain JAPAN](https://www.workbrainjapan.net/service-main)
+    * JasperReportsを扱っており、「[TIBCO Jaspersoft インシデントサポートサービス](https://www.workbrainjapan.net/jaspersoft-incident-support)」、「[帳票・レポート作成ソリューション](https://www.workbrainjapan.net/jasperreports-solution)」がある模様
 
 * [JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports)
 
