@@ -42,7 +42,7 @@ public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Ite
 		return ResourceUtils.getFile(JRXML_FILE_PATH);
 	}
 
-	// AbstractJasperReportCreatorのabstractメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す
+	// AbstractJasperReportCreatorのメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す
 	@Override
 	protected Map<String, Object> getParameters(List<Item> data) {
 		Map<String, Object> parameters = new HashMap<>();

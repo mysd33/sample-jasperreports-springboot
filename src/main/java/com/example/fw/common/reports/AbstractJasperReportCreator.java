@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,7 +141,9 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * @param data 帳票データ
 	 * @return パラメータ
 	 */
-	protected abstract Map<String, Object> getParameters(final T data);
+	protected Map<String, Object> getParameters(final T data) {
+		return new HashMap<String, Object>();
+	}
 
 	/**
 	 * 帳票作成に必要なデータソースを取得する

@@ -7,7 +7,7 @@ import com.example.jaspersample.domain.model.Order;
 /**
  * 請求に関する帳票作成のインタフェース
  */
-public interface BillingReportCreator {
+public interface InvoiceReportCreator {
 	/**
 	 * 請求書を作成する
 	 * 

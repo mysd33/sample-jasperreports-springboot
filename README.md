@@ -44,7 +44,9 @@
         * 「請求書.pdf」という名前のPDFファイルがダウンロードされます。
             * 実際の[PDFファイル](pdf/請求書.pdf)
         * 自分でゼロから作成した様式ファイルです。
-            * 実際の[帳票様式(jrml)ファイル](src/main/resources/reports/invoice-report.jrxml)
+            * 実際の帳票様式(jrml)ファイル
+                * [単項目をパラメータで設定した様式バージョン](src/main/resources/reports/invoice-report.jrxml)
+                * [単項目・明細ともにJRDataSourceから取得する様式バージョン](src/main/resources/reports/invoice-report.jrxml)
             * 某帳票製品の帳票サンプルを参考にして、同じようにデザインできるか試してみました。            
         * 出力される帳票のイメージ
         * 読み取りパスワード「1234」で設定しています。ファイルを開く際にパスワードを入力するようになります。
