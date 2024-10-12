@@ -37,6 +37,7 @@ import net.sf.jasperreports.engine.util.JRSaver;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.pdf.JRPdfExporter;
+import net.sf.jasperreports.pdf.PdfExporterConfiguration;
 import net.sf.jasperreports.pdf.SimplePdfExporterConfiguration;
 
 // TODO: SubReportの対応を検討
@@ -213,14 +214,27 @@ public abstract class AbstractJasperReportCreator<T> {
 		JRPdfExporter exporter = new JRPdfExporter();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		if (options.isEncrypted()) {
-			// PDFのパスワード等を指定する場合の設定
+		// PDFのオプションがある場合
+		if (options.hasOptions()) {
 			SimplePdfExporterConfiguration configuration = new SimplePdfExporterConfiguration();
-			configuration.setEncrypted(true);
-			configuration.setUserPassword(options.getUserPassword());
-			configuration.setOwnerPassword(options.getOwnerPassword());
+			// PDFのパスワードの指定
+			if (options.isEncrypted()) {
+				// パスワード指定時は、暗号化設定を有効化
+				configuration.setEncrypted(true);
+				// 閲覧パスワード
+				configuration.setUserPassword(options.getUserPassword());
+				// 権限パスワード
+				configuration.setOwnerPassword(options.getOwnerPassword());
+			}
+			// 権限の設定
+			if (options.hasPermissions()) {
+				configuration.setPermissions(options.getPermissions());
+			} else {
+				configuration.setPermissions(PdfExporterConfiguration.ALL_PERMISSIONS);
+			}
 			exporter.setConfiguration(configuration);
 		}
+
 		exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
 		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
 		exporter.exportReport();

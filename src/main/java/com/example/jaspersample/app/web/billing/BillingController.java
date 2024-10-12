@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.fw.web.io.ResponseUtil;
 import com.example.jaspersample.domain.model.Order;
 import com.example.jaspersample.domain.reports.InvoiceReportCreator;
+import com.example.jaspersample.domain.reports.InvoiceReportCSVData;
 import com.example.jaspersample.domain.service.order.OrderService;
+import com.example.jaspersample.infra.reports.InvoiceReportCreatorForCSVImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ public class BillingController {
 	private final OrderService orderService;
 	private final InvoiceReportCreator invoiceReportCreatorImpl;
 	private final InvoiceReportCreator invoiceReportCreatorImpl2;
+	private final InvoiceReportCreatorForCSVImpl invoiceReportCreatorForCSV;
 
 	/**
 	 * 請求書（PDF）を出力する
@@ -47,7 +50,7 @@ public class BillingController {
 	}
 
 	/**
-	 * 請求書（PDF）を出力する　その2
+	 * 請求書（PDF）を出力する その2
 	 * 
 	 * 請求書の様式が、単項目含めてすべてJRDataSourceから取得する版
 	 * 
@@ -62,5 +65,26 @@ public class BillingController {
 
 		// レスポンスを返す
 		return ResponseUtil.createResponseForPDF(reportInputStream, INVOICE_FILE_NAME);
+	}
+
+	/**
+	 * 請求書（PDF）を出力する その3
+	 * 
+	 * 請求書の様式が、単項目含めてすべてJRDataSourceから取得する版<br/>
+	 * CSVファイルを入力として、帳票出力する。
+	 * 
+	 * @return 請求書のPDFファイル
+	 */
+	@GetMapping("invoice3/{orderId}")
+	public ResponseEntity<Resource> getInvoice3(@PathVariable String orderId) {
+		// 注文情報のCSVデータの取得
+		InvoiceReportCSVData csvData = orderService.getReportCSVData(orderId);
+
+		// CSVデータより請求書の作成
+		InputStream reportInputStream = invoiceReportCreatorForCSV.createInvoice(csvData);
+
+		// レスポンスを返す
+		return ResponseUtil.createResponseForPDF(reportInputStream, INVOICE_FILE_NAME);
+
 	}
 }
