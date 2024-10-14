@@ -40,6 +40,16 @@ public class InvoiceReportCreatorImpl2 extends AbstractJasperReportCreator<Order
 		// PDFの読み取りパスワードのオプション設定例
 		PDFOptions options = PDFOptions.builder()//
 				.userPassword(order.getCustomer().getPdfPassword())//
+				// 権限パスワード
+				//.ownerPassword("admin")//
+				// 特定の処理個別の暗号化レベル設定				
+				//.is128bitKey(false)
+				// 特定の処理個別の権限設定
+				//.permissionsDenied(List.of(
+				//		PdfPermissionsEnum.COPY,
+				//		PdfPermissionsEnum.PRINTING,
+				//		PdfPermissionsEnum.MODIFY_CONTENTS
+				//		))//					
 				.build();
 		// AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
 		return createPDFReport(order, options);

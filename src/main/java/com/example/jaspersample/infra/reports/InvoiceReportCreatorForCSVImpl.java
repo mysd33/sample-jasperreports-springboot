@@ -3,6 +3,7 @@ package com.example.jaspersample.infra.reports;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.springframework.util.ResourceUtils;
 
@@ -16,6 +17,7 @@ import com.example.jaspersample.domain.reports.InvoiceReportCreatorForCSV;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRCsvDataSource;
+import net.sf.jasperreports.pdf.type.PdfPermissionsEnum;
 
 /**
  * InvoiceReportCreatorの実装クラスその3<br>
@@ -35,7 +37,18 @@ public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<
 	public InputStream createInvoice(InvoiceReportCSVData csvData) {
 		// PDFの読み取りパスワードのオプション設定例
 		PDFOptions options = PDFOptions.builder()//
+				//　読み取りパスワード
 				.userPassword(csvData.getPdfPassword())//
+				// 権限パスワード
+				//.ownerPassword("admin")//
+				// 特定の処理個別の暗号化レベル設定				
+				//.is128bitKey(false)
+				// 特定の処理個別の権限設定
+				//.permissionsDenied(List.of(
+				//		PdfPermissionsEnum.COPY,
+				//		PdfPermissionsEnum.PRINTING,
+				//		PdfPermissionsEnum.MODIFY_CONTENTS
+				//		))//						
 				.build();
 		// AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
 		return createPDFReport(csvData, options);

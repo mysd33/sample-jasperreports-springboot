@@ -1,11 +1,13 @@
 package com.example.fw.common.reports;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -39,6 +41,7 @@ import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.pdf.JRPdfExporter;
 import net.sf.jasperreports.pdf.PdfExporterConfiguration;
 import net.sf.jasperreports.pdf.SimplePdfExporterConfiguration;
+import net.sf.jasperreports.pdf.type.PdfPermissionsEnum;
 
 // TODO: SubReportの対応を検討
 
@@ -214,49 +217,98 @@ public abstract class AbstractJasperReportCreator<T> {
 		JRPdfExporter exporter = new JRPdfExporter();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		// PDFのオプションがある場合
-		if (options.hasOptions()) {
-			SimplePdfExporterConfiguration configuration = new SimplePdfExporterConfiguration();
-			// PDFのパスワードの指定
-			if (options.isEncrypted()) {
-				// パスワード指定時は、暗号化設定を有効化
-				configuration.setEncrypted(true);
-				// 閲覧パスワード
-				configuration.setUserPassword(options.getUserPassword());
-				// 権限パスワード
-				configuration.setOwnerPassword(options.getOwnerPassword());
-			}
-			// 権限の設定
-			if (options.hasPermissions()) {
-				configuration.setPermissions(options.getPermissions());
-			} else {
-				configuration.setPermissions(PdfExporterConfiguration.ALL_PERMISSIONS);
-			}
+		SimplePdfExporterConfiguration configuration = getPdfExproterConfiguration(options);
+		if (configuration != null) {
 			exporter.setConfiguration(configuration);
 		}
-
 		exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
 		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
 		exporter.exportReport();
 		return new ByteArrayInputStream(baos.toByteArray());
 	}
 
-	// 現状未使用だが、実装例として残しておき、必要な場合、こちらに切り替えることも検討
+	// TODO: 現状未使用だが、実装例として残しておき、必要な場合、こちらに切り替えることも検討
 	/**
 	 * PDF形式で帳票を出力する際、ファイルサイズが大きい場合の実装例
+	 * 
+	 * @param jasperPrint JasperPrintオブジェクト
+	 * @param options     PDF出力時のオプション設定
 	 * 
 	 * @return PDFファイルのInputStreamデータ
 	 * @throws JRException JasperReportsでPDFのエクスポートに失敗した場合
 	 * @throws IOException
 	 */
-	private InputStream exportPDFForLargeFile(final JasperPrint jasperPrint) throws JRException, IOException {
+	private InputStream exportPDFForLargeFile(final JasperPrint jasperPrint, PDFOptions options)
+			throws JRException, IOException {
 		// メモリを極力使わないよう、PDFのファイルサイズが大きい場合も考慮し一時ファイルに出力してInputStreamを返す実装例
 		Path tempFilePath = Files.createTempFile("item-report", ".pdf");
 		tempFilePath.toFile().deleteOnExit();
+
 		// PDF形式で出力
-		JasperExportManager.exportReportToPdfFile(jasperPrint, tempFilePath.toString());
+		// JasperExportManager.exportReportToPdfFile(jasperPrint,
+		// tempFilePath.toString());
+
+		JRPdfExporter exporter = new JRPdfExporter();
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tempFilePath.toFile()))) {
+			SimplePdfExporterConfiguration configuration = getPdfExproterConfiguration(options);
+			if (configuration != null) {
+				exporter.setConfiguration(configuration);
+			}
+			exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+			exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(bos));
+			exporter.exportReport();
+		}
 		// 一時ファイルのInputStreamを返す
 		return new BufferedInputStream(new FileInputStream(tempFilePath.toFile()));
 	}
 
+	/**
+	 * PDF出力時のオプション設定を取得する
+	 * 
+	 * @param options
+	 * @return
+	 */
+	private SimplePdfExporterConfiguration getPdfExproterConfiguration(PDFOptions options) {
+		if (!options.isEncrypted()) {
+			return null;
+		}
+		SimplePdfExporterConfiguration configuration = new SimplePdfExporterConfiguration();
+		// パスワード指定時は、暗号化設定を有効化
+		configuration.setEncrypted(true);
+		// 閲覧パスワード
+		configuration.setUserPassword(options.getUserPassword());
+		// 権限パスワード
+		configuration.setOwnerPassword(options.getOwnerPassword());
+
+		// 暗号化設定
+		if (options.has128bitKey()) {
+			// PDFOptionsで設定されている場合は、優先的に使用
+			configuration.set128BitKey(options.getIs128bitKey());
+		} else {
+			configuration.set128BitKey(config.is128bitKey());
+		}
+		// 権限の設定
+		if (options.hasPermissionsDenied()) {
+			// PDFOptionsで設定されている場合は、優先的に使用
+			int permissionsDenied = 0;
+			for (PdfPermissionsEnum permissionDenied : options.getPermissionsDenied()) {
+				if (PdfPermissionsEnum.ALL.equals(permissionDenied)) {
+					permissionsDenied = PdfExporterConfiguration.ALL_PERMISSIONS.intValue();
+					break;
+				}
+				permissionsDenied |= permissionDenied.getPdfPermission();
+			}
+			configuration.setPermissions(~permissionsDenied);
+		} else {
+			String permissionsDenied = config.getPdfPermissionDenied();
+			if (permissionsDenied != null && permissionsDenied.length() > 0) {
+				// PDFOptionsの設定がない場合は、application.ymlの設定を使用
+				configuration.setPermissions(~JRPdfExporter.getIntegerPermissions(permissionsDenied));
+			} else {
+				// application.ymlにも設定がない場合は、全ての権限を許可
+				configuration.setPermissions(PdfExporterConfiguration.ALL_PERMISSIONS);
+			}
+		}
+		return configuration;
+	}
 }

@@ -1,9 +1,12 @@
 package com.example.fw.common.reports;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.sf.jasperreports.pdf.type.PdfPermissionsEnum;
 
 /**
  * PDF出力時のオプション設定を行うクラス
@@ -17,29 +20,14 @@ public class PDFOptions {
 	private String userPassword;
 	// 権限パスワード
 	private String ownerPassword;
-
-	// TODO: PDFセキュリティ関連の設定（コピー許可、編集許可、印刷許可・・・）
-	// TODO: 権限設定を分かりやすいAPIに変更する
-	/*
-	 * public static final Integer ALL_PERMISSIONS = PdfWriter.ALLOW_ASSEMBLY |
-	 * PdfWriter.ALLOW_COPY | PdfWriter.ALLOW_DEGRADED_PRINTING |
-	 * PdfWriter.ALLOW_FILL_IN | PdfWriter.ALLOW_MODIFY_ANNOTATIONS |
-	 * PdfWriter.ALLOW_MODIFY_CONTENTS | PdfWriter.ALLOW_PRINTING |
-	 * PdfWriter.ALLOW_SCREENREADERS;
-	 */
-	private Integer permissions;
-
-	/**
-	 * PDFオプションの設定があるかどうか
-	 * 
-	 * @return PDFオプション指定がある場合はtrue
-	 */
-	public boolean hasOptions() {
-		return userPassword != null || ownerPassword != null || permissions != null;
-	}
+	// 128Bit暗号化を使用するか
+	private Boolean is128bitKey;
+	// 暗号化設定されている場合の権限拒否設定
+	private List<PdfPermissionsEnum> permissionsDenied;
 
 	/**
 	 * PDFの暗号化設定が必要かどうかを返却します
+	 * パスワード設定されている場合は暗号化設定が必要と判断します
 	 * 
 	 * @return trueの場合は暗号化設定が必要
 	 */
@@ -48,11 +36,19 @@ public class PDFOptions {
 	}
 	
 	/**
-	 * PDFの権限設定が必要かどうかを返却します
-	 * 
-	 * @return trueの場合は権限設定が必要
+	 * 128Bit暗号化設定が指定されているかどうかを返却します
+	 * @return
 	 */
-	public boolean hasPermissions() {
-		return permissions != null;			
+	public boolean has128bitKey() {
+		return is128bitKey != null;
 	}
+	
+	/**
+	 * 権限拒否設定が指定されているかどうかを返却します
+	 * @return
+	 */
+	public boolean hasPermissionsDenied() {
+		return permissionsDenied != null && !permissionsDenied.isEmpty();
+	}
+	
 }

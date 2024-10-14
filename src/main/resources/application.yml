@@ -9,4 +9,12 @@ spring:
 
   messages:
     basename: messages, messages-fw-common, messages-fw-web
-    
+
+
+# 帳票出力機能の設定
+#report:
+# PDFの権限拒否設定
+#  pdf-permission-denied: COPY|PRINTING|MODIFY_CONTENTS
+#  pdf-permission-denied: ALL
+# PDFの暗号化レベル設定
+#  128bit-key: false
