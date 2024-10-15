@@ -16,7 +16,7 @@
 	<description>Jasper Reports Demo project for Spring Boot</description>
 	<properties>
 		<java.version>21</java.version>		
-		<jasperreports.version>7.0.0</jasperreports.version>
+		<jasperreports.version>7.0.1</jasperreports.version>
 		<!--<jasperreports.version>6.21.3</jasperreports.version>-->
 		<bouncycastle.version>1.78.1</bouncycastle.version>
 		<!-- MapStruct -->
