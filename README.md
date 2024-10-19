@@ -290,7 +290,8 @@
 
     * PDFのセキュリティ設定
         * 全帳票に共通のPDFのセキュリティ設定を行うことができます。
-            * [application.yaml](src/main/resources/application.yml)での設定例            
+            * [application.yaml](src/main/resources/application.yml)での設定例     
+                * Spring Bootの仕組みの中でできるので、appplication.yml修正後にSpring DevToolsによる自動再起動で設定変更が反映されるので便利です。
 
             ```yaml
             report:
@@ -299,6 +300,20 @@
               #pdf-permission-denied: ALL
               # PDFの暗号化レベル設定
               #128bit-key: false
+            ```
+
+            * [japserreports.properties](src/main/resources/jasperreports.properties)での設定例
+                * JasperReport自体のプロパティファイルです。[JasperReports - Configuration Reference](https://jasperreports.sourceforge.net/config.reference.html)で定義されているプロパティがすべて設定できますので、よりきめ細かく設定が可能です。
+                * ただし、Spring DevToolsによる自動再起動で設定変更が反映されないようで、一度APを止めて再起動する必要があります。                
+
+            ```
+            net.sf.jasperreports.export.pdf.encrypted=true
+            net.sf.jasperreports.export.pdf.128.bit.key=true
+            net.sf.jasperreports.export.pdf.user.password=password
+            net.sf.jasperreports.export.pdf.owner.password=password
+            net.sf.jasperreports.export.pdf.permissions.allowed=ALL
+            net.sf.jasperreports.export.pdf.permissions.denied=COPY|PRINTING|MODIFY_CONTENTS
+            #net.sf.jasperreports.export.pdf.permissions.denied=ALL
             ```
 
         * 帳票個別にPDFのセキュリティ設定を行うことができます。

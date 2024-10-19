@@ -432,7 +432,7 @@ public abstract class AbstractJasperReportCreator<T> {
 				configuration.setPermissions(~JRPdfExporter.getIntegerPermissions(permissionsDenied));
 			} else {
 				// application.ymlにも設定がない場合は、全ての権限を許可
-				configuration.setPermissions(PdfExporterConfiguration.ALL_PERMISSIONS);
+				configuration.setAllowedPermissionsHint(PdfPermissionsEnum.ALL.getName());
 			}
 		}
 		return configuration;
