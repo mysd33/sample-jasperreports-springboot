@@ -282,13 +282,11 @@
 
     * CSVデータ
         * [CSVデータの例](https://github.com/mysd33/sample-jasperreports-springboot/blob/main/src/main/resources/csv/order.csv)
-    
-        * 1行目がフィールドを表すカラムヘッダー
-        * 帳票の鏡部分は、CSVの最初の行のデータのみ指定すればよい
-        * 帳票の明細一覧部分は、明細の数の行データを繰り返し指定すればよい
+            * 1行目がフィールドを表すカラムヘッダー
+            * 帳票の鏡部分は、CSVの最初の行のデータのみ指定すればよい
+            * 帳票の明細一覧部分は、明細の数の行データを繰り返し指定すればよい
 
-        * ![CSVデータ](image/csv.png)
-
+            ![CSVデータ](image/csv.png)
 
     * PDFのセキュリティ設定
         * 全帳票に共通のPDFのセキュリティ設定を行うことができます。
