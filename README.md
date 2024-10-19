@@ -187,9 +187,7 @@
     * 帳票出力のフレームワーク機能の実装例は[こちら](src/main/java/com/example/fw/common/reports/)
     
 * フレームワーク機能を利用した帳票出力の例を示します。
-    * JRBeanCollectionDataSource（JavaBeanをデータソース）による[サンプルコード](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorImpl.java)
-    
-    * 以下、抜粋
+    * JRBeanCollectionDataSource（JavaBeanをデータソース）による[サンプルコード](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorImpl.java)    
 
     ```java
     // @ReportCreatorを付与し、Bean定義    
