@@ -57,6 +57,7 @@ public abstract class AbstractJasperReportCreator<T> {
 	private ReportsConfigurationProperties config;
 	private Path jasperPath;
 	private String reportId;
+	private String reportName;
 
 	@Autowired
 	public void setConfig(final ReportsConfigurationProperties config) {
@@ -67,14 +68,16 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * 初期化処理
 	 * 
 	 * コンパイル済の帳票様式を保存する一時ディレクトリを作成し、帳票様式をコンパイルする
+	 * 
 	 * @throws FileNotFoundException jrxmlの様式ファイルの様式ファイルが存在しない場合
-	 * @throws JRException          様式のコンパイルエラーまたはコンパイル済様式の保存時のエラー
+	 * @throws JRException           様式のコンパイルエラーまたはコンパイル済様式の保存時のエラー
 	 */
 	@PostConstruct
 	public void init() throws FileNotFoundException, JRException {
-		// ログ出力用に、帳票IDを取得
+		// ログ出力用に、帳票ID、帳票名を取得
 		ReportCreator annotation = getClass().getAnnotation(ReportCreator.class);
 		reportId = annotation.id();
+		reportName = annotation.name();
 
 		// コンパイル済の帳票様式を保存する一時ディレクトリを作成する
 		String tempDir = System.getProperty("java.io.tmpdir");
@@ -89,7 +92,7 @@ public abstract class AbstractJasperReportCreator<T> {
 			// サブレポート用の帳票様式
 			compileSubReportJRXML();
 		} catch (FileNotFoundException | JRException e) {
-			monitoringLogger.error(CommonFrameworkMessageIds.E_CM_FW_9003, e, reportId);
+			monitoringLogger.error(CommonFrameworkMessageIds.E_CM_FW_9003, e, reportId, reportName);
 			throw e;
 		}
 
@@ -123,7 +126,7 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * @return PDFファイルのInputStreamデータ
 	 */
 	public InputStream createPDFReport(final T data, final PDFOptions options) {
-		appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0007, reportId);
+		appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0007, reportId, reportName);
 		// 処理時間を計測しログ出力
 		long startTime = System.nanoTime();
 		try {
@@ -133,7 +136,7 @@ public abstract class AbstractJasperReportCreator<T> {
 			// 呼び出し処理実行後、処理時間を計測しログ出力
 			long endTime = System.nanoTime();
 			double elapsedTime = SystemDateUtils.calcElaspedTimeByMilliSecounds(startTime, endTime);
-			appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0008, reportId, elapsedTime);
+			appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0008, reportId, reportName, elapsedTime);
 		}
 	}
 
@@ -150,10 +153,10 @@ public abstract class AbstractJasperReportCreator<T> {
 		JasperReport jasperReport = null;
 		try {
 			File jasperFile = getMainJasperFile();
-			// コンパイル済の帳票様式を読み込む
+			// コンパイル済の帳票様式（jasperファイル）を読み込む
 			jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
 		} catch (FileNotFoundException | JRException e) {
-			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9004, reportId);
+			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9004, reportId, reportName);
 		}
 
 		try {
@@ -167,7 +170,7 @@ public abstract class AbstractJasperReportCreator<T> {
 			// 一時ファイルに出力する実装例
 			// return exportPDFForLargeFile(jasperPrint, options);
 		} catch (JRException e) { // | IOException e) {
-			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9005, reportId);
+			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9005, reportId, reportName);
 		}
 	}
 
@@ -284,7 +287,7 @@ public abstract class AbstractJasperReportCreator<T> {
 		// 検索パス(--processor-path、--processor-module-path)が指定されるか、注釈処理が明示的に有効化(-proc:only、-proc:full)されている場合を除き、
 		// 将来のリリースのjavacでは注釈処理が無効化される可能性があります。-Xlint:オプションを使用すると、このメッセージを非表示にできます。-proc:noneを使用すると、注釈処理を無効化できます。」
 
-		appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0005, reportId, jrxmlFile.getAbsolutePath());
+		appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0005, reportId, reportName, jrxmlFile.getAbsolutePath());
 		// jrxmlの帳票様式ファイルをコンパイルする
 		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperCompileManager.html
 		JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
@@ -292,7 +295,7 @@ public abstract class AbstractJasperReportCreator<T> {
 		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/util/JRSaver.html
 		File jasperFile = getJasperFile(jrxmlFile);
 		JRSaver.saveObject(jasperReport, jasperFile);
-		appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0006, reportId, jasperFile.getAbsolutePath());
+		appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0006, reportId, reportName, jasperFile.getAbsolutePath());
 		return jasperReport;
 	}
 
@@ -304,16 +307,16 @@ public abstract class AbstractJasperReportCreator<T> {
 	 */
 	private void deleteJasperFile(final File jasperFile) throws IOException {
 		if (!jasperFile.exists()) {
-			appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0009, reportId, jasperFile.getAbsolutePath());
+			appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0009, reportId, reportName, jasperFile.getAbsolutePath());
 			return;
 		}
 		try {
 			Files.delete(jasperFile.toPath());
 		} catch (IOException e) {
-			appLogger.warn(CommonFrameworkMessageIds.W_CM_FW_8001, reportId, jasperFile.getAbsolutePath());
+			appLogger.warn(CommonFrameworkMessageIds.W_CM_FW_8001, reportId, reportName, jasperFile.getAbsolutePath());
 			throw e;
 		}
-		appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0010, reportId, jasperFile.getAbsolutePath());
+		appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0010, reportId, reportName, jasperFile.getAbsolutePath());
 	}
 
 	/**

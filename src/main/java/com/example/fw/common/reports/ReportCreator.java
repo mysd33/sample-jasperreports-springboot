@@ -16,5 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 public @interface ReportCreator {
 	// 帳票ID
-	String id() default "";  
+	String id() default "";
+
+	// 帳票名
+	String name() default "";
 }
