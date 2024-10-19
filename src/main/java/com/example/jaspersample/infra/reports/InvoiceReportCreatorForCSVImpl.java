@@ -3,7 +3,7 @@ package com.example.jaspersample.infra.reports;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.List;
+import java.io.UnsupportedEncodingException;
 
 import org.springframework.util.ResourceUtils;
 
@@ -17,7 +17,6 @@ import com.example.jaspersample.domain.reports.InvoiceReportCreatorForCSV;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRCsvDataSource;
-import net.sf.jasperreports.pdf.type.PdfPermissionsEnum;
 
 /**
  * InvoiceReportCreatorの実装クラスその3<br>
@@ -35,7 +34,7 @@ public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<
 	// 業務APが定義する帳票出力処理
 	@Override
 	public InputStream createInvoice(InvoiceReportCSVData csvData) {
-		// PDFの読み取りパスワードのオプション設定例
+        // PDFのセキュリティ設定のオプション例	
 		PDFOptions options = PDFOptions.builder()//
 				//　読み取りパスワード
 				.userPassword(csvData.getPdfPassword())//
@@ -69,7 +68,7 @@ public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<
 			// 1行目をフィールドを表すカラムヘッダーとして使用する設定
 			dataSource.setUseFirstRowAsHeader(true);
 			return dataSource;
-		} catch (Exception e) {			
+		} catch (UnsupportedEncodingException e) {			
 			throw new SystemException(e, MessageIds.E_EX_9001);
 		}			
 	}

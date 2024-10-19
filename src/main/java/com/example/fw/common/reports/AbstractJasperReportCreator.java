@@ -276,9 +276,6 @@ public abstract class AbstractJasperReportCreator<T> {
 		// byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
 		// return new ByteArrayInputStream(reportContent);
 
-		// PDFのパスワード等を指定する場合には、直接JRPdfExporterインスタンスを作成し実装
-		// https://javadoc.io/doc/net.sf.jasperreports/jasperreports-pdf/latest/net/sf/jasperreports/pdf/JRPdfExporter.html
-		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/pdf/PdfExporterConfiguration.html#getUserPassword()
 		JRPdfExporter exporter = new JRPdfExporter();
 		// PDFのセキュリティ設定を取得
 		SimplePdfExporterConfiguration configuration = getPdfExproterConfiguration(options);
@@ -338,6 +335,10 @@ public abstract class AbstractJasperReportCreator<T> {
 		if (!options.isEncrypted()) {
 			return null;
 		}
+		// PDFのパスワード等を指定する場合には、直接JRPdfExporterインスタンスを作成し実装
+		// https://javadoc.io/doc/net.sf.jasperreports/jasperreports-pdf/latest/net/sf/jasperreports/pdf/JRPdfExporter.html
+		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/pdf/PdfExporterConfiguration.html#getUserPassword()
+		
 		SimplePdfExporterConfiguration configuration = new SimplePdfExporterConfiguration();
 		// パスワード指定時は、暗号化設定を有効化
 		configuration.setEncrypted(true);

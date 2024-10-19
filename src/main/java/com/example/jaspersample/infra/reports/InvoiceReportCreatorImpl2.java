@@ -37,8 +37,9 @@ public class InvoiceReportCreatorImpl2 extends AbstractJasperReportCreator<Order
 	// 業務APが定義する帳票出力処理
 	@Override
 	public InputStream createInvoice(Order order) {
-		// PDFの読み取りパスワードのオプション設定例
+        // PDFのセキュリティ設定のオプション例				
 		PDFOptions options = PDFOptions.builder()//
+				//　読み取りパスワード
 				.userPassword(order.getCustomer().getPdfPassword())//
 				// 権限パスワード
 				//.ownerPassword("admin")//

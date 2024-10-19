@@ -75,7 +75,7 @@
     * JasperReportsでは、Jaspersoft Studioでデザインした帳票をjrxmlというXML形式で保存します。    
     * Javaのコードでは、jrxmlファイルをコンパイルしjasperファイルを生成します。
     * Jasperファイルに、帳票様式に定義したパラメータデータ(Map)と、帳票様式が参照するデータソース（JavaBeanのコレクションデータやDB等のJRDataSourceインタフェース）を帳票出力するデータとして渡すことで、帳票オブジェクト(JasperPrint)を作成します。
-    * 帳票オブジェクト(JasperPrint)を、PDFやExcel等の形式にエクスポーすることで、帳票を出力します。
+    * 帳票オブジェクト(JasperPrint)を、PDFやExcel等の形式にエクスポートすることで、帳票を出力します。
 
 ![JasperReportsの概念](https://content.invisioncic.com/i328763/monthly_2024_01/jss-jr-schema-xlsx.png.d4c7b77249240ab0a87151e5feb6f011.png)  
 
@@ -187,7 +187,7 @@
     * 帳票出力のフレームワーク機能の実装例は[こちら](src/main/java/com/example/fw/common/reports/)
     
 * フレームワーク機能を利用した帳票出力の例を示します。
-    * [サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorImpl.java)
+    * JRBeanCollectionDataSource（JavaBeanをデータソース）による[サンプルコード](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorImpl.java)
     
     * 以下、抜粋
 
@@ -202,9 +202,10 @@
         // 業務APが定義する帳票出力処理
         @Override
         public InputStream createInvoice(Order order) {
-            // PDFの読み取りパスワードのオプション設定例
+            // PDFのセキュリティ設定のオプション例
             PDFOptions options = PDFOptions.builder()//
-                    .userPassword(order.getCustomer().getPdfPassword())//
+                    // 読み取りパスワード
+                    .userPassword(order.getCustomer().getPdfPassword())//                   
                     .build();
             // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
             return createPDFReport(order, options);
@@ -219,7 +220,8 @@
         // AbstractJasperReportCreatorのabstractメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す
         @Override
         protected Map<String, Object> getParameters(Order data) {
-            // 帳票の鏡部分のデータをパラメータとして設定した例
+            // 帳票の鏡部分のデータをパラメータとして設定した場合の例
+            // 業務データなので本来DataSourceとして一緒に格納されるが、ここではパラメータとして設定している
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("orderId", data.getId());
             parameters.put("customerZip", data.getCustomer().getZip());
@@ -236,13 +238,99 @@
         // AbstractJasperReportCreatorのabstractメソッドgetDataSourceを実装して、データソースを返す
         @Override
         protected JRDataSource getDataSource(Order data) {
-            // 帳票の一覧部分に出力する注文明細のデータを設定した例
+            // 帳票の一覧部分に出力する注文明細のデータをDataSourceに設定した例
             return new JRBeanCollectionDataSource(data.getOrderItems());
         }
 
     }
     ```
 
+    * JRCsvDataSource（CSVファイルをデータソース）による[サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorForCSVImpl.java)    
+
+    ```java    
+    @ReportCreator
+    public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<InvoiceReportCSVData> implements InvoiceReportCreatorForCSV {
+        private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report2.jrxml";
+        
+        @Override
+        public InputStream createInvoice(InvoiceReportCSVData csvData) {
+            PDFOptions options = PDFOptions.builder()//
+                    .userPassword(csvData.getPdfPassword())//
+                    //…					
+                    .build();
+            return createPDFReport(csvData, options);
+        }
+
+        @Override
+        protected File getMainJRXMLFile() throws FileNotFoundException {
+            return ResourceUtils.getFile(JRXML_FILE_PATH);
+        }
+
+        @Override
+        protected JRDataSource getDataSource(InvoiceReportCSVData data) {
+            try {
+                // CSVファイルからJRDataSourceを生成
+                JRCsvDataSource dataSource = new JRCsvDataSource(data.getInputStream(), "UTF-8");
+                // 1行目をフィールドを表すカラムヘッダーとして使用する設定
+                dataSource.setUseFirstRowAsHeader(true);
+                return dataSource;
+            } catch (UnsupportedEncodingException e) {			
+                throw new SystemException(e, MessageIds.E_EX_9001);
+            }			
+        }
+    }
+
+    ```
+
+    * CSVデータ
+        * [CSVデータの例](https://github.com/mysd33/sample-jasperreports-springboot/blob/main/src/main/resources/csv/order.csv)
+    
+        * 1行目がフィールドを表すカラムヘッダー
+        * 帳票の鏡部分は、CSVの最初の行のデータのみ指定すればよい
+        * 帳票の明細一覧部分は、明細の数の行データを繰り返し指定すればよい
+
+        * ![CSVデータ](image/csv.png)
+
+
+    * PDFのセキュリティ設定
+        * 全帳票に共通のPDFのセキュリティ設定を行うことができます。
+            * [application.yaml](src/main/resources/application.yml)での設定例            
+
+            ```yaml
+            report:
+              # PDFの権限拒否設定
+              pdf-permission-denied: COPY|PRINTING|MODIFY_CONTENTS
+              #pdf-permission-denied: ALL
+              # PDFの暗号化レベル設定
+              #128bit-key: false
+            ```
+
+        * 帳票個別にPDFのセキュリティ設定を行うことができます。
+
+        ```java
+        @ReportCreator
+        public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<InvoiceReportCSVData> implements InvoiceReportCreatorForCSV {
+            …    
+
+            @Override
+            public InputStream createInvoice(Order order) {
+                // PDFのセキュリティ設定のオプション例
+                PDFOptions options = PDFOptions.builder()//
+                        .userPassword(order.getCustomer().getPdfPassword())//
+                        // 権限パスワード
+                        .ownerPassword("admin")//
+                        // 特定の処理個別の暗号化レベル設定				
+                        .is128bitKey(false)
+                        特定の処理個別の権限設定
+                        .permissionsDenied(List.of(
+                                PdfPermissionsEnum.COPY,
+                                PdfPermissionsEnum.PRINTING,
+                                PdfPermissionsEnum.MODIFY_CONTENTS
+                                ))//                    
+                        .build();
+            }                        
+        }
+        ```
 
 ## 日本語を出力する方法
 * デフォルトのフォントだと日本語出力できないので、日本語フォントを利用できるように、AP側では、以下の設定をする必要があります。
