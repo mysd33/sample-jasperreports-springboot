@@ -22,7 +22,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
  * 
  * 帳票出力のフレームワーク機能を利用して実装している
  */
-@ReportCreator
+@ReportCreator("R002")
 public class TransactionsReportCreatorImpl extends AbstractJasperReportCreator<List<Transaction>>
 		implements TransactionsReportCreator {
 	private static final String TITLE = "title";

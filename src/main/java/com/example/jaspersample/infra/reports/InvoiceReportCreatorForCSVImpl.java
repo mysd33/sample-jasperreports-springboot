@@ -25,7 +25,7 @@ import net.sf.jasperreports.engine.data.JRCsvDataSource;
  * 帳票データがCSVファイルの場合
  */
 // @ReportCreatorを付与し、Bean定義
-@ReportCreator
+@ReportCreator("R003")
 // AbstractJasperReportCreatorを継承
 // 型パラメータに帳票作成に必要なデータの型を指定
 public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<InvoiceReportCSVData> implements InvoiceReportCreatorForCSV {

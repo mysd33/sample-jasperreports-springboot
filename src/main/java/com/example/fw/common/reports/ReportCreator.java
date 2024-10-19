@@ -15,5 +15,5 @@ import org.springframework.stereotype.Component;
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 public @interface ReportCreator {
-
+	String value();  // 帳票IDを指定
 }
