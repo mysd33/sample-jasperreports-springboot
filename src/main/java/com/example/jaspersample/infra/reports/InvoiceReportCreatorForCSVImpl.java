@@ -56,7 +56,7 @@ public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<
 
 	// AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
 	@Override
-	protected File getJRXMLFile() throws FileNotFoundException {
+	protected File getMainJRXMLFile() throws FileNotFoundException {
 		return ResourceUtils.getFile(JRXML_FILE_PATH);
 	}
 

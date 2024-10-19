@@ -35,7 +35,7 @@ public class TransactionsReportCreatorImpl extends AbstractJasperReportCreator<L
 	}
 
 	@Override
-	protected File getJRXMLFile() throws FileNotFoundException {
+	protected File getMainJRXMLFile() throws FileNotFoundException {
 		return ResourceUtils.getFile(JRXML_FILE_PATH);
 	}
 
