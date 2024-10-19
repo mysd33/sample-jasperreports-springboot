@@ -191,7 +191,7 @@
 
     ```java
     // @ReportCreatorを付与し、Bean定義    
-    @ReportCreator("R003")
+    @ReportCreator(id = "R003")
     // AbstractJasperReportCreatorを継承
     // 型パラメータに帳票作成に必要なデータの型を指定
     public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order> implements BillingReportCreator {
@@ -246,7 +246,7 @@
     * JRCsvDataSource（CSVファイルをデータソース）による[サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorForCSVImpl.java)    
 
     ```java    
-    @ReportCreator("R003")    
+    @ReportCreator(id = "R003")    
     public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<InvoiceReportCSVData> implements InvoiceReportCreatorForCSV {
         private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report2.jrxml";
         
@@ -304,7 +304,7 @@
         * 帳票個別にPDFのセキュリティ設定を行うことができます。
 
         ```java
-        @ReportCreator
+        @ReportCreator(id = "R003")
         public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<InvoiceReportCSVData> implements InvoiceReportCreatorForCSV {
             …    
 

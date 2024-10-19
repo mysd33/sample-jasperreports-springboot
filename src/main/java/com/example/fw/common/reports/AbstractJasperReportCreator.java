@@ -25,6 +25,7 @@ import com.example.fw.common.logging.LoggerFactory;
 import com.example.fw.common.logging.MonitoringLogger;
 import com.example.fw.common.message.CommonFrameworkMessageIds;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
+import com.example.fw.common.systemdate.SystemDateUtils;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -45,7 +46,7 @@ import net.sf.jasperreports.pdf.SimplePdfExporterConfiguration;
 import net.sf.jasperreports.pdf.type.PdfPermissionsEnum;
 
 /**
- * Jasper Reportsを使用して、帳票作成のための基底クラス
+ * JasperReportsを使用して、帳票作成のための基底クラス
  * 
  * @param <T> 帳票データの型
  */
@@ -55,6 +56,7 @@ public abstract class AbstractJasperReportCreator<T> {
 	private static final MonitoringLogger monitoringLogger = LoggerFactory.getMonitoringLogger(log);
 	private ReportsConfigurationProperties config;
 	private Path jasperPath;
+	private String reportId;
 
 	@Autowired
 	public void setConfig(final ReportsConfigurationProperties config) {
@@ -63,6 +65,10 @@ public abstract class AbstractJasperReportCreator<T> {
 
 	@PostConstruct
 	public void init() throws FileNotFoundException, JRException {
+		// ログ出力用に、帳票IDを取得
+		ReportCreator annotation = getClass().getAnnotation(ReportCreator.class);
+		reportId = annotation.id();
+
 		// コンパイル済の帳票様式を保存する一時ディレクトリを作成する
 		String tempDir = System.getProperty("java.io.tmpdir");
 		jasperPath = Path.of(tempDir, config.getJasperFileTmpdir());
@@ -76,19 +82,20 @@ public abstract class AbstractJasperReportCreator<T> {
 			// サブレポート用の帳票様式
 			compileSubReportJRXML();
 		} catch (FileNotFoundException | JRException e) {
-			monitoringLogger.error(CommonFrameworkMessageIds.E_CM_FW_9003, e);
+			monitoringLogger.error(CommonFrameworkMessageIds.E_CM_FW_9003, e, reportId);
 			throw e;
 		}
 
 	}
 
 	@PreDestroy
-	public void destroy() throws FileNotFoundException {	
+	public void destroy() throws FileNotFoundException, IOException {
 		// メインの帳票様式のjapserファイルを削除する
-		File jasperFile = getMainJasperFile();
-		jasperFile.delete();
+		deleteJasperFile(getMainJasperFile());
 		// サブレポート用の帳票様式のjapserファイルを削除する
-		getSubReportJapserFiles().forEach(File::delete);
+		for (File subReportJaperFile : getSubReportJapserFiles()) {
+			deleteJasperFile(subReportJaperFile);
+		}
 	}
 
 	/**
@@ -109,6 +116,28 @@ public abstract class AbstractJasperReportCreator<T> {
 	 * @return PDFファイルのInputStreamデータ
 	 */
 	public InputStream createPDFReport(final T data, final PDFOptions options) {
+		appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0005, reportId);
+		// 処理時間を計測しログ出力
+		long startTime = System.nanoTime();
+		try {
+			// 本処理
+			return doCreatePDFReport(data, options);
+		} finally {
+			// 呼び出し処理実行後、処理時間を計測しログ出力
+			long endTime = System.nanoTime();
+			double elapsedTime = SystemDateUtils.calcElaspedTimeByMilliSecounds(startTime, endTime);
+			appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0006, reportId, elapsedTime);
+		}
+	}
+
+	/**
+	 * 帳票作成の本処理
+	 * 
+	 * @param data    帳票データ
+	 * @param options PDF出力時のオプション設定
+	 * @return PDFファイルのInputStreamデータ
+	 */
+	private InputStream doCreatePDFReport(final T data, final PDFOptions options) {
 		Map<String, Object> parameters = getParameters(data);
 		JRDataSource dataSource = getDataSource(data);
 		JasperReport jasperReport = null;
@@ -117,7 +146,7 @@ public abstract class AbstractJasperReportCreator<T> {
 			// コンパイル済の帳票様式を読み込む
 			jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
 		} catch (FileNotFoundException | JRException e) {
-			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9004);
+			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9004, reportId);
 		}
 
 		try {
@@ -127,11 +156,11 @@ public abstract class AbstractJasperReportCreator<T> {
 
 			// そのままバイト配列に出力する実装例
 			return exportPDF(jasperPrint, options);
-			
+
 			// 一時ファイルに出力する実装例
 			// return exportPDFForLargeFile(jasperPrint, options);
 		} catch (JRException e) { // | IOException e) {
-			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9005);
+			throw new SystemException(e, CommonFrameworkMessageIds.E_CM_FW_9005, reportId);
 		}
 	}
 
@@ -248,7 +277,7 @@ public abstract class AbstractJasperReportCreator<T> {
 		// 検索パス(--processor-path、--processor-module-path)が指定されるか、注釈処理が明示的に有効化(-proc:only、-proc:full)されている場合を除き、
 		// 将来のリリースのjavacでは注釈処理が無効化される可能性があります。-Xlint:オプションを使用すると、このメッセージを非表示にできます。-proc:noneを使用すると、注釈処理を無効化できます。」
 
-		appLogger.debug("帳票様式のコンパイル:{}", jrxmlFile.getAbsolutePath());
+		appLogger.debug("帳票ID[{}]様式のコンパイル:{}", reportId, jrxmlFile.getAbsolutePath());
 		// jrxmlの帳票様式ファイルをコンパイルする
 		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperCompileManager.html
 		JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
@@ -256,9 +285,29 @@ public abstract class AbstractJasperReportCreator<T> {
 		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/util/JRSaver.html
 		File jasperFile = getJasperFile(jrxmlFile);
 		JRSaver.saveObject(jasperReport, jasperFile);
-		appLogger.debug("コンパイル結果ファイル:{}", jasperFile.getAbsolutePath());
+		appLogger.debug("帳票ID[{}]コンパイル結果ファイル:{}", reportId, jasperFile.getAbsolutePath());
 		return jasperReport;
 	}
+	
+	/**
+	 * japserファイルを削除する
+	 * 
+	 * @param jasperFile japserファイル
+	 * @throws IOException 
+	 */
+	private void deleteJasperFile(File jasperFile) throws IOException {
+		if (!jasperFile.exists()) {
+			appLogger.debug("帳票ID[{}]jasperファイルは存在しません:{}", reportId, jasperFile.getAbsolutePath());
+			return;
+		}
+		try {
+			Files.delete(jasperFile.toPath());
+		} catch (IOException e) {
+			appLogger.debug("帳票ID[{}]jasperファイル削除に失敗しました:{}", reportId, jasperFile.getAbsolutePath());
+			throw e;
+		}
+		appLogger.debug("帳票ID[{}]jasperファイル削除に成功しました:{}", reportId, jasperFile.getAbsolutePath());
+	}	
 
 	/**
 	 * PDF形式で帳票を出力する
@@ -272,7 +321,7 @@ public abstract class AbstractJasperReportCreator<T> {
 	private InputStream exportPDF(final JasperPrint jasperPrint, final PDFOptions options) throws JRException {
 		// （参考）通常のPDF出力の実装例
 		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperExportManager.html
-		// 
+		//
 		// byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
 		// return new ByteArrayInputStream(reportContent);
 
@@ -338,7 +387,7 @@ public abstract class AbstractJasperReportCreator<T> {
 		// PDFのパスワード等を指定する場合には、直接JRPdfExporterインスタンスを作成し実装
 		// https://javadoc.io/doc/net.sf.jasperreports/jasperreports-pdf/latest/net/sf/jasperreports/pdf/JRPdfExporter.html
 		// https://jasperreports.sourceforge.net/api/net/sf/jasperreports/pdf/PdfExporterConfiguration.html#getUserPassword()
-		
+
 		SimplePdfExporterConfiguration configuration = new SimplePdfExporterConfiguration();
 		// パスワード指定時は、暗号化設定を有効化
 		configuration.setEncrypted(true);

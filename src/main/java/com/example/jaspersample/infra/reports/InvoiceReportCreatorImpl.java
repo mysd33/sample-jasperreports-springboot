@@ -23,7 +23,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
  * 帳票出力のフレームワーク機能を利用して実装している
  */
 // @ReportCreatorを付与し、Bean定義
-@ReportCreator("R003")
+@ReportCreator(id = "R003")
 // AbstractJasperReportCreatorを継承
 // 型パラメータに帳票作成に必要なデータの型を指定
 public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order> implements InvoiceReportCreator {

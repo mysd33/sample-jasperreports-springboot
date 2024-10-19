@@ -25,7 +25,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
  * 単項目も含めて、JRDataSourceを使用して帳票を作成する例
  */
 // @ReportCreatorを付与し、Bean定義
-@ReportCreator("R003")
+@ReportCreator(id = "R003")
 // AbstractJasperReportCreatorを継承
 // 型パラメータに帳票作成に必要なデータの型を指定
 @RequiredArgsConstructor
