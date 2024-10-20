@@ -289,8 +289,8 @@
             ![CSVデータ](image/csv.png)
 
     * PDFのセキュリティ設定
-        * 全帳票に共通のPDFのセキュリティ設定を行うことができます。
-            * [application.yaml](src/main/resources/application.yml)での設定例     
+        * 以下、いずれか2つの設定ファイルで全帳票に共通のPDFのセキュリティ設定を行うことができます。
+            * [application.yml](src/main/resources/application.yml)での設定例     
                 * Spring Bootの仕組みの中でできるので、appplication.yml修正後にSpring DevToolsによる自動再起動で設定変更が反映されるので便利です。
 
             ```yaml
@@ -303,10 +303,16 @@
             ```
 
             * [japserreports.properties](src/main/resources/jasperreports.properties)での設定例
-                * JasperReport自体のプロパティファイルです。[JasperReports - Configuration Reference](https://jasperreports.sourceforge.net/config.reference.html)で定義されているプロパティがすべて設定できますので、よりきめ細かく設定が可能です。
-                * ただし、Spring DevToolsによる自動再起動で設定変更が反映されないようで、一度APを止めて再起動する必要があります。                
+                * JasperReport自体のプロパティファイルです。
+                * なお、ISO 8859-1エンコーディングを前提としているようで、UTF-8のファイルに変えても日本語が文字化けするので、Unicodeエスケープ文字列にしておくとよいです。
+                * メリットは、[JasperReports - Configuration Reference](https://jasperreports.sourceforge.net/config.reference.html)で定義されているプロパティがすべて設定できますので、よりきめ細かく設定が可能なことです。
+                    * 例えば、application.ymlや後述のPDFOptionsではセキュリティ設定のみに対応していますが、`net.sf.jasperreports.export.pdf.metadata.author`で、Author（作成者）のメタデータを設定することもできます。                
+                * デメリットは、Spring DevToolsによる自動再起動で設定変更が反映されないようで、一度APを止めてから再度起動する必要がありますので、開発時には少し不便です。                
 
-            ```
+            ```            
+            net.sf.jasperreports.export.pdf.metadata.author=XXXX\u682A\u5F0F\u4F1A\u793E
+            #net.sf.jasperreports.export.pdf.metadata.author=XXXX Corporation            
+            
             net.sf.jasperreports.export.pdf.encrypted=true
             net.sf.jasperreports.export.pdf.128.bit.key=true
             net.sf.jasperreports.export.pdf.user.password=password
