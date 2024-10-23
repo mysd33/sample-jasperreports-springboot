@@ -376,20 +376,40 @@
 ## 参考情報
 * [Jaspersoft community editionの公式サイト](https://www.jaspersoft.com/products/jaspersoft-community)
 
-* [NRIのOpenStandiaが提供するJaspersoft情報](https://openstandia.jp/oss_info/jaspersoft/)
+* [JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports)
+
+* [JasperReports - Sample Reference](https://jasperreports.sourceforge.net/sample.reference/README.html)
 
 * [Workbrain JAPAN](https://www.workbrainjapan.net/service-main)
     * JasperReportsを扱っており、「[TIBCO Jaspersoft インシデントサポートサービス](https://www.workbrainjapan.net/jaspersoft-incident-support)」、「[帳票・レポート作成ソリューション](https://www.workbrainjapan.net/jasperreports-solution)」がある模様
 
-* [JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports)
+* [NRIのOpenStandiaが提供するJaspersoft情報](https://openstandia.jp/oss_info/jaspersoft/)
 
-* [OpenPDFのGitHubサイト](https://github.com/LibrePDF/OpenPDF)
-    * [OpenPDFによる電子署名付与](https://github.com/LibrePDF/OpenPDF/wiki/Signing)
+* JavaBeanを使った帳票出力
+    * [JasperReports - JavaBean Data Sources](https://jasperreports.sourceforge.net/sample.reference/datasource/README.html#javabeandatasources)
+
+* CSVデータを使った帳票出力
+    * [JasperReports - CSV Data Source](https://jasperreports.sourceforge.net/sample.reference/csvdatasource/README.html#csvdatasource)
+
+* JSONデータを使った帳票出力
+    * [JasperReports - JSON Data Source](https://jasperreports.sourceforge.net/sample.reference/jsondatasource/README.html#jsondatasource)
+
+* サブレポート
+    * [JasperReports - Subreports](https://jasperreports.sourceforge.net/sample.reference/subreport/README.html#subreports)
+
+* PDFの暗号化・セキュリティ設定
+    * [JasperReports - Encrypted PDF](https://jasperreports.sourceforge.net/sample.reference/pdfencrypt/README.html#pdfencrypt)
 
 * 日本語フォントの対応
     * [JasperReportでの日本語フォントの利用の記事](https://qiita.com/morya/items/26e1519b9ca813ed399a)
     * [IPAフォント](https://moji.or.jp/ipafont/ipafontdownload/)
-    * [Jasper Reportsのフォント拡張の記事](https://jasperreports.sourceforge.net/sample.reference/fonts/README.html#fontextensions)
+    * [JasperReportsのフォント拡張のリファレンス](https://jasperreports.sourceforge.net/sample.reference/fonts/README.html#fontextensions)
+
+* 電子署名
+    * [OpenPDFのGitHubサイト](https://github.com/LibrePDF/OpenPDF)
+        * [OpenPDFによる電子署名付与](https://github.com/LibrePDF/OpenPDF/wiki/Signing)
+    * [Adobe PDF ファイルで電子署名を利用する方法](https://helpx.adobe.com/jp/acrobat/kb/cq07131410.html)
+    * [Adobe Approved Trust List メンバー](https://helpx.adobe.com/jp/acrobat/kb/approved-trust-list1.html)
 
 * Japser Reportsを使ったチュートリアル、サンプル
     * サンプル1
