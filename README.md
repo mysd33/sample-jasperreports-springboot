@@ -254,7 +254,6 @@
         public InputStream createInvoice(InvoiceReportCSVData csvData) {
             PDFOptions options = PDFOptions.builder()//
                     .userPassword(csvData.getPdfPassword())//
-                    //…					
                     .build();
             return createPDFReport(csvData, options);
         }
@@ -322,7 +321,7 @@
             #net.sf.jasperreports.export.pdf.permissions.denied=ALL
             ```
 
-        * 帳票個別にPDFのセキュリティ設定を行うことができます。
+        * createPDFReportメソッド呼び出しの引数PDFOptionで、帳票個別で処理ごとに、PDFのセキュリティ設定を行うことができます。
 
         ```java
         @ReportCreator(id = "R003", name = "請求書")
@@ -345,6 +344,8 @@
                                 PdfPermissionsEnum.MODIFY_CONTENTS
                                 ))//                    
                         .build();
+
+                return createPDFReport(csvData, options);       
             }                        
         }
         ```
@@ -366,6 +367,12 @@
     * Window > Preferences > Jaspersoft Studio > Fonts. でフォントを追加する。
     * フォントファミリー名は、上記の定義ファイルのfontFamilyのname属性の値と同じものを指定します。
 
+## PDFへの電子署名付与
+* JasperReprots自体には、PDFへ電子署名を付与するAPIが持っていません。
+* 本サンプルAPでは現状、実装していませんが、OpenPDFのライブラリを利用することで、PDFへ電子署名を付与することができます。    
+    * [OpenPDF-Signing](https://github.com/LibrePDF/OpenPDF/wiki/Signing)
+    * [PdfStamperクラスのJavadoc(OpenOPF1.3.32)](https://javadoc.io/doc/com.github.librepdf/openpdf/1.3.32/com/lowagie/text/pdf/PdfStamper.html)
+
 ## 参考情報
 * [Jaspersoft community editionの公式サイト](https://www.jaspersoft.com/products/jaspersoft-community)
 
@@ -375,6 +382,9 @@
     * JasperReportsを扱っており、「[TIBCO Jaspersoft インシデントサポートサービス](https://www.workbrainjapan.net/jaspersoft-incident-support)」、「[帳票・レポート作成ソリューション](https://www.workbrainjapan.net/jasperreports-solution)」がある模様
 
 * [JaspterReports LibraryのGitHubサイト](https://github.com/TIBCOSoftware/jasperreports)
+
+* [OpenPDFのGitHubサイト](https://github.com/LibrePDF/OpenPDF)
+    * [OpenPDFによる電子署名付与](https://github.com/LibrePDF/OpenPDF/wiki/Signing)
 
 * 日本語フォントの対応
     * [JasperReportでの日本語フォントの利用の記事](https://qiita.com/morya/items/26e1519b9ca813ed399a)
