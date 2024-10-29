@@ -418,6 +418,7 @@
     * [Adobe Approved Trust List メンバー](https://helpx.adobe.com/jp/acrobat/kb/approved-trust-list1.html)
     * [アンテナハウス - PDF電子署名について](https://www.antenna.co.jp/pades/pr-e-signature.html)        
     * [アンテナハウス - PDF電子署名入門](https://www.antenna.co.jp/pdf/reference/PDFSingature.html)
+    * [総務省 - 電子署名・認証・タイムスタンプ](https://www.soumu.go.jp/main_sosiki/joho_tsusin/top/ninshou-law/pdf/090611_1.pdf)
     * [dss](https://github.com/esig/dss/tree/master/dss)
         * [dss-pades-openpdf](https://github.com/esig/dss/tree/master/dss-pades-openpdf)
             * DSS PAdESでのOpenPDF統合機能
