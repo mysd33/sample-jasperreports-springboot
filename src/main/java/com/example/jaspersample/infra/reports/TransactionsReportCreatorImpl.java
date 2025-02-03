@@ -24,32 +24,32 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
  */
 @ReportCreator(id = "R002", name = "取引一覧")
 public class TransactionsReportCreatorImpl extends AbstractJasperReportCreator<List<Transaction>>
-		implements TransactionsReportCreator {
-	private static final String TITLE = "title";
-	private static final String REPORT_NAME = "取引一覧";
-	private static final String JRXML_FILE_PATH = "classpath:reports/transaction-report.jrxml";
+        implements TransactionsReportCreator {
+    private static final String TITLE = "title";
+    private static final String REPORT_NAME = "取引一覧";
+    private static final String JRXML_FILE_PATH = "classpath:reports/transaction-report.jrxml";
 
-	@Override
-	public InputStream createTransactionsReport(List<Transaction> items) {
-		return createPDFReport(items);
-	}
+    @Override
+    public InputStream createTransactionsReport(List<Transaction> items) {
+        return createPDFReport(items);
+    }
 
-	@Override
-	protected File getMainJRXMLFile() throws FileNotFoundException {
-		return ResourceUtils.getFile(JRXML_FILE_PATH);
-	}
+    @Override
+    protected File getMainJRXMLFile() throws FileNotFoundException {
+        return ResourceUtils.getFile(JRXML_FILE_PATH);
+    }
 
-	@Override
-	protected Map<String, Object> getParameters(List<Transaction> data) {
-		Map<String, Object> parameters = new HashMap<>();
-		// タイトルをパラメータに指定
-		parameters.put(TITLE, REPORT_NAME);
-		return parameters;
-	}
+    @Override
+    protected Map<String, Object> getParameters(List<Transaction> data) {
+        Map<String, Object> parameters = new HashMap<>();
+        // タイトルをパラメータに指定
+        parameters.put(TITLE, REPORT_NAME);
+        return parameters;
+    }
 
-	@Override
-	protected JRDataSource getDataSource(List<Transaction> data) {
-		return new JRBeanCollectionDataSource(data);
-	}
+    @Override
+    protected JRDataSource getDataSource(List<Transaction> data) {
+        return new JRBeanCollectionDataSource(data);
+    }
 
 }

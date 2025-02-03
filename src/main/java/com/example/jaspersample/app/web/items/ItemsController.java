@@ -23,25 +23,25 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("items")
 @RequiredArgsConstructor
 public class ItemsController {
-	//private static final String REPORT_FILE_NAME = "items.pdf";
-	private static final String REPORT_FILE_NAME = "商品一覧.pdf";
-	private final ItemsService itemsService;
-	private final ItemsReportCreator reportCreator;
+    // private static final String REPORT_FILE_NAME = "items.pdf";
+    private static final String REPORT_FILE_NAME = "商品一覧.pdf";
+    private final ItemsService itemsService;
+    private final ItemsReportCreator reportCreator;
 
-	/**
-	 * 商品一覧の帳票（PDF）を出力する
-	 * 
-	 * @return 帳票のPDFファイル
-	 */
-	@GetMapping("report")
-	public ResponseEntity<Resource> getItemsReport() {
-		// 商品一覧を取得するサービスを実行し、帳票出力データを取得
-		List<Item> items = itemsService.findAll();
-		// 商品一覧のPDF帳票の作成		
-		InputStream reportInputStream = reportCreator.createItemsReport(items);				
+    /**
+     * 商品一覧の帳票（PDF）を出力する
+     * 
+     * @return 帳票のPDFファイル
+     */
+    @GetMapping("report")
+    public ResponseEntity<Resource> getItemsReport() {
+        // 商品一覧を取得するサービスを実行し、帳票出力データを取得
+        List<Item> items = itemsService.findAll();
+        // 商品一覧のPDF帳票の作成
+        InputStream reportInputStream = reportCreator.createItemsReport(items);
 
-		// レスポンスを返す
-		return ResponseUtil.createResponseForPDF(reportInputStream, REPORT_FILE_NAME);
-	}
+        // レスポンスを返す
+        return ResponseUtil.createResponseForPDF(reportInputStream, REPORT_FILE_NAME);
+    }
 
 }

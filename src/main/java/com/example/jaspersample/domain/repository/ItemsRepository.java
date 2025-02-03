@@ -9,10 +9,10 @@ import com.example.jaspersample.domain.model.Item;
  */
 public interface ItemsRepository {
 
-	/**
-	 * 商品一覧を取得する
-	 * 
-	 * @return 商品一覧
-	 */
-	List<Item> findAll();
+    /**
+     * 商品一覧を取得する
+     * 
+     * @return 商品一覧
+     */
+    List<Item> findAll();
 }

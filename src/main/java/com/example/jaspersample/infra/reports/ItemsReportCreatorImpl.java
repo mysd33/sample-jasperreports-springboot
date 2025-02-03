@@ -26,35 +26,35 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 // AbstractJasperReportCreatorを継承
 // 型パラメータに帳票作成に必要なデータの型を指定
 public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Item>> implements ItemsReportCreator {
-	private static final String TITLE = "title";
-	private static final String REPORT_NAME = "商品一覧";
-	private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
+    private static final String TITLE = "title";
+    private static final String REPORT_NAME = "商品一覧";
+    private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
 
-	@Override
-	public InputStream createItemsReport(List<Item> items) {
+    @Override
+    public InputStream createItemsReport(List<Item> items) {
         // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
-		return createPDFReport(items);
-	}
+        return createPDFReport(items);
+    }
 
-	// AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
-	@Override
-	protected File getMainJRXMLFile() throws FileNotFoundException {
-		return ResourceUtils.getFile(JRXML_FILE_PATH);
-	}
+    // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
+    @Override
+    protected File getMainJRXMLFile() throws FileNotFoundException {
+        return ResourceUtils.getFile(JRXML_FILE_PATH);
+    }
 
-	// AbstractJasperReportCreatorのメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す
-	@Override
-	protected Map<String, Object> getParameters(List<Item> data) {
-		Map<String, Object> parameters = new HashMap<>();
-		// タイトルをパラメータに指定
-		parameters.put(TITLE, REPORT_NAME);
-		return parameters;
-	}
+    // AbstractJasperReportCreatorのメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す
+    @Override
+    protected Map<String, Object> getParameters(List<Item> data) {
+        Map<String, Object> parameters = new HashMap<>();
+        // タイトルをパラメータに指定
+        parameters.put(TITLE, REPORT_NAME);
+        return parameters;
+    }
 
-	// AbstractJasperReportCreatorのabstractメソッドgetDataSourceを実装して、データソースを返す
-	@Override
-	protected JRDataSource getDataSource(List<Item> data) {
-		return new JRBeanCollectionDataSource(data);
-	}
+    // AbstractJasperReportCreatorのabstractメソッドgetDataSourceを実装して、データソースを返す
+    @Override
+    protected JRDataSource getDataSource(List<Item> data) {
+        return new JRBeanCollectionDataSource(data);
+    }
 
 }

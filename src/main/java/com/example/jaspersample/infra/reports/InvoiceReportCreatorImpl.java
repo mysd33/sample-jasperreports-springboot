@@ -27,58 +27,58 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 // AbstractJasperReportCreatorを継承
 // 型パラメータに帳票作成に必要なデータの型を指定
 public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order> implements InvoiceReportCreator {
-	private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report.jrxml";
+    private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report.jrxml";
 
-	// 業務APが定義する帳票出力処理
-	@Override
-	public InputStream createInvoice(Order order) {
-        // PDFのセキュリティ設定のオプション例		
-		PDFOptions options = PDFOptions.builder()//
-				//　読み取りパスワード
-				.userPassword(order.getCustomer().getPdfPassword())//
-				// 権限パスワード
-				//.ownerPassword("admin")//
-				// 特定の処理個別の暗号化レベル設定				
-				//.is128bitKey(false)
-				// 特定の処理個別の権限設定
-				//.permissionsDenied(List.of(
-				//		PdfPermissionsEnum.COPY,
-				//		PdfPermissionsEnum.PRINTING,
-				//		PdfPermissionsEnum.MODIFY_CONTENTS
-				//		))//					
-				.build();
+    // 業務APが定義する帳票出力処理
+    @Override
+    public InputStream createInvoice(Order order) {
+        // PDFのセキュリティ設定のオプション例
+        PDFOptions options = PDFOptions.builder()//
+                // 読み取りパスワード
+                .userPassword(order.getCustomer().getPdfPassword())//
+                // 権限パスワード
+                // .ownerPassword("admin")//
+                // 特定の処理個別の暗号化レベル設定
+                // .is128bitKey(false)
+                // 特定の処理個別の権限設定
+                // .permissionsDenied(List.of(
+                // PdfPermissionsEnum.COPY,
+                // PdfPermissionsEnum.PRINTING,
+                // PdfPermissionsEnum.MODIFY_CONTENTS
+                // ))//
+                .build();
         // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
-		return createPDFReport(order, options);
-	}
+        return createPDFReport(order, options);
+    }
 
     // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
-	@Override
-	protected File getMainJRXMLFile() throws FileNotFoundException {
-		return ResourceUtils.getFile(JRXML_FILE_PATH);
-	}
+    @Override
+    protected File getMainJRXMLFile() throws FileNotFoundException {
+        return ResourceUtils.getFile(JRXML_FILE_PATH);
+    }
 
     // AbstractJasperReportCreatorのメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す
-	@Override
-	protected Map<String, Object> getParameters(Order data) {
-		// 帳票の鏡部分のデータをパラメータとして設定した例
-		Map<String, Object> parameters = new HashMap<>();
-		parameters.put("orderId", data.getId());
-		parameters.put("customerZip", data.getCustomer().getZip());
-		parameters.put("customerAddress", data.getCustomer().getAddress());
-		parameters.put("customerName", data.getCustomer().getName());
-		parameters.put("billingSourceName", data.getBillingSource().getName());
-		parameters.put("billingSourceZip", data.getBillingSource().getZip());
-		parameters.put("billingSourceAddress", data.getBillingSource().getAddress());
-		parameters.put("billingSourceTel", data.getBillingSource().getTel());
-		parameters.put("billingSourceManager", data.getBillingSource().getManager());
-		return parameters;
-	}
+    @Override
+    protected Map<String, Object> getParameters(Order data) {
+        // 帳票の鏡部分のデータをパラメータとして設定した例
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("orderId", data.getId());
+        parameters.put("customerZip", data.getCustomer().getZip());
+        parameters.put("customerAddress", data.getCustomer().getAddress());
+        parameters.put("customerName", data.getCustomer().getName());
+        parameters.put("billingSourceName", data.getBillingSource().getName());
+        parameters.put("billingSourceZip", data.getBillingSource().getZip());
+        parameters.put("billingSourceAddress", data.getBillingSource().getAddress());
+        parameters.put("billingSourceTel", data.getBillingSource().getTel());
+        parameters.put("billingSourceManager", data.getBillingSource().getManager());
+        return parameters;
+    }
 
     // AbstractJasperReportCreatorのabstractメソッドgetDataSourceを実装して、データソースを返す
-	@Override
-	protected JRDataSource getDataSource(Order data) {
-		// 帳票の一覧部分に出力する注文明細のデータを設定した例
-		return new JRBeanCollectionDataSource(data.getOrderItems());
-	}
+    @Override
+    protected JRDataSource getDataSource(Order data) {
+        // 帳票の一覧部分に出力する注文明細のデータを設定した例
+        return new JRBeanCollectionDataSource(data.getOrderItems());
+    }
 
 }

@@ -23,24 +23,24 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("transactions")
 @RequiredArgsConstructor
 public class TransactionsController {
-	//private static final String REPORT_FILE_NAME = "transactions.pdf";
-	private static final String REPORT_FILE_NAME = "取引一覧.pdf";
-	private final TransactionsService transactionService;
-	private final TransactionsReportCreator reportCreator;
+    // private static final String REPORT_FILE_NAME = "transactions.pdf";
+    private static final String REPORT_FILE_NAME = "取引一覧.pdf";
+    private final TransactionsService transactionService;
+    private final TransactionsReportCreator reportCreator;
 
-	/**
-	 * 取引一覧の帳票（PDF）を出力する
-	 * 
-	 * @return 帳票のPDFファイル	 * 
-	 */
-	@GetMapping("report")
-	public ResponseEntity<Resource> getTransactionsReport() {
-		// 取引一覧の帳票を取得するサービスを実行し、帳票出力データを取得		
-		List<Transaction> transactions = transactionService.findAll();
-		// 取引一覧のPDF帳票の作成
-		InputStream reportInputStream = reportCreator.createTransactionsReport(transactions);
+    /**
+     * 取引一覧の帳票（PDF）を出力する
+     * 
+     * @return 帳票のPDFファイル *
+     */
+    @GetMapping("report")
+    public ResponseEntity<Resource> getTransactionsReport() {
+        // 取引一覧の帳票を取得するサービスを実行し、帳票出力データを取得
+        List<Transaction> transactions = transactionService.findAll();
+        // 取引一覧のPDF帳票の作成
+        InputStream reportInputStream = reportCreator.createTransactionsReport(transactions);
 
-		// レスポンスを返す
-		return ResponseUtil.createResponseForPDF(reportInputStream, REPORT_FILE_NAME);
-	}
+        // レスポンスを返す
+        return ResponseUtil.createResponseForPDF(reportInputStream, REPORT_FILE_NAME);
+    }
 }

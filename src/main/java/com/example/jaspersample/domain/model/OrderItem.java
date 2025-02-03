@@ -13,18 +13,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderItem {
-	// 商品コード
-	private String itemCode;
-	// 商品名
-	private String itemName;
-	// 数量
-	private int quantity;
-	// 単価
-	private int unitPrice;
-	// 金額
-	private int amount;
-	// 備考
-	@Builder.Default
-	private String note = "";
+    // 商品コード
+    private String itemCode;
+    // 商品名
+    private String itemName;
+    // 数量
+    private int quantity;
+    // 単価
+    private int unitPrice;
+    // 金額
+    private int amount;
+    // 備考
+    @Builder.Default
+    private String note = "";
 
 }

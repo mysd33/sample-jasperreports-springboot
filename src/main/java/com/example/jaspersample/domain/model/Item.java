@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Item {
-	// 商品ID
-	private Long id;
-	// 商品名
-	private String name;
+    // 商品ID
+    private Long id;
+    // 商品名
+    private String name;
 }

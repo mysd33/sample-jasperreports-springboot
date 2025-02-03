@@ -10,12 +10,12 @@ import com.example.jaspersample.domain.model.Transaction;
  */
 public interface TransactionsReportCreator {
 
-	/**
-	 * 取引一覧の帳票を作成する
-	 * 
-	 * @param items 帳票に出力する取引リスト
-	 * 
-	 * @return 取引一覧帳票の入力ストリームデータ
-	 */
-	InputStream createTransactionsReport(List<Transaction> items);
+    /**
+     * 取引一覧の帳票を作成する
+     * 
+     * @param items 帳票に出力する取引リスト
+     * 
+     * @return 取引一覧帳票の入力ストリームデータ
+     */
+    InputStream createTransactionsReport(List<Transaction> items);
 }

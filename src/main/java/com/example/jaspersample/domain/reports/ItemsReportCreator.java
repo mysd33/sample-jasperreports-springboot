@@ -10,12 +10,12 @@ import com.example.jaspersample.domain.model.Item;
  */
 public interface ItemsReportCreator {
 
-	/**
-	 * 商品一覧の帳票を作成する
-	 * 
-	 * @param items 帳票に出力する商品リスト
-	 * 
-	 * @return 商品一覧帳票の入力ストリームデータ
-	 */
-	InputStream createItemsReport(List<Item> items);
+    /**
+     * 商品一覧の帳票を作成する
+     * 
+     * @param items 帳票に出力する商品リスト
+     * 
+     * @return 商品一覧帳票の入力ストリームデータ
+     */
+    InputStream createItemsReport(List<Item> items);
 }
