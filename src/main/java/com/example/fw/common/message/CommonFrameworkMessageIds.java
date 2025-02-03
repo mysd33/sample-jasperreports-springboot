@@ -20,6 +20,7 @@ public final class CommonFrameworkMessageIds {
 	public static final String I_CM_FW_0009 = "i.cm.fw.0009";
 	public static final String I_CM_FW_0010 = "i.cm.fw.0010";
 	public static final String W_CM_FW_8001 = "w.cm.fw.8001";
+	public static final String W_CM_FW_8002 = "w.cm.fw.8002";
 	public static final String E_CM_FW_9001 = "e.cm.fw.9001";
 	public static final String E_CM_FW_9002 = "e.cm.fw.9002";
 	public static final String E_CM_FW_9003 = "e.cm.fw.9003";
