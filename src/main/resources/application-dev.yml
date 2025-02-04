@@ -13,5 +13,6 @@ report:
 #  jasper-file-tmpdir: jasper2
 # PDFを一時保存するディレクトリを変更する場合に設定
 #  report-tmpdir: pdf2
+# PDFを一時保存するディレクトリを削除する間隔を変更する場合に設定
 #  delete-tempfiles-initial-delay-seconds: 60
 #  delete-tempfiles-fixed-rate-seconds: 60

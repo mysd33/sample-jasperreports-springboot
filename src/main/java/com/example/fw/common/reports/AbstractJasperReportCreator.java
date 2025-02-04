@@ -463,8 +463,8 @@ public abstract class AbstractJasperReportCreator<T> {
      * PDFの一時保存ファイルを定期的に削除する処理
      * 
      */
-    @Scheduled(initialDelayString = "${report.deleteTempfilesInitialDelaySeconds:120}", //
-            fixedRateString = "${report.deleteTempfilesFixedRateSeconds:60}", timeUnit = TimeUnit.SECONDS)
+    @Scheduled(initialDelayString = "${report.delete-tempfiles-initial-delay-seconds:120}", //
+            fixedRateString = "${report.delete-tempfiles-fixed-rate-seconds:60}", timeUnit = TimeUnit.SECONDS)
     protected void deleteTempFiles() { // @Scheduledで実行されるため、アクセス修飾子をprivateにできないのでprotectedに
         appLogger.debug("Delete temporary files Task run.");
         if (pdfTempPath.get() == null) {
