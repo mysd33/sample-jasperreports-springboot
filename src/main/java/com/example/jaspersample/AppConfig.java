@@ -23,7 +23,7 @@ public class AppConfig {
      * ロギング機能
      */
     @Bean
-    public LogAspect logAspect(SystemDate systemDate) {
+    LogAspect logAspect(SystemDate systemDate) {
         return new LogAspect(systemDate, MessageIds.E_EX_9001);
     }
 }
