@@ -1,6 +1,5 @@
 package com.example.jaspersample.app.web.transactions;
 
-import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.fw.web.io.ResponseUtil;
 import com.example.jaspersample.domain.model.Transaction;
+import com.example.jaspersample.domain.reports.ReportFile;
 import com.example.jaspersample.domain.reports.TransactionsReportCreator;
 import com.example.jaspersample.domain.service.transactions.TransactionsService;
 
@@ -23,8 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("transactions")
 @RequiredArgsConstructor
 public class TransactionsController {
-    // private static final String REPORT_FILE_NAME = "transactions.pdf";
-    private static final String REPORT_FILE_NAME = "取引一覧.pdf";
     private final TransactionsService transactionService;
     private final TransactionsReportCreator reportCreator;
 
@@ -38,9 +36,11 @@ public class TransactionsController {
         // 取引一覧の帳票を取得するサービスを実行し、帳票出力データを取得
         List<Transaction> transactions = transactionService.findAll();
         // 取引一覧のPDF帳票の作成
-        InputStream reportInputStream = reportCreator.createTransactionsReport(transactions);
+        ReportFile reportFile = reportCreator.createTransactionsReport(transactions);
 
         // レスポンスを返す
-        return ResponseUtil.createResponseForPDF(reportInputStream, REPORT_FILE_NAME);
+        return ResponseUtil.createResponseForPDF(reportFile.getInputStream(), reportFile.getFileName(),
+                reportFile.getFileSize());
+
     }
 }

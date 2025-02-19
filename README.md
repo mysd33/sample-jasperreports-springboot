@@ -139,12 +139,13 @@
     ```java
     private static final String TITLE = "title";	
     private static final String REPORT_NAME = "商品一覧";
+    private static final String REPORT_FILE_NAME = "商品一覧.pdf";
     private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
     private static final String JASPER_FILE_PATH = "item-report.jasper";
 
     // 商品一覧の帳票の作成例    
     @Override
-    public InputStream createItemListReport(List<Item> items) {        
+    public ReportFile createItemListReport(List<Item> items) {        
         JasperReport jasperReport;		
         try {
             // コンパイル済の帳票様式がある場合はそれを利用する     
@@ -173,8 +174,13 @@
             // そのままバイト配列に出力する実装例
             // PDF形式で出力
             byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
-            return new ByteArrayInputStream(reportContent);
-            
+            InputStream is = new ByteArrayInputStream(reportContent);
+            return ReportFile.builder()//
+                    .inputStream(is)//
+                    .fileSize(reportContent.length)//
+                    .fileName(REPORT_FILE_NAME)//
+                    .build();
+
         } catch (JRException e) { // | IOException e) {
             …
         }
@@ -199,14 +205,19 @@
 
         // 業務APが定義する帳票出力処理
         @Override
-        public InputStream createInvoice(Order order) {
+        public ReportFile createInvoice(Order order) {
             // PDFのセキュリティ設定のオプション例
             PDFOptions options = PDFOptions.builder()//
                     // 読み取りパスワード
                     .userPassword(order.getCustomer().getPdfPassword())//                   
                     .build();
-            // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
-            return createPDFReport(order, options);
+            // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する            
+            Report report = createPDFReport(order, options);
+            return ReportFile.builder()//
+                    .inputStream(report.getInputStream())//
+                    .fileName(INVOICE_FILE_NAME)//
+                    .fileSize(report.getSize())//
+                    .build();            
         }
 
         // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
@@ -251,11 +262,16 @@
         private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report2.jrxml";
         
         @Override
-        public InputStream createInvoice(InvoiceReportCSVData csvData) {
+        public ReportFile createInvoice(InvoiceReportCSVData csvData) {
             PDFOptions options = PDFOptions.builder()//
                     .userPassword(csvData.getPdfPassword())//
                     .build();
-            return createPDFReport(csvData, options);
+            Report report = createPDFReport(csvData, options);
+            return ReportFile.builder()//
+                    .inputStream(report.getInputStream())//
+                    .fileName(INVOICE_FILE_NAME)//
+                    .fileSize(report.getSize())//
+                    .build();
         }
 
         @Override
@@ -329,7 +345,7 @@
             …    
 
             @Override
-            public InputStream createInvoice(Order order) {
+            public ReportFile createInvoice(Order order) {
                 // PDFのセキュリティ設定のオプション例
                 PDFOptions options = PDFOptions.builder()//
                         .userPassword(order.getCustomer().getPdfPassword())//
@@ -345,7 +361,13 @@
                                 ))//                    
                         .build();
 
-                return createPDFReport(csvData, options);       
+                
+                Report report = createPDFReport(csvData, options);
+                return ReportFile.builder()//
+                        .inputStream(report.getInputStream())//
+                        .fileName(INVOICE_FILE_NAME)//
+                        .fileSize(report.getSize())//
+                        .build();
             }                        
         }
         ```

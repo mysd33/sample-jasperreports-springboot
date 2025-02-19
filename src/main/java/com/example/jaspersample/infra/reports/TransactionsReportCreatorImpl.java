@@ -2,7 +2,6 @@ package com.example.jaspersample.infra.reports;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +9,10 @@ import java.util.Map;
 import org.springframework.util.ResourceUtils;
 
 import com.example.fw.common.reports.AbstractJasperReportCreator;
+import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportCreator;
 import com.example.jaspersample.domain.model.Transaction;
+import com.example.jaspersample.domain.reports.ReportFile;
 import com.example.jaspersample.domain.reports.TransactionsReportCreator;
 
 import net.sf.jasperreports.engine.JRDataSource;
@@ -27,11 +28,17 @@ public class TransactionsReportCreatorImpl extends AbstractJasperReportCreator<L
         implements TransactionsReportCreator {
     private static final String TITLE = "title";
     private static final String REPORT_NAME = "取引一覧";
+    private static final String REPORT_FILE_NAME = "取引一覧.pdf";    
     private static final String JRXML_FILE_PATH = "classpath:reports/transaction-report.jrxml";
 
     @Override
-    public InputStream createTransactionsReport(List<Transaction> items) {
-        return createPDFReport(items);
+    public ReportFile createTransactionsReport(List<Transaction> items) {
+        Report report = createPDFReport(items);
+        return ReportFile.builder()//
+                .inputStream(report.getInputStream())//
+                .fileName(REPORT_FILE_NAME)//
+                .fileSize(report.getSize())//
+                .build();
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.example.jaspersample.domain.reports;
 
-import java.io.InputStream;
 import java.util.List;
 
 import com.example.jaspersample.domain.model.Item;
@@ -15,7 +14,7 @@ public interface ItemsReportCreator {
      * 
      * @param items 帳票に出力する商品リスト
      * 
-     * @return 商品一覧帳票の入力ストリームデータ
+     * @return 商品一覧の帳票ファイル
      */
-    InputStream createItemsReport(List<Item> items);
+    ReportFile createItemsReport(List<Item> items);
 }

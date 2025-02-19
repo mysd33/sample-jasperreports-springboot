@@ -2,7 +2,6 @@ package com.example.jaspersample.infra.reports;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,9 +9,11 @@ import org.springframework.util.ResourceUtils;
 
 import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.fw.common.reports.PDFOptions;
+import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportCreator;
 import com.example.jaspersample.domain.model.Order;
 import com.example.jaspersample.domain.reports.InvoiceReportCreator;
+import com.example.jaspersample.domain.reports.ReportFile;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -27,11 +28,12 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 // AbstractJasperReportCreatorを継承
 // 型パラメータに帳票作成に必要なデータの型を指定
 public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order> implements InvoiceReportCreator {
+    private static final String INVOICE_FILE_NAME = "請求書.pdf";
     private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report.jrxml";
 
     // 業務APが定義する帳票出力処理
     @Override
-    public InputStream createInvoice(Order order) {
+    public ReportFile createInvoice(Order order) {
         // PDFのセキュリティ設定のオプション例
         PDFOptions options = PDFOptions.builder()//
                 // 読み取りパスワード
@@ -48,7 +50,12 @@ public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order>
                 // ))//
                 .build();
         // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
-        return createPDFReport(order, options);
+        Report report = createPDFReport(order, options);
+        return ReportFile.builder()//
+                .inputStream(report.getInputStream())//
+                .fileName(INVOICE_FILE_NAME)//
+                .fileSize(report.getSize())//
+                .build();
     }
 
     // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す

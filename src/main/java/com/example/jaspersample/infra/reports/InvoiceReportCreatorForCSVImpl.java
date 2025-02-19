@@ -2,7 +2,6 @@ package com.example.jaspersample.infra.reports;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.springframework.util.ResourceUtils;
@@ -10,10 +9,12 @@ import org.springframework.util.ResourceUtils;
 import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.fw.common.reports.PDFOptions;
+import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportCreator;
 import com.example.jaspersample.domain.message.MessageIds;
 import com.example.jaspersample.domain.reports.InvoiceReportCSVData;
 import com.example.jaspersample.domain.reports.InvoiceReportCreatorForCSV;
+import com.example.jaspersample.domain.reports.ReportFile;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRCsvDataSource;
@@ -29,11 +30,12 @@ import net.sf.jasperreports.engine.data.JRCsvDataSource;
 // 型パラメータに帳票作成に必要なデータの型を指定
 public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<InvoiceReportCSVData>
         implements InvoiceReportCreatorForCSV {
+    private static final String INVOICE_FILE_NAME = "請求書.pdf";
     private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report2.jrxml";
 
     // 業務APが定義する帳票出力処理
     @Override
-    public InputStream createInvoice(InvoiceReportCSVData csvData) {
+    public ReportFile createInvoice(InvoiceReportCSVData csvData) {
         // PDFのセキュリティ設定のオプション例
         PDFOptions options = PDFOptions.builder()//
                 // 読み取りパスワード
@@ -50,7 +52,12 @@ public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<
                 // ))//
                 .build();
         // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
-        return createPDFReport(csvData, options);
+        Report report = createPDFReport(csvData, options);
+        return ReportFile.builder()//
+                .inputStream(report.getInputStream())//
+                .fileName(INVOICE_FILE_NAME)//
+                .fileSize(report.getSize())//
+                .build();
     }
 
     // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す

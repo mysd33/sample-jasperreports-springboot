@@ -1,7 +1,5 @@
 package com.example.jaspersample.app.web.billing;
 
-import java.io.InputStream;
-
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.fw.web.io.ResponseUtil;
 import com.example.jaspersample.domain.model.Order;
-import com.example.jaspersample.domain.reports.InvoiceReportCreator;
 import com.example.jaspersample.domain.reports.InvoiceReportCSVData;
+import com.example.jaspersample.domain.reports.InvoiceReportCreator;
+import com.example.jaspersample.domain.reports.ReportFile;
 import com.example.jaspersample.domain.service.order.OrderService;
 import com.example.jaspersample.infra.reports.InvoiceReportCreatorForCSVImpl;
 
@@ -25,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("billing")
 @RequiredArgsConstructor
 public class BillingController {
-    private static final String INVOICE_FILE_NAME = "請求書.pdf";
     private final OrderService orderService;
     private final InvoiceReportCreator invoiceReportCreatorImpl;
     private final InvoiceReportCreator invoiceReportCreatorImpl2;
@@ -43,10 +41,11 @@ public class BillingController {
         // 注文情報の取得の取得
         Order order = orderService.findOne(orderId);
         // 請求書の作成
-        InputStream reportInputStream = invoiceReportCreatorImpl.createInvoice(order);
+        ReportFile reportFile = invoiceReportCreatorImpl.createInvoice(order);
 
         // レスポンスを返す
-        return ResponseUtil.createResponseForPDF(reportInputStream, INVOICE_FILE_NAME);
+        return ResponseUtil.createResponseForPDF(reportFile.getInputStream(), reportFile.getFileName(),
+                reportFile.getFileSize());
     }
 
     /**
@@ -61,10 +60,11 @@ public class BillingController {
         // 注文情報の取得の取得
         Order order = orderService.findOne(orderId);
         // 請求書の作成
-        InputStream reportInputStream = invoiceReportCreatorImpl2.createInvoice(order);
+        ReportFile reportFile = invoiceReportCreatorImpl2.createInvoice(order);
 
         // レスポンスを返す
-        return ResponseUtil.createResponseForPDF(reportInputStream, INVOICE_FILE_NAME);
+        return ResponseUtil.createResponseForPDF(reportFile.getInputStream(), reportFile.getFileName(),
+                reportFile.getFileSize());
     }
 
     /**
@@ -81,10 +81,11 @@ public class BillingController {
         InvoiceReportCSVData csvData = orderService.getReportCSVData(orderId);
 
         // CSVデータより請求書の作成
-        InputStream reportInputStream = invoiceReportCreatorForCSV.createInvoice(csvData);
+        ReportFile reportFile = invoiceReportCreatorForCSV.createInvoice(csvData);
 
         // レスポンスを返す
-        return ResponseUtil.createResponseForPDF(reportInputStream, INVOICE_FILE_NAME);
+        return ResponseUtil.createResponseForPDF(reportFile.getInputStream(), reportFile.getFileName(),
+                reportFile.getFileSize());
 
     }
 }

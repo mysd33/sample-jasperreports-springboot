@@ -12,6 +12,7 @@ import org.springframework.util.ResourceUtils;
 
 import com.example.jaspersample.domain.model.Item;
 import com.example.jaspersample.domain.reports.ItemsReportCreator;
+import com.example.jaspersample.domain.reports.ReportFile;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -34,11 +35,12 @@ import net.sf.jasperreports.engine.util.JRSaver;
 public class ItemsReportCreatorImplByJasperAPISimple implements ItemsReportCreator {
     private static final String TITLE = "title";
     private static final String REPORT_NAME = "商品一覧";
+    private static final String REPORT_FILE_NAME = "商品一覧.pdf";
     private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
     private static final String JASPER_FILE_PATH = "item-report.jasper";
 
     @Override
-    public InputStream createItemsReport(List<Item> items) {
+    public ReportFile createItemsReport(List<Item> items) {
         JasperReport jasperReport;
 
         try {
@@ -69,7 +71,12 @@ public class ItemsReportCreatorImplByJasperAPISimple implements ItemsReportCreat
             // そのままバイト配列に出力する実装例
             // PDF形式で出力
             byte[] reportContent = JasperExportManager.exportReportToPdf(jasperPrint);
-            return new ByteArrayInputStream(reportContent);
+            InputStream is = new ByteArrayInputStream(reportContent);
+            return ReportFile.builder()//
+                    .inputStream(is)//
+                    .fileSize(reportContent.length)//
+                    .fileName(REPORT_FILE_NAME)//
+                    .build();
 
             // メモリを極力使わないよう、PDFのファイルサイズが大きい場合も考慮し一時ファイルに出力してInputStreamを返す実装例
             // Path tempFilePath = Files.createTempFile("item-report", ".pdf");
