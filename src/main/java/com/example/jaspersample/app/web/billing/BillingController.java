@@ -99,7 +99,9 @@ public class BillingController {
             return ResponseUtil.createResponseForPDF(is, fileName, fileSize);
         } catch (RuntimeException e) {
             try {
-                is.close();
+                if (is != null) {
+                    is.close();
+                }
             } catch (IOException e1) {
                 // 何もしない
                 appLogger.warn(MessageIds.W_EX_8001, e1);
