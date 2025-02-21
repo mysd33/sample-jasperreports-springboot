@@ -1,6 +1,9 @@
 package com.example.jaspersample.domain.message;
 
 public class MessageIds {
-    private MessageIds() {}
+    private MessageIds() {
+    }
+
+    public static final String W_EX_8001 = "w.ex.8001";
     public static final String E_EX_9001 = "e.ex.9001";
 }
