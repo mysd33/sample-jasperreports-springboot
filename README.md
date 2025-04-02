@@ -77,7 +77,7 @@
     * Jasperファイルに、帳票様式に定義したパラメータデータ(Map)と、帳票様式が参照するデータソース（JavaBeanのコレクションデータやDB等のJRDataSourceインタフェース）を帳票出力するデータとして渡すことで、帳票オブジェクト(JasperPrint)を作成します。
     * 帳票オブジェクト(JasperPrint)を、PDFやExcel等の形式にエクスポートすることで、帳票を出力します。
 
-![JasperReportsの概念](https://content.invisioncic.com/i328763/monthly_2024_01/jss-jr-schema-xlsx.png.d4c7b77249240ab0a87151e5feb6f011.png)  
+![JasperReportsの概念](./image/jasper-reports.png)
 
 ## ライブラリの利用方法
 * pom.xmlにライブラリの依存関係を追加
