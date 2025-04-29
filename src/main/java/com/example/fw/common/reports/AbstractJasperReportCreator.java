@@ -13,7 +13,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +38,11 @@ import com.example.fw.common.logging.MonitoringLogger;
 import com.example.fw.common.message.CommonFrameworkMessageIds;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
 import com.example.fw.common.systemdate.SystemDateUtils;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfSignatureAppearance;
+import com.lowagie.text.pdf.PdfStamper;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -159,6 +172,80 @@ public abstract class AbstractJasperReportCreator<T> {
             double elapsedTime = SystemDateUtils.calcElapsedTimeByMilliSeconds(startTime, endTime);
             appLogger.info(CommonFrameworkMessageIds.I_CM_FW_0010, reportId, reportName, elapsedTime);
         }
+    }
+
+    /**
+     * 帳票に電子署名を付与する
+     * 
+     * @param originalReport 帳票
+     * @return 署名付与後の帳票
+     */
+    public Report signReport(final Report originalReport, final SignedOptions options) {
+        // TODO: 動作未確認。実装方法の調査中。
+        if (options.getSignType() == null | options.getSignType() == SignedOptions.SignType.Default) {
+            // デフォルトの署名処理としてOpenPDFを使用して、PDFに電子署名を付与する実装例
+            PdfReader originalPdfReader = null;
+            try {
+                originalPdfReader = new PdfReader(originalReport.getInputStream());
+            } catch (IOException e) {
+                throw new SystemException(e, "TBD:MessageID");
+            }
+            // メモリを極力使わないよう、PDFのファイルサイズが大きい場合も考慮し一時ファイルに出力してInputStreamで返却するようにする
+            Path signedPdfTempFilePath = null;
+            try {
+                signedPdfTempFilePath = Files.createTempFile(pdfTempPath.get(), PDF_TEMP_FILE_PREFIX,
+                        PDF_FILE_EXTENSION);
+            } catch (IOException e) {
+                throw new SystemException(e, "TBD:MessageID");
+            } finally {
+                originalPdfReader.close();
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(signedPdfTempFilePath.toFile())) {
+                KeyStore ks = KeyStore.getInstance("pkcs12");
+                ks.load(new FileInputStream(options.getKeyStoreFile()), options.getPassword().toCharArray());
+                String alias = ks.aliases().nextElement();
+                PrivateKey key = (PrivateKey) ks.getKey(alias, options.getPassword().toCharArray());
+                Certificate[] chain = ks.getCertificateChain(alias);
+                PdfStamper pdfStamper = PdfStamper.createSignature(originalPdfReader, fos, '\0');
+                PdfSignatureAppearance sap = pdfStamper.getSignatureAppearance();
+
+                // TODO: Optionsでの指定
+                sap.setCrypto(key, chain, null, PdfSignatureAppearance.WINCER_SIGNED);
+                sap.setReason("署名理由");
+                sap.setLocation("署名場所");
+                sap.setSignDate(null);
+                if (options.isVisible()) {
+                    sap.setVisibleSignature(new Rectangle(100, 100, 200, 200), 1);
+                    sap.setLayer2Text("署名者");
+                }
+                pdfStamper.setEnforcedModificationDate(Calendar.getInstance());
+                pdfStamper.close();
+                return DefaultReport.builder()//
+                        .file(signedPdfTempFilePath.toFile())
+                        .build();
+            } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException | CertificateException
+                    | DocumentException | IOException e) {
+                throw new SystemException(e, "TBD:MessageID");
+            } finally {
+                originalPdfReader.close();
+            }
+        } else if (options.getSignType() == SignedOptions.SignType.PAdES) {
+            // PAdESの署名処理を実装する
+            // DSS等で、署名の実装によってはファイルかオンメモリかの区別が必要な場合の判定の実装する例
+            // @formatter:off
+            /*
+            if (originalReport instanceof DefaultReport defaultReport) {
+                File file = defaultReport.getFile(); // TODO: Fileに対して電子署名付与の実装
+            } else {
+                InputStream inputStream = report.getInputStream(); // TODO: それ以外はInputStreamまたはオンメモリで実装 }
+            }
+            throw new UnsupportedOperationException("署名処理は未実装です。");
+            */
+            // @formatter:on
+            
+        }
+        throw new UnsupportedOperationException("署名処理は未実装です。");
     }
 
     /**
@@ -369,10 +456,8 @@ public abstract class AbstractJasperReportCreator<T> {
         exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
         exporter.exportReport();
         byte[] bytes = baos.toByteArray();
-        InputStream is = new ByteArrayInputStream(bytes);
-        return Report.builder()//
-                .inputStream(is)//
-                .size(bytes.length)//
+        return InMemoryReport.builder()//
+                .data(bytes)//
                 .build();
     }
 
@@ -406,10 +491,8 @@ public abstract class AbstractJasperReportCreator<T> {
             exporter.exportReport();
         }
         // 一時ファイルのInputStreamを返す
-        InputStream is = new BufferedInputStream(new FileInputStream(tempFilePath.toFile()));
-        return Report.builder()//
-                .inputStream(is)//
-                .size(Files.size(tempFilePath))//
+        return DefaultReport.builder()//
+                .file(tempFilePath.toFile())//
                 .build();
     }
 
