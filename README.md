@@ -394,20 +394,22 @@
 * 本サンプルAPでは現状、実装していませんが、OpenPDFのライブラリを利用することで、PDFへ電子署名を付与することができます。    
     * [OpenPDF-Signing](https://github.com/LibrePDF/OpenPDF/wiki/Signing)
     * [PdfStamperクラスのJavadoc(OpenPDF1.3.32)](https://javadoc.io/doc/com.github.librepdf/openpdf/1.3.32/com/lowagie/text/pdf/PdfStamper.html)
-* なお、OpenPDFは、PAdES長期署名には対応していないようです。
-    * [OpenPDF issue #86 PAdES signatures support](https://github.com/LibrePDF/OpenPDF/issues/86)
-    * DSSが、PAdESに対応
-        * [dss](https://github.com/esig/dss/)
-            * [DSSのドキュメント](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/dss-documentation.adoc)
-                * [Generic information](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/generic-information.adoc)
-                * [How to start with DSS](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/how-to-start-with-dss.adoc)
-                * [Signature creation](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/signature-creation.adoc)
-                * [Specificities of signature creation in different signature formats](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/signature-creation-different-formats.adoc)
-
+    * なお、OpenPDFは、PAdES長期署名には対応していないようです。
+        * [OpenPDF issue #86 PAdES signatures support](https://github.com/LibrePDF/OpenPDF/issues/86)
+* DSSが、PAdESに対応しています。
+    * [dss](https://github.com/esig/dss/)
+        * [DSSのドキュメント](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/dss-documentation.adoc)
+            * [Generic information](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/generic-information.adoc)
+            * [How to start with DSS](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/how-to-start-with-dss.adoc)
+            * [Signature creation](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/signature-creation.adoc)
+            * [Specificities of signature creation in different signature formats](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/signature-creation-different-formats.adoc)
+            * [dss-pades-openpdf](https://github.com/esig/dss/tree/master/dss-pades-openpdf)
+                * DSS PAdESでのOpenPDF統合機能。可視署名の実現に利用する模様
         * サンプルコードのリンク
             * [Annex](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/annex.adoc)
                 * [PKC#12の証明書でのトークン、署名取得](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/snippets/PKCS12Snippet.java)
                 * [PAdESでのPDF署名](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/sign/SignPdfPadesBTest.java)
+
 
 
 ## 参考情報
@@ -442,19 +444,6 @@
     * [IPAフォント](https://moji.or.jp/ipafont/ipafontdownload/)
     * [JasperReportsのフォント拡張のリファレンス](https://jasperreports.sourceforge.net/sample.reference/fonts/README.html#fontextensions)
 
-* 電子署名
-    * [OpenPDFのGitHubサイト](https://github.com/LibrePDF/OpenPDF)
-        * [OpenPDFによる電子署名付与](https://github.com/LibrePDF/OpenPDF/wiki/Signing)
-    * [Adobe - PDF ファイルで電子署名を利用する方法](https://helpx.adobe.com/jp/acrobat/kb/cq07131410.html)
-    * [Adobe Approved Trust List メンバー](https://helpx.adobe.com/jp/acrobat/kb/approved-trust-list1.html)
-    * [アンテナハウス - PDF電子署名について](https://www.antenna.co.jp/pades/pr-e-signature.html)        
-    * [アンテナハウス - PDF電子署名入門](https://www.antenna.co.jp/pdf/reference/PDFSingature.html)
-    * [総務省 - 電子署名・認証・タイムスタンプ](https://www.soumu.go.jp/main_sosiki/joho_tsusin/top/ninshou-law/pdf/090611_1.pdf)
-    * [dss](https://github.com/esig/dss/tree/master/dss)
-        * [dss-pades-openpdf](https://github.com/esig/dss/tree/master/dss-pades-openpdf)
-            * DSS PAdESでのOpenPDF統合機能
-            * [サンプルコード](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/annex.adoc)
-
 * Japser Reportsを使ったチュートリアル、サンプル
     * サンプル1
         * https://howtodoinjava.com/spring-boot/spring-boot-jasper-report/
@@ -473,3 +462,16 @@
         * https://www.baeldung.com/spring-jasper
         * 完全なサンプルコード
             * https://github.com/eugenp/tutorials/tree/master/libraries-reporting
+
+* 電子署名
+    * [OpenPDFのGitHubサイト](https://github.com/LibrePDF/OpenPDF)
+        * [OpenPDFによる電子署名付与](https://github.com/LibrePDF/OpenPDF/wiki/Signing)
+    * [dss](https://github.com/esig/dss/tree/master/dss)
+    * [Adobe - PDF ファイルで電子署名を利用する方法](https://helpx.adobe.com/jp/acrobat/kb/cq07131410.html)
+    * [Adobe Approved Trust List メンバー](https://helpx.adobe.com/jp/acrobat/kb/approved-trust-list1.html)
+    * [アンテナハウス - PDF電子署名について](https://www.antenna.co.jp/pades/pr-e-signature.html)        
+    * [アンテナハウス - PDF電子署名入門](https://www.antenna.co.jp/pdf/reference/PDFSingature.html)    
+    * [総務省 - 電子署名・認証・タイムスタンプ](https://www.soumu.go.jp/main_sosiki/joho_tsusin/top/ninshou-law/pdf/090611_1.pdf)
+    * [Re:ゼロから始める長期署名](https://qiita.com/lemiyachi/items/87d698e51e4a53c721d6)
+    * [JNSA - デジタル署名検証ガイドライン](https://www.jnsa.org/result/e-signature/data/e-signature-guideline_v1.0_20210331.pdf)    
+    * [JNSA電子署名WG スキルアップTF - なんとなく分かった気になるPDF電子署名仕様入門2](https://www.langedge.jp/download/jnsa/20131030-SUTF-4-pdfsign.pdf)
