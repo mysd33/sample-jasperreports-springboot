@@ -1,5 +1,6 @@
 package com.example.jaspersample;
 
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -23,7 +24,8 @@ public class AppConfig {
      * ロギング機能
      */
     @Bean
-    LogAspect logAspect(SystemDate systemDate) {
-        return new LogAspect(systemDate, MessageIds.E_EX_9001);
+    LogAspect logAspect(SystemDate systemDate, MessageSource messageSource) {
+        return new LogAspect(systemDate, messageSource, MessageIds.W_EX_2001, MessageIds.E_EX_9001);
     }
+
 }
