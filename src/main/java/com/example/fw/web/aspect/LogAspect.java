@@ -15,6 +15,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.example.fw.common.exception.BusinessException;
@@ -46,8 +47,8 @@ public class LogAspect {
     private final MessageSource messageSource;
     // 入力エラーのログ出力メッセージID
     private final String inputErrorMessageId;
-    // 業務エラーのログ出力メッセージID
-    private final String unknownErrorMessageId;
+    // 予期せぬエラーのログ出力メッセージID
+    private final String unexpectedErrorMessageId;
 
     /**
      * 水際で、各種エラーに対して適切なログレベルでのログ出力を行う
@@ -81,6 +82,9 @@ public class LogAspect {
         case NoResourceFoundException nrfe -> {
             // 本サンプルAPでは何もしない（案件によってログ追加してもよい）
         }
+        case NoHandlerFoundException nhfe -> {
+            // 本サンプルAPでは何もしない（案件によってログ追加してもよい）
+        }
         // REST API405 Method Not Allowedエラーが発生した場合
         case HttpRequestMethodNotSupportedException hrmse -> {
             // 本サンプルAPでは何もしない（案件によってログ追加してもよい）
@@ -98,7 +102,7 @@ public class LogAspect {
             monitoringLogger.error(se.getCode(), se, (Object[]) se.getArgs());
         // システムエラー（予期せぬ例外）の場合
         case null, default -> {
-            monitoringLogger.error(unknownErrorMessageId, e);
+            monitoringLogger.error(unexpectedErrorMessageId, e);
         }
         }
     }
@@ -133,7 +137,7 @@ public class LogAspect {
             // 万が一発生した場合は、業務例外のコードと引数をログ出力する
             case BusinessException be -> appLogger.warn(be.getCode(), logFormat, null, (Object[]) be.getArgs());
             case SystemException se -> appLogger.warn(se.getCode(), logFormat, null, (Object[]) se.getArgs());
-            default -> appLogger.warn(unknownErrorMessageId, logFormat, null);
+            default -> appLogger.warn(unexpectedErrorMessageId, logFormat, null);
             }
             throw e;
         }
@@ -170,7 +174,7 @@ public class LogAspect {
             // システムエラーは、ここではメソッドが異常終了した旨を警告ログのみ出力。スタックトレースは出力しない
             case SystemException se -> //
                 appLogger.warn(se.getCode(), logFormat, null, (Object[]) se.getArgs());
-            default -> appLogger.warn(unknownErrorMessageId, logFormat, null);
+            default -> appLogger.warn(unexpectedErrorMessageId, logFormat, null);
             }
             throw e;
         }
@@ -189,7 +193,7 @@ public class LogAspect {
         } catch (Exception e) {
             // 例外が発生した場合は、エラーログを出力
             Object[] args = { jp.getSignature(), Arrays.asList(jp.getArgs()) };
-            String message = messageSource.getMessage(WebFrameworkMessageIds.I_ON_FW_0002, args, Locale.getDefault());
+            String message = messageSource.getMessage(WebFrameworkMessageIds.W_ON_FW_8004, args, Locale.getDefault());
             String logFormat = message + LOG_FORMAT_SUFFIX;
             switch (e) {
             // 業務エラーは、メソッドが異常終了した旨を警告ログを出力するが、
@@ -200,7 +204,7 @@ public class LogAspect {
             // システムエラーは、ここではメソッドが異常終了した旨を警告ログのみ出力。スタックトレースは出力しない。
             case SystemException se -> //
                 appLogger.warn(se.getCode(), logFormat, null, (Object[]) se.getArgs());
-            default -> appLogger.warn(unknownErrorMessageId, logFormat, null);
+            default -> appLogger.warn(unexpectedErrorMessageId, logFormat, null);
             }
             throw e;
         }
