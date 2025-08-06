@@ -1,0 +1,56 @@
+logging:
+  level:
+    org.springframework: INFO
+    org.springframework.jdbc: INFO
+#    org.springframework.security: DEBUG
+#    org.thymeleaf: DEBUG
+    com.example: DEBUG
+    
+
+# 帳票出力機能の設定
+report:
+# コンパイル済の様式ファイルを保管する一時ディレクトリを変更する場合に設定
+#  jasper-file-tmpdir: jasper2
+# PDFを一時保存するディレクトリを変更する場合に設定
+#  report-tmpdir: pdf2
+# PDFを一時保存するディレクトリを削除する間隔を変更する場合に設定
+#  delete-tempfiles-initial-delay-seconds: 60
+#  delete-tempfiles-fixed-rate-seconds: 60
+
+# 鍵管理機能の設定
+keymanagement:
+  # オブジェクトストレージで管理されているKMSの署名鍵の証明書
+  # 開発時は自己署名証明書のpemファイルを使用するように設定している
+  cert-pem-file-name: self-certificate.pem
+
+  # 電子署名機能の設定
+digitalsignature:
+  type: pkcs12-pades
+  pkcs12:
+    # PKCS#12のキーストアファイル名
+    keystore-file-path: certs/pkcs12/keystore.p12
+    # PKCS#12のキーストアパスワード
+    password: password123
+
+#  type: aws-kms-pades
+#  aws-kms:
+    # AWS KMSのキーIDを設定
+#    key-id: 23f2bb36-47d5-468d-95a8-d1229cd619eb
+
+# オブジェクトストレージの設定
+aws:
+  s3:
+    localfake:
+#S3 Fake by local file system
+      type: file
+      base-dir: C:\tmp\objectstorage
+#S3 Fake by s3rver    
+#      type: s3rver
+#      port: 4568
+#    bucket: mysd33bucket123
+#S3 Fake by MinIO
+#      type: minio
+#      port: 9000
+#      access-key-id: minioadmin
+#      secret-access-key: minioadmin
+#    bucket: mysd33bucket123
