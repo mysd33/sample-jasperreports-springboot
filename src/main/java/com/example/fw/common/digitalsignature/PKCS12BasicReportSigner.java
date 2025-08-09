@@ -22,6 +22,7 @@ import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportsConstants;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
@@ -93,13 +94,18 @@ public class PKCS12BasicReportSigner implements ReportSigner {
             Certificate[] chain = ks.getCertificateChain(alias);
             PdfStamper pdfStamper = PdfStamper.createSignature(originalPdfReader, fos, '\0'); 
             PdfSignatureAppearance sap = pdfStamper.getSignatureAppearance();
+            // TODO: 証明書チェーンの設定切り替え
+            //sap.setCrypto(key, chain, null, PdfSignatureAppearance.SELF_SIGNED);
             sap.setCrypto(key, chain, null, PdfSignatureAppearance.WINCER_SIGNED);
-            // TODO: Optionsでの設定
-            //sap.setReason("署名理由");
-            //sap.setLocation("署名場所");
+            // TODO: Optionsでの設定切り出し
+            sap.setReason("署名理由");
+            sap.setLocation("署名場所"); 
             if (options.isVisible()) {
                 sap.setVisibleSignature(new Rectangle(100, 100, 200, 200), 1);
+                // 可視署名の設定切り出し
                 sap.setLayer2Text("署名者");
+                String imagePath = "certs/stamp.png"; // 署名画像のパス
+                sap.setImage(Image.getInstance(imagePath));
             }
             pdfStamper.setEnforcedModificationDate(Calendar.getInstance());                                    
             pdfStamper.close();

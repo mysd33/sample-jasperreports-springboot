@@ -15,6 +15,12 @@ public class SignatureOptions {
      * 可視署名かどうか
      */
     private boolean visible;
+    
+    /**
+     * 署名の画像ファイルパス
+     * 
+     */
+    private String stampImagePath;
 
     /**
      * キーストアのファイル

@@ -42,6 +42,7 @@ public class DigitalSignatureConfig {
                                 new File(digitalSignatureConfigurationProperties.getPkcs12().getKeystoreFilePath()))//
                         .password(digitalSignatureConfigurationProperties.getPkcs12().getPassword())//
                         .visible(digitalSignatureConfigurationProperties.isVisible())//
+                        .stampImagePath(digitalSignatureConfigurationProperties.getStampImagePath())//
                         .build());
     }
 
@@ -49,14 +50,15 @@ public class DigitalSignatureConfig {
      * PKCS#12ファイルを使用し、PAdES形式でのPDF署名を付与するReportSignerのBean定義 （デフォルト）
      */
     @Bean
-    @ConditionalOnProperty(name = DIGITAL_SIGNATURE_TYPE, havingValue = "pkcs12-pades")
+    @ConditionalOnProperty(name = DIGITAL_SIGNATURE_TYPE, havingValue = "pkcs12-pades")    
     ReportSigner reportSignerByPKCS12() {
         return new PKCS12PAdESReportSiginer(reportsConfigurationProperties, //
                 SignatureOptions.builder()//
                         .keyStoreFile(
                                 new File(digitalSignatureConfigurationProperties.getPkcs12().getKeystoreFilePath()))//
                         .password(digitalSignatureConfigurationProperties.getPkcs12().getPassword())//
-                        .visible(digitalSignatureConfigurationProperties.isVisible())//
+                        // 可視署名は未対応
+                        //.visible(digitalSignatureConfigurationProperties.isVisible())//
                         .build());
     }
 
@@ -70,6 +72,7 @@ public class DigitalSignatureConfig {
     @Bean
     @ConditionalOnProperty(name = DIGITAL_SIGNATURE_TYPE, havingValue = "aws-kms-pades")
     ReportSigner reportSignerByKms(KeyManager keyManager, ObjectStorageFileAccessor objectStorageFileAccessor) {
+        // 可視署名は未対応
         return new AWSKmsPAdESReportSigner(keyManager, //
                 digitalSignatureConfigurationProperties, //
                 reportsConfigurationProperties);

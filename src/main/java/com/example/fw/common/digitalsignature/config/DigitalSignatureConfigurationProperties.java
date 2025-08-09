@@ -8,9 +8,14 @@ import lombok.Data;
 @Data
 @ConfigurationProperties(prefix = DigitalSignatureConfigurationProperties.DIGITAL_SIGNATURE)
 public class DigitalSignatureConfigurationProperties {
+    // 電子署名の設定を保持するプロパティのプレフィックス
     static final String DIGITAL_SIGNATURE = "digitalsignature";
+    // 署名に使用するアルゴリズム（デフォルト: ECDSA_SHA256）
     private SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.ECDSA_SHA256;
+    // 署名の可視性（true: 可視署名、false: 非可視署名）
     private boolean visible = false;
+    // 可視署名のスタンプ画像のパス
+    private String stampImagePath = "";
     // PKCS#12固有の設定(digitalsignature.pkcs12.*)
     private PKCS12Properties pkcs12 = new PKCS12Properties();
     // AWS KMS固有の設定(digitalsignature.aws-kms.*)
