@@ -1,7 +1,6 @@
 package com.example.fw.common.digitalsignature;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,7 +15,6 @@ import java.security.cert.CertificateException;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
 import com.example.fw.common.reports.DefaultReport;
@@ -32,9 +30,7 @@ import com.lowagie.text.pdf.PdfStamper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jasperreports.engine.JRException;
 
-// TODO: 動作未確認。実装中。
 
 /**
  * PKCS#12形式のキーストアを使用してPDFに基本的な電子署名を付与するクラス
@@ -46,6 +42,7 @@ import net.sf.jasperreports.engine.JRException;
 @Slf4j
 @RequiredArgsConstructor
 public class PKCS12BasicReportSigner implements ReportSigner {
+    private static final String PKCS12 = "pkcs12";
     private static final ApplicationLogger appLogger = LoggerFactory.getApplicationLogger(log);
     private final ReportsConfigurationProperties config;
     private final SignatureOptions options;
@@ -68,11 +65,13 @@ public class PKCS12BasicReportSigner implements ReportSigner {
     @Override
     public Report sign(Report originalReport) {
         // デフォルトの署名処理としてOpenPDFを使用して、PDFに電子署名を付与する実装例
+        // https://javadoc.io/doc/com.github.librepdf/openpdf/1.3.43/com/lowagie/text/pdf/PdfStamper.html#createSignature-com.lowagie.text.pdf.PdfReader-java.io.OutputStream-char-
         PdfReader originalPdfReader = null;
         try {
             originalPdfReader = new PdfReader(originalReport.getInputStream());
         } catch (IOException e) {
-            throw new SystemException(e, "TBD:MessageID");
+            //TODO: 適切な例外、メッセージをスローする
+            throw new RuntimeException("Failed Read PDF", e);
         }
         // メモリを極力使わないよう、PDFのファイルサイズが大きい場合も考慮し一時ファイルに出力してInputStreamで返却するようにする
         Path signedPdfTempFilePath = null;
@@ -80,36 +79,37 @@ public class PKCS12BasicReportSigner implements ReportSigner {
             signedPdfTempFilePath = Files.createTempFile(pdfTempPath.get(), ReportsConstants.PDF_TEMP_FILE_PREFIX,
                     ReportsConstants.PDF_FILE_EXTENSION);
         } catch (IOException e) {
-            throw new SystemException(e, "TBD:MessageID");
+            // TODO: 適切な例外、メッセージをスローする
+            throw new RuntimeException("Failed Create File", e);
         } finally {
             originalPdfReader.close();
         }
-
+        //TODO: ハッシュアルゴリズムがSHA-1と表示されてしまうが、SHA-256に変更する方法が不明
         try (FileOutputStream fos = new FileOutputStream(signedPdfTempFilePath.toFile())) {
-            KeyStore ks = KeyStore.getInstance("pkcs12");
+            KeyStore ks = KeyStore.getInstance(PKCS12);
             ks.load(new FileInputStream(options.getKeyStoreFile()), options.getPassword().toCharArray());
             String alias = ks.aliases().nextElement();
             PrivateKey key = (PrivateKey) ks.getKey(alias, options.getPassword().toCharArray());
             Certificate[] chain = ks.getCertificateChain(alias);
-            PdfStamper pdfStamper = PdfStamper.createSignature(originalPdfReader, fos, '\0');
+            PdfStamper pdfStamper = PdfStamper.createSignature(originalPdfReader, fos, '\0'); 
             PdfSignatureAppearance sap = pdfStamper.getSignatureAppearance();
-
-            // TODO: Optionsでの指定
             sap.setCrypto(key, chain, null, PdfSignatureAppearance.WINCER_SIGNED);
-            sap.setReason("署名理由");
-            sap.setLocation("署名場所");
-            sap.setSignDate(null);
+            // TODO: Optionsでの設定
+            //sap.setReason("署名理由");
+            //sap.setLocation("署名場所");
             if (options.isVisible()) {
                 sap.setVisibleSignature(new Rectangle(100, 100, 200, 200), 1);
                 sap.setLayer2Text("署名者");
             }
-            pdfStamper.setEnforcedModificationDate(Calendar.getInstance());
+            pdfStamper.setEnforcedModificationDate(Calendar.getInstance());                                    
             pdfStamper.close();
+            
             return DefaultReport.builder()//
                     .file(signedPdfTempFilePath.toFile()).build();
         } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException | CertificateException
                 | DocumentException | IOException e) {
-            throw new SystemException(e, "TBD:MessageID");
+            // TODO: 適切な例外、メッセージをスローする
+            throw new RuntimeException("Failed to sign the report", e);
         } finally {
             originalPdfReader.close();
         }

@@ -25,6 +25,8 @@ keymanagement:
 
   # 電子署名機能の設定
 digitalsignature:
+#  visible: true
+#  type: pkcs12-basic
   type: pkcs12-pades
   pkcs12:
     # PKCS#12のキーストアファイル名

@@ -10,6 +10,7 @@ import lombok.Data;
 public class DigitalSignatureConfigurationProperties {
     static final String DIGITAL_SIGNATURE = "digitalsignature";
     private SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.ECDSA_SHA256;
+    private boolean visible = false;
     // PKCS#12固有の設定(digitalsignature.pkcs12.*)
     private PKCS12Properties pkcs12 = new PKCS12Properties();
     // AWS KMS固有の設定(digitalsignature.aws-kms.*)

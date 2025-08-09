@@ -31,6 +31,21 @@ public class DigitalSignatureConfig {
     private final ReportsConfigurationProperties reportsConfigurationProperties;
 
     /**
+     * PKCS#12ファイルを使用し、通常のPDF署名を付与するReportSignerのBean定義
+     */
+    @Bean
+    @ConditionalOnProperty(name = DIGITAL_SIGNATURE_TYPE, havingValue = "pkcs12-basic")
+    ReportSigner reportSignerByPKCS12Basic() {
+        return new PKCS12BasicReportSigner(reportsConfigurationProperties, //
+                SignatureOptions.builder()//
+                        .keyStoreFile(
+                                new File(digitalSignatureConfigurationProperties.getPkcs12().getKeystoreFilePath()))//
+                        .password(digitalSignatureConfigurationProperties.getPkcs12().getPassword())//
+                        .visible(digitalSignatureConfigurationProperties.isVisible())//
+                        .build());
+    }
+
+    /**
      * PKCS#12ファイルを使用し、PAdES形式でのPDF署名を付与するReportSignerのBean定義 （デフォルト）
      */
     @Bean
@@ -40,7 +55,9 @@ public class DigitalSignatureConfig {
                 SignatureOptions.builder()//
                         .keyStoreFile(
                                 new File(digitalSignatureConfigurationProperties.getPkcs12().getKeystoreFilePath()))//
-                        .password(digitalSignatureConfigurationProperties.getPkcs12().getPassword()).build());
+                        .password(digitalSignatureConfigurationProperties.getPkcs12().getPassword())//
+                        .visible(digitalSignatureConfigurationProperties.isVisible())//
+                        .build());
     }
 
     /**
@@ -58,16 +75,4 @@ public class DigitalSignatureConfig {
                 reportsConfigurationProperties);
     }
 
-    /**
-     * PKCS#12ファイルを使用し、通常のPDF署名を付与するReportSignerのBean定義
-     */
-    @Bean
-    @ConditionalOnProperty(name = DIGITAL_SIGNATURE_TYPE, havingValue = "pkcs12-basic")
-    ReportSigner reportSignerByPKCS12Basic() {
-        // TODO: 実装途中
-        return new PKCS12BasicReportSigner(reportsConfigurationProperties, //
-                SignatureOptions.builder()//
-                        .keyStoreFile(new File("todo: PKCS12ファイルのパス"))//
-                        .password("todo: PKCパスワード").build());
-    }
 }
