@@ -29,8 +29,8 @@ digitalsignature:
 #  type: pkcs12-basic
   type: pkcs12-pades
   pkcs12:
-    # PKCS#12のキーストアファイル名
-    keystore-file-path: certs/pkcs12/keystore.p12
+    # PKCS#12のキーストアファイル名(ECDSA with SHA-256)
+    keystore-file-path: certs/pkcs12/ecdsa/keystore.p12
     # PKCS#12のキーストアパスワード
     password: password123
 
