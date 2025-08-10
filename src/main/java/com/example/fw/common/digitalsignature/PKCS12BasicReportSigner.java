@@ -104,7 +104,7 @@ public class PKCS12BasicReportSigner implements ReportSigner {
                 sap.setVisibleSignature(new Rectangle(100, 100, 200, 200), 1);
                 // 可視署名の設定切り出し
                 sap.setLayer2Text("署名者");
-                String imagePath = "certs/stamp.png"; // 署名画像のパス
+                String imagePath = options.getStampImagePath();
                 sap.setImage(Image.getInstance(imagePath));
             }
             pdfStamper.setEnforcedModificationDate(Calendar.getInstance());                                    

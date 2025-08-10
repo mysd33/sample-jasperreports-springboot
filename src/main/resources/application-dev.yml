@@ -26,7 +26,7 @@ keymanagement:
   # 電子署名機能の設定
 digitalsignature:
 #  visible: true
-#  stamp-file-path: certs/stamp.png
+#  stamp-image-path: certs/stamp.png
 #  type: pkcs12-basic
   type: pkcs12-pades
   pkcs12:
