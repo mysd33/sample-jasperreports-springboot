@@ -86,6 +86,9 @@ public class PKCS12BasicReportSigner implements ReportSigner {
             originalPdfReader.close();
         }
         //TODO: ハッシュアルゴリズムがSHA-1と表示されてしまうが、SHA-256に変更する方法が不明
+        // https://github.com/LibrePDF/OpenPDF/blob/1.3.43/openpdf/src/main/java/com/lowagie/text/pdf/PdfSigGenericPKCS.java#L234
+        // https://github.com/LibrePDF/OpenPDF/blob/1.3.43/openpdf/src/main/java/com/lowagie/text/pdf/PdfSignatureAppearance.java#L1144
+        // https://github.com/LibrePDF/OpenPDF/blob/1.3.43/openpdf/src/main/java/com/lowagie/text/pdf/PdfSigGenericPKCS.java
         try (FileOutputStream fos = new FileOutputStream(signedPdfTempFilePath.toFile())) {
             KeyStore ks = KeyStore.getInstance(PKCS12);
             ks.load(new FileInputStream(options.getKeyStoreFile()), options.getPassword().toCharArray());
@@ -96,7 +99,7 @@ public class PKCS12BasicReportSigner implements ReportSigner {
             PdfSignatureAppearance sap = pdfStamper.getSignatureAppearance();
             // TODO: 証明書チェーンの設定切り替え
             //sap.setCrypto(key, chain, null, PdfSignatureAppearance.SELF_SIGNED);
-            sap.setCrypto(key, chain, null, PdfSignatureAppearance.WINCER_SIGNED);
+            sap.setCrypto(key, chain, null, PdfSignatureAppearance.WINCER_SIGNED);            
             // TODO: Optionsでの設定切り出し
             sap.setReason("署名理由");
             sap.setLocation("署名場所"); 

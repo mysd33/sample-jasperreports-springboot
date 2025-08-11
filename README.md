@@ -391,13 +391,32 @@
 
 ## PDFへの電子署名付与
 * JasperReports自体には、PDFへ電子署名を付与するAPIが持っていません。
-* 本サンプルAPでは現状、実装していませんが、OpenPDFのライブラリを利用することで、PDFへ電子署名を付与することができます。    
-    * [OpenPDF-Signing](https://github.com/LibrePDF/OpenPDF/wiki/Signing)
-    * [PdfStamperクラスのJavadoc(OpenPDF1.3.32)](https://javadoc.io/doc/com.github.librepdf/openpdf/1.3.32/com/lowagie/text/pdf/PdfStamper.html)
-    * なお、OpenPDFは、PAdES長期署名には対応していないようです。
-        * [OpenPDF issue #86 PAdES signatures support](https://github.com/LibrePDF/OpenPDF/issues/86)
-* DSSが、PAdESに対応しています。
-    * [dss](https://github.com/esig/dss/)
+* 電子署名の対応方法として、以下があります。
+    1. [Open PDF（ver1.x系）](https://github.com/LibrePDF/OpenPDF/tree/1.3.43)のライブラリを利用する
+        * Jasper Reportが依存しているOpen PDF（1.3.43）のライブラリのAPIを使用します。
+        * Javadoc(OpenPDF1.3.43)
+            * [PdfStamperクラス](https://javadoc.io/doc/com.github.librepdf/openpdf/1.3.43/com/lowagie/text/pdf/PdfStamper.html#createSignature-com.lowagie.text.pdf.PdfReader-java.io.OutputStream-char-)
+            * [PdfSignatureAppearanceクラス](https://javadoc.io/doc/com.github.librepdf/openpdf/1.3.43/com/lowagie/text/pdf/PdfSignatureAppearance.html)
+       * ただし、OpenPDF ver1.x系を使用したやり方は、現状いろいろ注意、制約がありそうです。
+            * Open PDFは現在、[ver2.x系](https://github.com/LibrePDF/OpenPDF/tree/2.4.0)になっており、新しいパッケージは「org.openpdf」になっておりPdfStamperをはじめとした「com.lowagie.text」パッケージのクラスは非推奨で、ver3.0からは削除される。
+                * [新しいパッケージ](https://github.com/LibrePDF/OpenPDF/tree/2.4.0/openpdf-core-modern)にも、[org.openpdf.tex.pdf](https://github.com/LibrePDF/OpenPDF/tree/2.4.0/openpdf-core-modern/src/main/java/org/openpdf/text/pdf)パッケージのPdfStamperクラス等は存在はしている。
+            * OpenPDFの電子署名のサンプルコード[OpenPDF-Signing](https://github.com/LibrePDF/OpenPDF/wiki/Signing)もリンク切れになっており、見つからない状態。
+                * ソースコードとJavadocによるドキュメントはあるものの、この状態だと使っていいものなのか不安になる。
+            * 生成された署名付きのPDFをAcrobatReaderで開くと、ハッシュアルゴリズムが「SHA-1」となってなってしまう。
+                * おそらく、原因は、以下のコードでハードコードされているためか、ハッシュアルゴリズムが「SHA-1」固定になってしまう。
+                    * https://github.com/LibrePDF/OpenPDF/blob/1.3.43/openpdf/src/main/java/com/lowagie/text/pdf/PdfSigGenericPKCS.java#L234
+                    * https://github.com/LibrePDF/OpenPDF/blob/1.3.43/openpdf/src/main/java/com/lowagie/text/pdf/PdfSignatureAppearance.java#L1144
+                    * https://github.com/LibrePDF/OpenPDF/blob/1.3.43/openpdf/src/main/java/com/lowagie/text/pdf/PdfSigGenericPKCS.java                
+                * これを簡単に差し替えできる拡張ポイントが見当たらず、ひょっとすると[PdfPKCS7クラス](https://javadoc.io/static/com.github.librepdf/openpdf/1.3.43/com/lowagie/text/pdf/PdfPKCS7.html)を使って抜本的にソースを置き換えればできるかもしれないが、かなり難しい。
+            * OpenPDFは、PAdES長期署名には対応していない。
+                * [OpenPDF issue #86 PAdES signatures support](https://github.com/LibrePDF/OpenPDF/issues/86)
+
+    2. [DSS（Digtal Signature Service](https://github.com/esig/dss/)
+        * 欧州委員会（European Commission）が作成する電子署名の作成と検証のためのオープンソースソフトウェアライブラリです。
+        * PDFの電子署名においては、PAdESにも対応しています。
+        * 本サンプルAPの実装例
+            * [PKCS#12キーストアを使った場合の実装例](/sample-jasperreports-springboot/src/main/java/com/example/fw/common/digitalsignature/PKCS12PAdESReportSiginer.java)
+
         * [DSSのドキュメント](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/dss-documentation.adoc)
             * [Generic information](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/generic-information.adoc)
             * [How to start with DSS](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/how-to-start-with-dss.adoc)
@@ -405,12 +424,32 @@
             * [Specificities of signature creation in different signature formats](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/signature-creation-different-formats.adoc)
             * [dss-pades-openpdf](https://github.com/esig/dss/tree/master/dss-pades-openpdf)
                 * DSS PAdESでのOpenPDF統合機能。可視署名の実現に利用する模様
-        * サンプルコードのリンク
-            * [Annex](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/annex.adoc)
-                * [PKC#12の証明書でのトークン、署名取得](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/snippets/PKCS12Snippet.java)
-                * [PAdESでのPDF署名](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/sign/SignPdfPadesBTest.java)
+            * サンプルコードのリンク
+                * [Annex](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/annex.adoc)
+                    * [PKC#12キーストアでのトークン、署名取得](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/snippets/PKCS12Snippet.java)
+                    * [PAdESでのPDF署名](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/sign/SignPdfPadesBTest.java)
 
+* 本サンプルAPの実装例
 
+    > [!WARNING]
+    > 現在、作成中です。
+    
+    1. PKCS#12のキーストアに管理した秘密鍵・公開鍵証明書を使用した、サンプルAPの実装例
+        * 利用前には、opensslを使って鍵、CSR、証明書、キーストアの作成が必要です。
+            * [SHA-256 with RSA](certs/pkcs12/rsa/README.md)
+            * [SHA-256 with ECDSA](certs/pkcs12/ecdsa/README.md)
+        * サンプルコードは2パターンです。
+            * 通常の署名(PKCS#7/CMS)
+                * [PKCS12BasicReportSignerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12BasicReportSigner.java)
+                    * ただし、上に記載した問題で、現状、ハッシュアルゴリズムがSHA-1になってしまいます。(SHR-256にできない)
+            * PAdES-B-B（署名のみ、タイムスタンプなし）
+                * [PKCS12PAdESReportSiginerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12PAdESReportSiginer.java)
+        * [application-dev.yaml](/sample-jasperreports-springboot/src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで動作切り替え可能です。
+    2. AWS KMSに管理した
+        * 利用前には、独自作成ツールを使って、鍵、CSR、証明書、キーストアの作成が必要です。
+            * [SHA-256 with ECDSA](certs/kms/README.md)
+        * サンプルコードは以下です。
+            * TBD: 作成中
 
 ## 参考情報
 * [Jaspersoft community editionの公式サイト](https://www.jaspersoft.com/products/jaspersoft-community)
@@ -466,7 +505,7 @@
 * 電子署名
     * [OpenPDFのGitHubサイト](https://github.com/LibrePDF/OpenPDF)
         * [OpenPDFによる電子署名付与](https://github.com/LibrePDF/OpenPDF/wiki/Signing)
-    * [dss](https://github.com/esig/dss/tree/master/dss)
+    * [DSS(Digital Signature Service)](https://github.com/esig/dss/tree/master/dss)
     * [Adobe - PDF ファイルで電子署名を利用する方法](https://helpx.adobe.com/jp/acrobat/kb/cq07131410.html)
     * [Adobe Approved Trust List メンバー](https://helpx.adobe.com/jp/acrobat/kb/approved-trust-list1.html)
     * [アンテナハウス - PDF電子署名について](https://www.antenna.co.jp/pades/pr-e-signature.html)        
