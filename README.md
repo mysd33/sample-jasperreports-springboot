@@ -435,29 +435,29 @@
 > [!WARNING]
 > 現在、作成中です。
     
-    1. PKCS#12のキーストアに管理した秘密鍵・公開鍵証明書を使用した、サンプルAPの実装例
-        * 利用前には、opensslを使って鍵、CSR、証明書、キーストアの作成が必要です。
-            * [SHA-256 with RSA](certs/pkcs12/rsa/README.md)
-            * [SHA-256 with ECDSA](certs/pkcs12/ecdsa/README.md)
-        * サンプルコードは2パターンです。
-            * [application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。
-            * 通常の署名(PKCS#7/CMS)
-                * [PKCS12BasicReportSignerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12BasicReportSigner.java)
-                    * `digitalsignature.type`プロパティを`pkcs12-basic`に設定します。
-                * 可視署名にも対応しています。[application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。
-                    * `digitalsignature.visible`プロパティを`true`に設定します。また、`digitalsignature.stamp-image-path`に可視署名の画像（印影等）のファイルパスを設定します。
-            * PAdES-B-B（署名のみ、タイムスタンプなし）
-                * [PKCS12PAdESReportSiginerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12PAdESReportSiginer.java)
-                    * `digitalsignature.type`プロパティを`pkcs12-pades`に設定します。
-                * 現状、可視署名には対応していません。            
-    2. AWS KMSに管理した秘密鍵・公開鍵証明書を使用した、サンプルAPの実装例
-        * 利用前には、独自作成ツールを使って、鍵、CSR、証明書、キーストアの作成が必要です。
-            * [SHA-256 with ECDSA](certs/kms/README.md)
-        * サンプルコードは以下です。
-            * TBD: 作成中 [AWSKmsPAdESReportSignerクラス](src/main/java/com/example/fw/common/digitalsignature/AWSKmsPAdESReportSigner.java)
-                * `digitalsignature.type`プロパティを`aws-kms-pades`に設定します。また、`digitalsignature.aws-kms.key-id`に署名に使用するAWS KMSのキーIDを設定します。
-            * 現状可視署名には対応していません。
-            * [application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。            
+1. PKCS#12のキーストアに管理した秘密鍵・公開鍵証明書を使用した、サンプルAPの実装例
+    * 利用前には、opensslを使って鍵、CSR、証明書、キーストアの作成が必要です。
+        * [SHA-256 with RSA](certs/pkcs12/rsa/README.md)
+        * [SHA-256 with ECDSA](certs/pkcs12/ecdsa/README.md)
+    * サンプルコードは2パターンです。
+        * [application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。
+        * 通常の署名(PKCS#7/CMS)
+            * [PKCS12BasicReportSignerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12BasicReportSigner.java)
+                * `digitalsignature.type`プロパティを`pkcs12-basic`に設定します。
+            * 可視署名にも対応しています。[application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。
+                * `digitalsignature.visible`プロパティを`true`に設定します。また、`digitalsignature.stamp-image-path`に可視署名の画像（印影等）のファイルパスを設定します。
+        * PAdES-B-B（署名のみ、タイムスタンプなし）
+            * [PKCS12PAdESReportSiginerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12PAdESReportSiginer.java)
+                * `digitalsignature.type`プロパティを`pkcs12-pades`に設定します。
+            * 現状、可視署名には対応していません。            
+2. AWS KMSに管理した秘密鍵・公開鍵証明書を使用した、サンプルAPの実装例
+    * 利用前には、独自作成ツールを使って、鍵、CSR、証明書、キーストアの作成が必要です。
+        * [SHA-256 with ECDSA](certs/kms/README.md)
+    * サンプルコードは以下です。
+        * TBD: 作成中 [AWSKmsPAdESReportSignerクラス](src/main/java/com/example/fw/common/digitalsignature/AWSKmsPAdESReportSigner.java)
+            * `digitalsignature.type`プロパティを`aws-kms-pades`に設定します。また、`digitalsignature.aws-kms.key-id`に署名に使用するAWS KMSのキーIDを設定します。
+        * 現状可視署名には対応していません。
+        * [application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。            
 
 ## 参考情報
 * [Jaspersoft community editionの公式サイト](https://www.jaspersoft.com/products/jaspersoft-community)
