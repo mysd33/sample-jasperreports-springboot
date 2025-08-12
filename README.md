@@ -430,7 +430,7 @@
                     * [PKC#12キーストアでのトークン、署名取得](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/snippets/PKCS12Snippet.java)
                     * [PAdESでのPDF署名](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/sign/SignPdfPadesBTest.java)
 
-* 本サンプルAPの実装例
+* 本サンプルAPのでの電子署名付与機能の実装例
 
 > [!WARNING]
 > 現在、作成中です。
