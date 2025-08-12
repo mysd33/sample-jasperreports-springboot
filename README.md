@@ -397,19 +397,20 @@
         * Javadoc(OpenPDF1.3.43)
             * [PdfStamperクラス](https://javadoc.io/doc/com.github.librepdf/openpdf/1.3.43/com/lowagie/text/pdf/PdfStamper.html#createSignature-com.lowagie.text.pdf.PdfReader-java.io.OutputStream-char-)
             * [PdfSignatureAppearanceクラス](https://javadoc.io/doc/com.github.librepdf/openpdf/1.3.43/com/lowagie/text/pdf/PdfSignatureAppearance.html)
-       * ただし、OpenPDF ver1.x系を使用したやり方は、現状いろいろ注意、制約がありそうです。
-            * Open PDFは現在、[ver2.x系](https://github.com/LibrePDF/OpenPDF/tree/2.4.0)になっており、新しいパッケージは「org.openpdf」になっておりPdfStamperをはじめとした「com.lowagie.text」パッケージのクラスは非推奨で、ver3.0からは削除される。
-                * [新しいパッケージ](https://github.com/LibrePDF/OpenPDF/tree/2.4.0/openpdf-core-modern)にも、[org.openpdf.tex.pdf](https://github.com/LibrePDF/OpenPDF/tree/2.4.0/openpdf-core-modern/src/main/java/org/openpdf/text/pdf)パッケージのPdfStamperクラス等は存在はしている。
-            * OpenPDFの電子署名のサンプルコード[OpenPDF-Signing](https://github.com/LibrePDF/OpenPDF/wiki/Signing)もリンク切れになっており、見つからない状態。
-                * ソースコードとJavadocによるドキュメントはあるものの、この状態だと使っていいものなのか不安になる。
-            * 生成された署名付きのPDFをAcrobatReaderで開くと、ハッシュアルゴリズムが「SHA-1」となってなってしまう。
+       * ただし、OpenPDF ver1.x系を使用したやり方は、現状いろいろ注意が必要そうです。
+            * デフォルトの実装だと、生成された署名付きのPDFをAcrobatReaderで開くと、ハッシュアルゴリズムが「SHA-1」となってなってしまう。
                 * おそらく、原因は、以下のコードでハードコードされているためか、ハッシュアルゴリズムが「SHA-1」固定になってしまう。
                     * https://github.com/LibrePDF/OpenPDF/blob/1.3.43/openpdf/src/main/java/com/lowagie/text/pdf/PdfSigGenericPKCS.java#L234
                     * https://github.com/LibrePDF/OpenPDF/blob/1.3.43/openpdf/src/main/java/com/lowagie/text/pdf/PdfSignatureAppearance.java#L1144
                     * https://github.com/LibrePDF/OpenPDF/blob/1.3.43/openpdf/src/main/java/com/lowagie/text/pdf/PdfSigGenericPKCS.java                
-                * これを簡単に差し替えできる拡張ポイントが見当たらず、ひょっとすると[PdfPKCS7クラス](https://javadoc.io/static/com.github.librepdf/openpdf/1.3.43/com/lowagie/text/pdf/PdfPKCS7.html)を使って抜本的にソースを置き換えればできるかもしれないが、かなり難しい。
+                * 本サンプルでは、実装をいろいろ修正して、「SHA-256」になるように修正している。
+            * Open PDFは現在、[ver2.x系](https://github.com/LibrePDF/OpenPDF/tree/2.4.0)になっており、新しいパッケージは「org.openpdf」になっておりPdfStamperをはじめとした「com.lowagie.text」パッケージのクラスは非推奨で、ver3.0からは削除される。
+                * [新しいパッケージ](https://github.com/LibrePDF/OpenPDF/tree/2.4.0/openpdf-core-modern)にも、[org.openpdf.tex.pdf](https://github.com/LibrePDF/OpenPDF/tree/2.4.0/openpdf-core-modern/src/main/java/org/openpdf/text/pdf)パッケージのPdfStamperクラス等は存在はしている。
+            * OpenPDFの電子署名のサンプルコード[OpenPDF-Signing](https://github.com/LibrePDF/OpenPDF/wiki/Signing)もリンク切れになっており、見つからない状態。
+                * ソースコードとJavadocによるドキュメントはあるものの、この状態だと使っていいものなのか不安になる。
             * OpenPDFは、PAdES長期署名には対応していない。
                 * [OpenPDF issue #86 PAdES signatures support](https://github.com/LibrePDF/OpenPDF/issues/86)
+                * PAdESに対応するには、次に説明するライブラリDSSを使用する必要がある。
 
     2. [DSS（Digtal Signature Service](https://github.com/esig/dss/)
         * 欧州委員会（European Commission）が作成する電子署名の作成と検証のためのオープンソースソフトウェアライブラリです。
@@ -423,7 +424,7 @@
             * [Signature creation](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/signature-creation.adoc)
             * [Specificities of signature creation in different signature formats](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/signature-creation-different-formats.adoc)
             * [dss-pades-openpdf](https://github.com/esig/dss/tree/master/dss-pades-openpdf)
-                * DSS PAdESでのOpenPDF統合機能。可視署名の実現に利用する模様
+                * DSS PAdESでのOpenPDF統合機能。可視署名の実現に利用する模様ですが、サンプルAPでは利用できていません。
             * サンプルコードのリンク
                 * [Annex](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/annex.adoc)
                     * [PKC#12キーストアでのトークン、署名取得](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/snippets/PKCS12Snippet.java)
@@ -439,17 +440,24 @@
             * [SHA-256 with RSA](certs/pkcs12/rsa/README.md)
             * [SHA-256 with ECDSA](certs/pkcs12/ecdsa/README.md)
         * サンプルコードは2パターンです。
+            * [application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。
             * 通常の署名(PKCS#7/CMS)
                 * [PKCS12BasicReportSignerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12BasicReportSigner.java)
-                    * ただし、上に記載した問題で、現状、ハッシュアルゴリズムがSHA-1になってしまいます。(SHR-256にできない)
+                    * `digitalsignature.type`プロパティを`pkcs12-basic`に設定します。
+                * 可視署名にも対応しています。[application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。
+                    * `digitalsignature.visible`プロパティを`true`に設定します。また、`digitalsignature.stamp-image-path`に可視署名の画像（印影等）のファイルパスを設定します。
             * PAdES-B-B（署名のみ、タイムスタンプなし）
                 * [PKCS12PAdESReportSiginerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12PAdESReportSiginer.java)
-        * [application-dev.yaml](/sample-jasperreports-springboot/src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで動作切り替え可能です。
-    2. AWS KMSに管理した
+                    * `digitalsignature.type`プロパティを`pkcs12-pades`に設定します。
+                * 現状、可視署名には対応していません。            
+    2. AWS KMSに管理した秘密鍵・公開鍵証明書を使用した、サンプルAPの実装例
         * 利用前には、独自作成ツールを使って、鍵、CSR、証明書、キーストアの作成が必要です。
             * [SHA-256 with ECDSA](certs/kms/README.md)
         * サンプルコードは以下です。
-            * TBD: 作成中
+            * TBD: 作成中 [AWSKmsPAdESReportSignerクラス](src/main/java/com/example/fw/common/digitalsignature/AWSKmsPAdESReportSigner.java)
+                * `digitalsignature.type`プロパティを`aws-kms-pades`に設定します。また、`digitalsignature.aws-kms.key-id`に署名に使用するAWS KMSのキーIDを設定します。
+            * 現状可視署名には対応していません。
+            * [application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。            
 
 ## 参考情報
 * [Jaspersoft community editionの公式サイト](https://www.jaspersoft.com/products/jaspersoft-community)
