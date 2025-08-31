@@ -25,10 +25,10 @@ keymanagement:
 
 # 電子署名機能の設定
 digitalsignature:
-  visible: true
-  stamp-image-path: certs/stamp.png
-  type: pkcs12-basic
-#  type: pkcs12-pades
+#  visible: true
+#  stamp-image-path: certs/stamp.png
+#  type: pkcs12-basic
+  type: pkcs12-pades
   pkcs12:
     # PKCS#12のキーストアファイル名(SHA256 WITH RSA)
 #    keystore-file-path: certs/pkcs12/rsa/keystore.p12

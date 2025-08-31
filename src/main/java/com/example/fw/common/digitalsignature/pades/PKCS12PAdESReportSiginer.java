@@ -15,8 +15,10 @@ import org.springframework.util.Assert;
 
 import com.example.fw.common.digitalsignature.ReportSigner;
 import com.example.fw.common.digitalsignature.config.DigitalSignatureConfigurationProperties;
+import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
+import com.example.fw.common.message.CommonFrameworkMessageIds;
 import com.example.fw.common.reports.DefaultReport;
 import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportsConstants;
@@ -117,8 +119,7 @@ public class PKCS12PAdESReportSiginer implements ReportSigner {
             File file = tempFielPath.toFile();
             return DefaultReport.builder().file(file).build();
         } catch (IOException e) {
-            // TODO：適切な例外処理を実装する
-            throw new RuntimeException("Failed to sign the report", e);
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9002);
         }
     }
 
@@ -128,19 +129,15 @@ public class PKCS12PAdESReportSiginer implements ReportSigner {
      * @param certificate 検証対象の証明書
      */
     private void validateCertificate(X509Certificate certificate) {
-        // TODO: 適切な例外、メッセージをスローする
         Assert.notNull(certificate, "Certificate must not be null");
         try {
             // 証明書の有効期限を確認
             certificate.checkValidity();
-        } catch (CertificateExpiredException e) {
-            // TODO: 適切な例外、メッセージをスローする
-            throw new RuntimeException("Certificate has expired", e);
         } catch (CertificateNotYetValidException e) {
-            // TODO: 適切な例外、メッセージをスローする
-            throw new RuntimeException("Certificate is not yet valid", e);
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9004);
+        } catch (CertificateExpiredException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9005);
         }
-
     }
 
     /**
@@ -153,7 +150,7 @@ public class PKCS12PAdESReportSiginer implements ReportSigner {
         PAdESSignatureParameters pAdESSignatureParameters = new PAdESSignatureParameters();
         pAdESSignatureParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
         pAdESSignatureParameters.setSignaturePackaging(SignaturePackaging.ENVELOPED);
-        pAdESSignatureParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+        pAdESSignatureParameters.setDigestAlgorithm(DigestAlgorithm.valueOf(digitalSignatureConfig.getHashAlgorithm()));
         pAdESSignatureParameters.setSigningCertificate(privateKey.getCertificate());
         pAdESSignatureParameters.setCertificateChain(privateKey.getCertificateChain());
         return pAdESSignatureParameters;

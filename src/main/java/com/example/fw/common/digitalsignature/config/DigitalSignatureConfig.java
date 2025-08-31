@@ -57,10 +57,10 @@ public class DigitalSignatureConfig {
     @Bean
     @ConditionalOnProperty(name = DIGITAL_SIGNATURE_TYPE, havingValue = "aws-kms-pades")
     ReportSigner reportSignerByKms(KeyManager keyManager, ObjectStorageFileAccessor objectStorageFileAccessor) {
-        // TODO: 可視署名は未対応
         return new AWSKmsPAdESReportSigner(keyManager, //
-                digitalSignatureConfigurationProperties, //
-                reportsConfigurationProperties);
+                reportsConfigurationProperties, //
+                digitalSignatureConfigurationProperties);
+
     }
 
 }

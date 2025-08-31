@@ -15,11 +15,13 @@ import org.springframework.util.Assert;
 
 import com.example.fw.common.digitalsignature.ReportSigner;
 import com.example.fw.common.digitalsignature.config.DigitalSignatureConfigurationProperties;
+import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.keymanagement.Certificate;
 import com.example.fw.common.keymanagement.KeyInfo;
 import com.example.fw.common.keymanagement.KeyManager;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
+import com.example.fw.common.message.CommonFrameworkMessageIds;
 import com.example.fw.common.reports.DefaultReport;
 import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportsConstants;
@@ -54,8 +56,9 @@ import lombok.extern.slf4j.Slf4j;
 public class AWSKmsPAdESReportSigner implements ReportSigner {
     private static final ApplicationLogger appLogger = LoggerFactory.getApplicationLogger(log);
     private final KeyManager keyManager;
-    private final DigitalSignatureConfigurationProperties digitalSignatureConfigurationProperties;
     private final ReportsConfigurationProperties reportsConfigurationProperties;
+    private final DigitalSignatureConfigurationProperties digitalSignatureConfigurationProperties;
+
     // PDFの一時保存ファイルのディレクトリ（パスを初期化設定後、定期削除のための別スレッドで参照されるためAtomicReferenceにしておく）
     private final AtomicReference<Path> pdfTempPath = new AtomicReference<>();
     // 電子署名に使用するキーID
@@ -86,6 +89,11 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
             } else {
                 // InMemoryDocumentに対して電子署名付与を実装
                 toSignDocument = new InMemoryDocument(report.getInputStream());
+            }
+
+            // TODO: 可視署名は現在未対応
+            if (digitalSignatureConfigurationProperties.isVisible()) {
+                appLogger.debug("可視署名は現在未対応");
             }
 
             // 証明書検証機能を初期化
@@ -142,19 +150,15 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
      * @param certificate 検証対象の証明書
      */
     private void validateCertificate(X509Certificate certificate) {
-        // TODO: 適切な例外、メッセージをスローする
         Assert.notNull(certificate, "Certificate must not be null");
         try {
             // 証明書の有効期限を確認
             certificate.checkValidity();
-        } catch (CertificateExpiredException e) {
-            // TODO: 適切な例外、メッセージをスローする
-            throw new RuntimeException("Certificate has expired", e);
         } catch (CertificateNotYetValidException e) {
-            // TODO: 適切な例外、メッセージをスローする
-            throw new RuntimeException("Certificate is not yet valid", e);
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9004);
+        } catch (CertificateExpiredException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9005);
         }
-
     }
 
     /**
@@ -167,7 +171,8 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
         PAdESSignatureParameters pAdESSignatureParameters = new PAdESSignatureParameters();
         pAdESSignatureParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
         pAdESSignatureParameters.setSignaturePackaging(SignaturePackaging.ENVELOPED);
-        pAdESSignatureParameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+        pAdESSignatureParameters.setDigestAlgorithm(
+                DigestAlgorithm.valueOf(digitalSignatureConfigurationProperties.getHashAlgorithm()));
         CertificateToken certificateToken = new CertificateToken(x509Certificate);
         pAdESSignatureParameters.setSigningCertificate(certificateToken);
         // TODO
