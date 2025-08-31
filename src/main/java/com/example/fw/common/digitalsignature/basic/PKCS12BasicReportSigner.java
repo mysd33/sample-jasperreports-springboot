@@ -21,8 +21,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.example.fw.common.digitalsignature.ReportSigner;
 import com.example.fw.common.digitalsignature.config.DigitalSignatureConfigurationProperties;
+import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
+import com.example.fw.common.message.CommonFrameworkMessageIds;
 import com.example.fw.common.reports.DefaultReport;
 import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportsConstants;
@@ -83,8 +85,7 @@ public class PKCS12BasicReportSigner implements ReportSigner {
         try {
             originalPdfReader = new PdfReader(originalReport.getInputStream());
         } catch (IOException e) {
-            // TODO: 適切な例外、メッセージをスローする
-            throw new RuntimeException("Failed Read PDF", e);
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9001);
         }
         // メモリを極力使わないよう、PDFのファイルサイズが大きい場合も考慮し一時ファイルに出力してInputStreamで返却するようにする
         Path signedPdfTempFilePath = null;
@@ -92,10 +93,7 @@ public class PKCS12BasicReportSigner implements ReportSigner {
             signedPdfTempFilePath = Files.createTempFile(pdfTempPath.get(), ReportsConstants.PDF_TEMP_FILE_PREFIX,
                     ReportsConstants.PDF_FILE_EXTENSION);
         } catch (IOException e) {
-            // TODO: 適切な例外、メッセージをスローする
-            throw new RuntimeException("Failed Create File", e);
-        } finally {
-            originalPdfReader.close();
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9002);
         }
         try (FileOutputStream fos = new FileOutputStream(signedPdfTempFilePath.toFile())) {
             KeyStore ks = KeyStore.getInstance(PKCS12);
@@ -152,14 +150,13 @@ public class PKCS12BasicReportSigner implements ReportSigner {
             dic.put(PdfName.CONTENTS, str);
             sap.close(dic);
             pdfStamper.getReader().close();
-            // TODO: ここまで
-
+            // TODO: リファクタリング対象ここまで
             return DefaultReport.builder()//
                     .file(signedPdfTempFilePath.toFile()).build();
         } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException | CertificateException
                 | DocumentException | IOException e) {
-            // TODO: 適切な例外、メッセージをスローする
-            throw new RuntimeException("Failed to sign the report", e);
+            // TODO: リファクタリング後、適切なtry-catchに分解する
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9003);
         } finally {
             originalPdfReader.close();
         }

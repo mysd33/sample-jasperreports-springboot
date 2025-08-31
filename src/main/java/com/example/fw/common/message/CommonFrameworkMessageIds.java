@@ -53,5 +53,8 @@ public final class CommonFrameworkMessageIds {
     public static final String E_FW_KYMG_9010 = "e.fw.kymg.9010";
     public static final String E_FW_KYMG_9011 = "e.fw.kymg.9011";
     public static final String E_FW_KYMG_9012 = "e.fw.kymg.9012";
-
+    // PDF署名機能
+    public static final String E_FW_PDFSGN_9001 = "e.fw.pdfsgn.9001";
+    public static final String E_FW_PDFSGN_9002 = "e.fw.pdfsgn.9002";
+    public static final String E_FW_PDFSGN_9003 = "e.fw.pdfsgn.9003";
 }
