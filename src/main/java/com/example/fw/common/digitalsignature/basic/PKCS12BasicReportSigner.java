@@ -1,4 +1,4 @@
-package com.example.fw.common.digitalsignature;
+package com.example.fw.common.digitalsignature.basic;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,6 +19,8 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.example.fw.common.digitalsignature.ReportSigner;
+import com.example.fw.common.digitalsignature.config.DigitalSignatureConfigurationProperties;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
 import com.example.fw.common.reports.DefaultReport;
@@ -55,7 +57,8 @@ public class PKCS12BasicReportSigner implements ReportSigner {
     private static final String PKCS12 = "pkcs12";
     private static final ApplicationLogger appLogger = LoggerFactory.getApplicationLogger(log);
     private final ReportsConfigurationProperties config;
-    private final SignatureOptions options;
+    private final DigitalSignatureConfigurationProperties digitalSignatureConfig;
+
     // PDFの一時保存ファイルのディレクトリ（パスを初期化設定後、定期削除のための別スレッドで参照されるためAtomicReferenceにしておく）
     private final AtomicReference<Path> pdfTempPath = new AtomicReference<>();
 
@@ -96,35 +99,34 @@ public class PKCS12BasicReportSigner implements ReportSigner {
         }
         try (FileOutputStream fos = new FileOutputStream(signedPdfTempFilePath.toFile())) {
             KeyStore ks = KeyStore.getInstance(PKCS12);
-            ks.load(new FileInputStream(options.getKeyStoreFile()), options.getPassword().toCharArray());
+            ks.load(new FileInputStream(digitalSignatureConfig.getPkcs12().getKeystoreFilePath()),
+                    digitalSignatureConfig.getPkcs12().getPassword().toCharArray());
             String alias = ks.aliases().nextElement();
-            PrivateKey key = (PrivateKey) ks.getKey(alias, options.getPassword().toCharArray());
+            PrivateKey key = (PrivateKey) ks.getKey(alias,
+                    digitalSignatureConfig.getPkcs12().getPassword().toCharArray());
             Certificate[] chain = ks.getCertificateChain(alias);
             PdfStamper pdfStamper = PdfStamper.createSignature(originalPdfReader, fos, '\0');
             PdfSignatureAppearance sap = pdfStamper.getSignatureAppearance();
-            // TODO: Optionsでの設定切り出し
-            sap.setReason("署名理由");
-            sap.setLocation("署名場所");
-            if (options.isVisible()) {
+            sap.setReason(digitalSignatureConfig.getReason());
+            sap.setLocation(digitalSignatureConfig.getLocation());
+            if (digitalSignatureConfig.isVisible()) {
                 sap.setVisibleSignature(new Rectangle(100, 100, 200, 200), 1);
-                // 可視署名の設定切り出し
-                sap.setLayer2Text("署名者");
-                String imagePath = options.getStampImagePath();
+                sap.setLayer2Text(digitalSignatureConfig.getVisibleSignText());
+                String imagePath = digitalSignatureConfig.getStampImagePath();
                 sap.setImage(Image.getInstance(imagePath));
             }
             pdfStamper.setEnforcedModificationDate(Calendar.getInstance());
 
             // デフォルト実装はハッシュアルゴリズムがSHA-1と表示されてしまうため
-            // ハッシュアルゴリズムをSHA-256の明示的な設定の上書きのため拡張をする
-            DefaultPdfSignature sig = new DefaultPdfSignature();
+            // ハッシュアルゴリズムをSHA-256の明示的な設定の上書きのための拡張実装をする
+            DefaultPdfSignature sig = new DefaultPdfSignature(digitalSignatureConfig.getHashAlgorithm());
             sig.setSignInfo(key, chain, null);
             sig.put(PdfName.M, new PdfDate(new GregorianCalendar()));
             sap.setCryptoDictionary(sig);
-            
-            // 通常なら、PdfStamperをclose()は呼び出すが、
-            // close()メソッド内で、sap.preClose()で、NullPointerExceptionが発生するため置き換え
 
-            // TODO: リファクタリング（メソッド切り出しまたはPdfStamperの拡張クラスへの変更）
+            // 通常なら、PdfStamperのclose()は呼び出すが、
+            // close()メソッド内で、sap.preClose()で、NullPointerExceptionが発生するため置き換え
+            // TODO: リファクタリング PdfStamperの拡張クラスを実装して、その中のclose()をオーバーライドして対応する
             PdfString contents = (PdfString) sig.get(PdfName.CONTENTS);
             PdfLiteral lit = new PdfLiteral(
                     (contents.toString().length() + (PdfName.ADOBE_PPKLITE.equals(sap.getFilter()) ? 0 : 64)) * 2 + 2);
@@ -150,6 +152,7 @@ public class PKCS12BasicReportSigner implements ReportSigner {
             dic.put(PdfName.CONTENTS, str);
             sap.close(dic);
             pdfStamper.getReader().close();
+            // TODO: ここまで
 
             return DefaultReport.builder()//
                     .file(signedPdfTempFilePath.toFile()).build();
