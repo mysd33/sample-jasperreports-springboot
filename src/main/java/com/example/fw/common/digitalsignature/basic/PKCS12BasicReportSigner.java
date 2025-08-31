@@ -3,20 +3,17 @@ package com.example.fw.common.digitalsignature.basic;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.example.fw.common.digitalsignature.ReportSigner;
@@ -29,18 +26,13 @@ import com.example.fw.common.reports.DefaultReport;
 import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportsConstants;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfDate;
-import com.lowagie.text.pdf.PdfDictionary;
-import com.lowagie.text.pdf.PdfLiteral;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
-import com.lowagie.text.pdf.PdfString;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +88,7 @@ public class PKCS12BasicReportSigner implements ReportSigner {
             throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9002);
         }
         try (FileOutputStream fos = new FileOutputStream(signedPdfTempFilePath.toFile())) {
+            // PKCS#12形式のキーストアから秘密鍵と証明書を読み込む
             KeyStore ks = KeyStore.getInstance(PKCS12);
             ks.load(new FileInputStream(digitalSignatureConfig.getPkcs12().getKeystoreFilePath()),
                     digitalSignatureConfig.getPkcs12().getPassword().toCharArray());
@@ -103,63 +96,63 @@ public class PKCS12BasicReportSigner implements ReportSigner {
             PrivateKey key = (PrivateKey) ks.getKey(alias,
                     digitalSignatureConfig.getPkcs12().getPassword().toCharArray());
             Certificate[] chain = ks.getCertificateChain(alias);
-            PdfStamper pdfStamper = PdfStamper.createSignature(originalPdfReader, fos, '\0');
-            PdfSignatureAppearance sap = pdfStamper.getSignatureAppearance();
+            // PDFに電子署名を付与する
+            doSign(originalPdfReader, fos, key, chain);
+            // 署名付きPDFの帳票を返却する
+            return DefaultReport.builder()//
+                    .file(signedPdfTempFilePath.toFile()).build();
+        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9007);
+        } catch (IOException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9002);
+        } finally {
+            originalPdfReader.close();
+        }
+    }
+
+    /**
+     * PDFに電子署名を付与する
+     * 
+     * @param originalPdfReader 元のPDFのPdfReader
+     * @param fos               署名付きPDFの出力先のFileOutputStream
+     * @param key               秘密鍵
+     * @param chain             証明書チェーン
+     */
+    private void doSign(PdfReader originalPdfReader, FileOutputStream fos, PrivateKey key, Certificate[] chain) {
+        try (PdfStamperWrapper pdfStamperWrapper = new PdfStamperWrapper(
+                PdfStamper.createSignature(originalPdfReader, fos, '\0'))) {
+            PdfSignatureAppearance sap = pdfStamperWrapper.getSignatureAppearance();
             sap.setReason(digitalSignatureConfig.getReason());
             sap.setLocation(digitalSignatureConfig.getLocation());
             if (digitalSignatureConfig.isVisible()) {
-                sap.setVisibleSignature(new Rectangle(100, 100, 200, 200), 1);
-                sap.setLayer2Text(digitalSignatureConfig.getVisibleSignText());
-                String imagePath = digitalSignatureConfig.getStampImagePath();
-                sap.setImage(Image.getInstance(imagePath));
+                createVisbleSignatureImage(sap);
             }
-            pdfStamper.setEnforcedModificationDate(Calendar.getInstance());
+            pdfStamperWrapper.setEnforcedModificationDate(Calendar.getInstance());
 
-            // デフォルト実装はハッシュアルゴリズムがSHA-1と表示されてしまうため
+            // OpenPDFの標準実装では、ハッシュアルゴリズムがSHA-1が固定になってしまうため
             // ハッシュアルゴリズムをSHA-256の明示的な設定の上書きのための拡張実装をする
             DefaultPdfSignature sig = new DefaultPdfSignature(digitalSignatureConfig.getHashAlgorithm());
             sig.setSignInfo(key, chain, null);
             sig.put(PdfName.M, new PdfDate(new GregorianCalendar()));
             sap.setCryptoDictionary(sig);
-
-            // 通常なら、PdfStamperのclose()は呼び出すが、
-            // close()メソッド内で、sap.preClose()で、NullPointerExceptionが発生するため置き換え
-            // TODO: リファクタリング PdfStamperの拡張クラスを実装して、その中のclose()をオーバーライドして対応する
-            PdfString contents = (PdfString) sig.get(PdfName.CONTENTS);
-            PdfLiteral lit = new PdfLiteral(
-                    (contents.toString().length() + (PdfName.ADOBE_PPKLITE.equals(sap.getFilter()) ? 0 : 64)) * 2 + 2);
-            Map<PdfName, Integer> exclusionSize = Map.of(PdfName.CONTENTS, lit.getPosLength());
-            sap.preClose(exclusionSize);
-            int totalBuf = (lit.getPosLength() - 2) / 2;
-            byte[] buf = new byte[8192];
-            int n;
-            InputStream inp = sap.getRangeStream();
-            try {
-                while ((n = inp.read(buf)) > 0) {
-                    sig.getSigner().update(buf, 0, n);
-                }
-            } catch (SignatureException se) {
-                throw new ExceptionConverter(se);
-            }
-            buf = new byte[totalBuf];
-            byte[] bsig = sig.getSignerContents();
-            System.arraycopy(bsig, 0, buf, 0, bsig.length);
-            PdfString str = new PdfString(buf);
-            str.setHexWriting(true);
-            PdfDictionary dic = new PdfDictionary();
-            dic.put(PdfName.CONTENTS, str);
-            sap.close(dic);
-            pdfStamper.getReader().close();
-            // TODO: リファクタリング対象ここまで
-            return DefaultReport.builder()//
-                    .file(signedPdfTempFilePath.toFile()).build();
-        } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException | CertificateException
-                | DocumentException | IOException e) {
-            // TODO: リファクタリング後、適切なtry-catchに分解する
+        } catch (IOException e) {
             throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9003);
-        } finally {
-            originalPdfReader.close();
         }
+    }
 
+    /**
+     * PDFに表示する可視署名の署名イメージを作成する
+     * 
+     * @param sap PdfSignatureAppearance
+     */
+    private void createVisbleSignatureImage(PdfSignatureAppearance sap) {
+        sap.setVisibleSignature(new Rectangle(100, 100, 200, 200), 1);
+        sap.setLayer2Text(digitalSignatureConfig.getVisibleSignText());
+        String imagePath = digitalSignatureConfig.getStampImagePath();
+        try {
+            sap.setImage(Image.getInstance(imagePath));
+        } catch (IOException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9006, imagePath);
+        }
     }
 }

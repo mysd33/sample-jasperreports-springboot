@@ -6,7 +6,7 @@ import com.lowagie.text.pdf.PdfSigGenericPKCS;
 /**
  * 本機能のデフォルトのPdfSignature（PdfDictionary）実装クラス<br>
  * 
- * OpenPDF署名のデフォルト実装の場合、ハッシュアルゴリズムがSHA-1と表示されてしまうため //
+ * OpenPDF署名のデフォルト実装の場合、ハッシュアルゴリズムがSHA-1固定になってしまうため、
  * ハッシュアルゴリズムをSHA-256等で明示的な設定の上書きのため拡張をする
  */
 public class DefaultPdfSignature extends PdfSigGenericPKCS {
