@@ -1,6 +1,5 @@
 package com.example.fw.common.keymanagement;
 
-import java.io.InputStream;
 import java.security.PublicKey;
 
 /**
@@ -48,7 +47,7 @@ public interface KeyManager {
      * @return 作成された自己署名証明書
      */
     Certificate createSelfSignedCertificate(CertificateSigningRequest csr, KeyInfo keyInfo);
-    
+
     /**
      * CSR（証明書署名要求）をオブジェクトストレージに保存します。
      * 
@@ -64,7 +63,7 @@ public interface KeyManager {
      * @return 取得した証明書署名要求
      */
     CertificateSigningRequest getCsrFromObjectStorage(KeyInfo keyInfo);
-    
+
     /**
      * オブジェクトストレージに自己署名証明書を保存します。
      * 
@@ -92,8 +91,8 @@ public interface KeyManager {
     /**
      * メッセージダイジェスト（ハッシュ）をもとに電子署名を生成します。
      * 
-     * @param digestData    署名対象のダイジェスト（ハッシュ）データ
-     * @param keyInfo 署名に使用する暗号鍵の情報
+     * @param digestData 署名対象のダイジェスト（ハッシュ）データ
+     * @param keyInfo    署名に使用する暗号鍵の情報
      */
     Signature createSignatureFromDigest(byte[] digestData, KeyInfo keyInfo);
 

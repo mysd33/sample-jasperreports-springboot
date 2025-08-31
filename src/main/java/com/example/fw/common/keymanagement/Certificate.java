@@ -20,7 +20,7 @@ import lombok.Value;
 @Value
 @Builder
 public class Certificate {
-    private static final String CERTIFICATE = "CERTIFICATE";
+    private static final String PEM_TYPE = "CERTIFICATE";
     private final byte[] der; // DER形式でエンコードされたCSRデータ
 
     /**
@@ -55,7 +55,7 @@ public class Certificate {
      */
     public void exportPemTo(Writer writer) throws IOException {
         try (PemWriter pemWriter = new PemWriter(writer)) {
-            pemWriter.writeObject(new PemObject(CERTIFICATE, der));
+            pemWriter.writeObject(new PemObject(PEM_TYPE, der));
         }
     }
 }

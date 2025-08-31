@@ -10,6 +10,8 @@ import lombok.Value;
 @Value
 @Builder
 public class KeyInfo {
-    private final String keyId; // キーのID
-    private final String state; // キーの状態
+    // キーのID
+    private final String keyId;
+    // キーの状態
+    private final String state;
 }

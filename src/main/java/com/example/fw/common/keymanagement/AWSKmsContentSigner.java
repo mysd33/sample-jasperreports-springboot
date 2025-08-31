@@ -9,7 +9,9 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 
+import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.keymanagement.config.KeyManagementConfigurationProperties;
+import com.example.fw.common.message.CommonFrameworkMessageIds;
 
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.kms.KmsAsyncClient;
@@ -26,7 +28,14 @@ public class AWSKmsContentSigner implements ContentSigner {
     private final AlgorithmIdentifier algorithmIdentifier;
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-    public AWSKmsContentSigner(KmsAsyncClient kmsAsyncClient, KeyInfo keyInfo,
+    /**
+     * コンストラクタ
+     * 
+     * @param kmsAsyncClient                       AWS KMSの非同期クライアント
+     * @param keyInfo                              署名に使用するキー情報
+     * @param keyManagementConfigurationProperties キー管理の設定プロパティ
+     */
+    public AWSKmsContentSigner(final KmsAsyncClient kmsAsyncClient, final KeyInfo keyInfo,
             KeyManagementConfigurationProperties keyManagementConfigurationProperties) {
         this.kmsAsyncClient = kmsAsyncClient;
         this.keyInfo = keyInfo;
@@ -48,23 +57,22 @@ public class AWSKmsContentSigner implements ContentSigner {
     @Override
     public byte[] getSignature() {
         byte[] dataToSign = outputStream.toByteArray();
+        String messageDigestAlgorithm = keyManagementConfigurationProperties.getHashAlgorithm();
+        byte[] hash;
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance(keyManagementConfigurationProperties.getHashAlgorithm());
-            byte[] hash = messageDigest.digest(dataToSign);
-            return kmsAsyncClient.sign(builder -> builder//
-                    .keyId(keyInfo.getKeyId()) // キーIDを指定
-                    .message(SdkBytes.fromByteArray(hash)) // ハッシュ値をメッセージとして指定
-                    .signingAlgorithm(keyManagementConfigurationProperties.getAwsKms().getKmsSigningAlgorithmSpec())) // 署名アルゴリズムを指定
-                    .thenApply(response -> {
-                        // 署名の結果を取得
-                        return response.signature().asByteArray();
-                    }).join(); // 非同期処理の完了を待つ
-
+            MessageDigest messageDigest = MessageDigest.getInstance(messageDigestAlgorithm);
+            hash = messageDigest.digest(dataToSign);
         } catch (NoSuchAlgorithmException e) {
-            // TODO 例外の定義
-            throw new RuntimeException("Unsupported hash algorithm", e);
-
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9007, messageDigestAlgorithm);
         }
+        return kmsAsyncClient.sign(builder -> builder//
+                .keyId(keyInfo.getKeyId()) // キーIDを指定
+                .message(SdkBytes.fromByteArray(hash)) // ハッシュ値をメッセージとして指定
+                .signingAlgorithm(keyManagementConfigurationProperties.getAwsKms().getKmsSigningAlgorithmSpec())) // 署名アルゴリズムを指定
+                .thenApply(response -> {
+                    // 署名の結果を取得
+                    return response.signature().asByteArray();
+                }).join(); // 非同期処理の完了を待つ
 
     }
 

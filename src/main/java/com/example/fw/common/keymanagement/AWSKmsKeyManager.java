@@ -14,7 +14,6 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -25,9 +24,11 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 
+import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.keymanagement.config.KeyManagementConfigurationProperties;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
+import com.example.fw.common.message.CommonFrameworkMessageIds;
 import com.example.fw.common.objectstorage.DownloadObject;
 import com.example.fw.common.objectstorage.ObjectStorageFileAccessor;
 import com.example.fw.common.objectstorage.UploadObject;
@@ -97,17 +98,15 @@ public class AWSKmsKeyManager implements KeyManager {
                 .keyId(keyInfo.getKeyId()))//
                 .thenApply(response -> {
                     byte[] publicKeyBytes = response.publicKey().asByteArray();
+                    String algorithm = keyManagementConfigurationProperties.getKeyFactoryAlgorithm();
                     KeyFactory keyFactory;
                     try {
-                        keyFactory = KeyFactory
-                                .getInstance(keyManagementConfigurationProperties.getKeyFactoryAlgorithm());
+                        keyFactory = KeyFactory.getInstance(algorithm);
                         return keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
                     } catch (NoSuchAlgorithmException e) {
-                        // TODO 例外の定義
-                        throw new RuntimeException("Unsupported key algorithm", e);
+                        throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9001, algorithm);
                     } catch (InvalidKeySpecException e) {
-                        // TODO 例外の定義
-                        throw new RuntimeException("Invalid key specification", e);
+                        throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9002);
                     }
                 }).join();
     }
@@ -124,47 +123,55 @@ public class AWSKmsKeyManager implements KeyManager {
                     .der(csr.getEncoded()) // CSRのDERエンコードされたバイト配列を設定
                     .build();
         } catch (IOException e) {
-            // TODO 例外の定義
-            throw new RuntimeException("Failed to encode CSR", e);
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9003);
         }
     }
 
     @Override
     public Certificate createSelfSignedCertificate(final CertificateSigningRequest csr, final KeyInfo keyInfo) {
+        // CSRの読み込み
+        PKCS10CertificationRequest pkcs10Csr;
         try {
-            PKCS10CertificationRequest pkcs10Csr = new PKCS10CertificationRequest(csr.getDer());
-            // CSRからSubjectと公開鍵を抽出
-            X500Name subject = pkcs10Csr.getSubject();
+            pkcs10Csr = new PKCS10CertificationRequest(csr.getDer());
+        } catch (IOException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9004);
+        }
+        // CSRからSubjectと公開鍵を抽出
+        X500Name subject = pkcs10Csr.getSubject();
+        String algorithm = keyManagementConfigurationProperties.getKeyFactoryAlgorithm();
+        PublicKey publicKey;
+        try {
             byte[] pubKeyBytes = pkcs10Csr.getSubjectPublicKeyInfo().getEncoded();
-            PublicKey publicKey = KeyFactory.getInstance(keyManagementConfigurationProperties.getKeyFactoryAlgorithm())
+            publicKey = KeyFactory.getInstance(algorithm)//
                     .generatePublic(new X509EncodedKeySpec(pubKeyBytes));
-            X500Name issuer = subject; // 自己署名なのでIssuerはSubjectと同じ
-            BigInteger serialNumber = BigInteger.valueOf(1);
-            Date notBefore = new Date();
-            Date notAfter = new Date(System.currentTimeMillis()
-                    + keyManagementConfigurationProperties.getSelfSignedCertValidityDays() * 24 * 60 * 60 * 1000L);
-            X509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(issuer, serialNumber,
-                    notBefore, notAfter, subject, publicKey);
-            // Subject Key Identifierを取得
+        } catch (IOException | InvalidKeySpecException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9005);
+        } catch (NoSuchAlgorithmException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9001, algorithm);
+        }
+        X500Name issuer = subject; // 自己署名なのでIssuerはSubjectと同じ
+        BigInteger serialNumber = BigInteger.valueOf(1);
+        Date notBefore = new Date();
+        Date notAfter = new Date(System.currentTimeMillis()
+                + keyManagementConfigurationProperties.getSelfSignedCertValidityDays() * 24 * 60 * 60 * 1000L);
+        X509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(issuer, serialNumber, notBefore,
+                notAfter, subject, publicKey);
+        // Subject Key Identifierを取得
+        try {
             JcaX509ExtensionUtils extensionUtils = new JcaX509ExtensionUtils();
             certificateBuilder.addExtension(Extension.subjectKeyIdentifier, false,
                     extensionUtils.createSubjectKeyIdentifier(pkcs10Csr.getSubjectPublicKeyInfo()));
-            // certificateBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
+            // certificateBuilder.addExtension(Extension.basicConstraints, true, new
+            // BasicConstraints(false));
             X509CertificateHolder certificateHolder = certificateBuilder
                     .build(new AWSKmsContentSigner(kmsAsyncClient, keyInfo, keyManagementConfigurationProperties));
             return Certificate.builder() //
                     .der(certificateHolder.getEncoded()) // 証明書のDERエンコードされたバイト配列を設定
                     .build();
-        } catch (IOException e) {
-            // TODO 例外の定義
-            throw new RuntimeException("Failed to read CSR", e);
-        } catch (NoSuchAlgorithmException e) {
-            // TODO 例外の定義
-            throw new RuntimeException("Unsupported key algorithm", e);
-        } catch (InvalidKeySpecException e) {
-            // TODO 例外の定義
-            throw new RuntimeException("Invalid key specification", e);
+        } catch (NoSuchAlgorithmException | IOException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9006);
         }
+
     }
 
     @Override
@@ -177,8 +184,7 @@ public class AWSKmsKeyManager implements KeyManager {
         try {
             csr.exportPemTo(csrWriter);
         } catch (IOException e) {
-            // TODO 例外の定義
-            throw new RuntimeException("Failed to export CSR to PEM format", e);
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9007);
         }
         appLogger.debug("CSR PEM: {}", csrWriter.toString());
         InputStream csrInputStream = new ByteArrayInputStream(csrWriter.toString().getBytes());
@@ -200,8 +206,7 @@ public class AWSKmsKeyManager implements KeyManager {
             return CertificateSigningRequest.builder()//
                     .der(downloadObject.getInputStream().readAllBytes()).build();
         } catch (IOException e) {
-            // TODO 例外の定義
-            throw new RuntimeException("Failed to read CSR from object storage", e);
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9008);
         }
     }
 
@@ -216,8 +221,7 @@ public class AWSKmsKeyManager implements KeyManager {
         try {
             certificate.exportPemTo(certWriter);
         } catch (IOException e) {
-            // TODO 例外の定義
-            throw new RuntimeException("Failed to export self-signed certificate to PEM format", e);
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9009);
         }
         appLogger.debug("自己署名証明書 PEM: {}", certWriter.toString());
         InputStream certInputStream = new ByteArrayInputStream(certWriter.toString().getBytes());
@@ -230,15 +234,22 @@ public class AWSKmsKeyManager implements KeyManager {
 
     @Override
     public Certificate getSelfSignedCertificateFromObjectStorage(final KeyInfo keyInfo) {
-        final String selfSignedCertificateFileName = keyManagementConfigurationProperties
-                .getSelfSignedCertPemFileName();
-        return getCertificateFromObjectStorage(keyInfo, selfSignedCertificateFileName);
+        String selfSignedCertificateFileName = keyManagementConfigurationProperties.getSelfSignedCertPemFileName();
+        try {
+            return getCertificateFromObjectStorage(keyInfo, selfSignedCertificateFileName);
+        } catch (IOException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9010);
+        }
     }
 
     @Override
     public Certificate getCertificateFromObjectStorage(final KeyInfo keyInfo) {
-        final String certificateFileName = keyManagementConfigurationProperties.getCertPemFileName();
-        return getCertificateFromObjectStorage(keyInfo, certificateFileName);
+        String certificateFileName = keyManagementConfigurationProperties.getCertPemFileName();
+        try {
+            return getCertificateFromObjectStorage(keyInfo, certificateFileName);
+        } catch (IOException e) {
+            throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9011);
+        }
     }
 
     @Override
@@ -261,20 +272,19 @@ public class AWSKmsKeyManager implements KeyManager {
      * @param keyInfo
      * @param certificateFileName
      * @return
+     * @throws IOException
      */
-    private Certificate getCertificateFromObjectStorage(final KeyInfo keyInfo, final String certificateFileName) {
+    private Certificate getCertificateFromObjectStorage(final KeyInfo keyInfo, final String certificateFileName)
+            throws IOException {
         final String certsBassPrefix = keyManagementConfigurationProperties.getCertsBasePrefix();
         final String certifacatePrefix = certsBassPrefix + keyInfo.getKeyId() + "/" + certificateFileName;
         // オブジェクトストレージから自己署名証明書のpemをダウンロード
         DownloadObject downloadObject = objectStorageFileAccessor.download(certifacatePrefix);
-        try {
-            return Certificate.builder()//
-                    .der(downloadObject.getInputStream().readAllBytes()) // 証明書のDERエンコードされたバイト配列を設定
-                    .build();
-        } catch (IOException e) {
-            // TODO 例外の定義
-            throw new RuntimeException("Failed to read self-signed certificate from object storage", e);
-        }
+
+        return Certificate.builder()//
+                .der(downloadObject.getInputStream().readAllBytes()) // 証明書のDERエンコードされたバイト配列を設定
+                .build();
+
     }
 
 }
