@@ -93,7 +93,17 @@ public interface KeyManager {
      * 
      * @param digestData 署名対象のダイジェスト（ハッシュ）データ
      * @param keyInfo    署名に使用する暗号鍵の情報
+     * @return 生成された電子署名
      */
     Signature createSignatureFromDigest(byte[] digestData, KeyInfo keyInfo);
+
+    /**
+     * 生データをもとに電子署名を生成します。
+     * 
+     * @param rawData 署名対象のメッセージデータ
+     * @param keyInfo 署名に使用する暗号鍵の情報
+     * @return 生成された電子署名
+     */
+    Signature createSignatureFromRawData(byte[] rawData, KeyInfo keyInfo);
 
 }

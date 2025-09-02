@@ -25,10 +25,12 @@ keymanagement:
 
 # 電子署名機能の設定
 digitalsignature:
-  visible: true
-  stamp-image-path: certs/stamp.png
-  type: pkcs12-basic
-#  type: pkcs12-pades
+#  visible: true
+#  stamp-image-path: certs/stamp.png
+# PKCS#12のキーストアを使用して基本署名を行う場合に設定
+#  type: pkcs12-basic
+# PKCS#12のキーストアを使用してPADES署名(PADES-B-B)を行う場合に設定
+  type: pkcs12-pades
   pkcs12:
     # PKCS#12のキーストアファイル名(SHA256 WITH RSA)
 #    keystore-file-path: certs/pkcs12/rsa/keystore.p12
@@ -36,11 +38,11 @@ digitalsignature:
     keystore-file-path: certs/pkcs12/ecdsa/keystore.p12
     # PKCS#12のキーストアパスワード
     password: password123
-
+# AWS KMSを使用してPADES署名(PADES-B-B)を行う場合に設定
 #  type: aws-kms-pades
-#  aws-kms:
+  aws-kms:
     # AWS KMSのキーIDを設定
-#    key-id: 23f2bb36-47d5-468d-95a8-d1229cd619eb
+    key-id: a9d52165-8223-4c95-9ec3-32e1e6fd2bee
 
 # オブジェクトストレージの設定
 aws:

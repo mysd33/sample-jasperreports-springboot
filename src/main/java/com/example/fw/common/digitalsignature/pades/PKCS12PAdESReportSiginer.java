@@ -153,6 +153,8 @@ public class PKCS12PAdESReportSiginer implements ReportSigner {
         pAdESSignatureParameters.setDigestAlgorithm(DigestAlgorithm.valueOf(digitalSignatureConfig.getHashAlgorithm()));
         pAdESSignatureParameters.setSigningCertificate(privateKey.getCertificate());
         pAdESSignatureParameters.setCertificateChain(privateKey.getCertificateChain());
+        pAdESSignatureParameters.setReason(digitalSignatureConfig.getReason());
+        pAdESSignatureParameters.setLocation(digitalSignatureConfig.getLocation());
         return pAdESSignatureParameters;
     }
 }

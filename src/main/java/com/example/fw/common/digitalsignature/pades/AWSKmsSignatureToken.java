@@ -2,7 +2,6 @@ package com.example.fw.common.digitalsignature.pades;
 
 import java.util.List;
 
-import com.example.fw.common.digitalsignature.config.DigitalSignatureConfigurationProperties;
 import com.example.fw.common.keymanagement.KeyInfo;
 import com.example.fw.common.keymanagement.KeyManager;
 import com.example.fw.common.keymanagement.Signature;
@@ -20,9 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AWSKmsSignatureToken implements SignatureTokenConnection {
     private final KeyManager keyManager;
-    private final DigitalSignatureConfigurationProperties digitalSignatureConfigurationProperties;
-
-    // TODO: 適当な実装。本来は、引数で渡されるDSSPrivateKeyEntryからkeyIdを取得する必要がある。
     private final String keyId;
 
     @Override
@@ -31,16 +27,10 @@ public class AWSKmsSignatureToken implements SignatureTokenConnection {
     }
 
     @Override
-    public List<DSSPrivateKeyEntry> getKeys() throws DSSException {
-        // TODO: 未実装
-        throw new UnsupportedOperationException("getKeys() is not supported in AWSKmsSignatureTokenConnection");
-    }
-
-    @Override
     public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry)
             throws DSSException {
-        SignatureAlgorithm signatureAlgorithm = digitalSignatureConfigurationProperties.getSignatureAlgorithm();
-        return doSign(toBeSigned.getBytes(), signatureAlgorithm);
+        throw new UnsupportedOperationException(
+                "sign(ToBeSigned, DigestAlgorithm, DSSPrivateKeyEntry) is not supported in AWSKmsSignatureTokenConnection");
     }
 
     @Override
@@ -51,21 +41,27 @@ public class AWSKmsSignatureToken implements SignatureTokenConnection {
 
     @Override
     public SignatureValue signDigest(Digest digest, DSSPrivateKeyEntry keyEntry) throws DSSException {
-        // SignatureAlgorithmを取得
-        SignatureAlgorithm signatureAlgorithm = digitalSignatureConfigurationProperties.getSignatureAlgorithm();
-        return doSign(digest.getValue(), signatureAlgorithm);
+        throw new UnsupportedOperationException(
+                "signDigest(Digest, DSSPrivateKeyEntry) is not supported in AWSKmsSignatureTokenConnection");
     }
 
     @Override
     public SignatureValue signDigest(Digest digest, SignatureAlgorithm signatureAlgorithm, DSSPrivateKeyEntry keyEntry)
             throws DSSException {
-        return doSign(digest.getValue(), signatureAlgorithm);
+        throw new UnsupportedOperationException(
+                "signDigest(Digest, SignatureAlgorithm, DSSPrivateKeyEntry) is not supported in AWSKmsSignatureTokenConnection");
     }
 
     private SignatureValue doSign(byte[] data, SignatureAlgorithm signatureAlgorithm) throws DSSException {
         // ダイジェストから署名を生成
-        Signature signature = keyManager.createSignatureFromDigest(data, // ,
+        Signature signature = keyManager.createSignatureFromRawData(data, // ,
                 KeyInfo.builder().keyId(keyId).build());
         return new SignatureValue(signatureAlgorithm, signature.getValue());
     }
+
+    @Override
+    public List<DSSPrivateKeyEntry> getKeys() throws DSSException {
+        throw new UnsupportedOperationException("getKeys() is not supported in AWSKmsSignatureTokenConnection");
+    }
+
 }

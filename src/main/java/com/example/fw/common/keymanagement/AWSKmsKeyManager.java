@@ -8,9 +8,12 @@ import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -94,6 +97,7 @@ public class AWSKmsKeyManager implements KeyManager {
 
     @Override
     public PublicKey getPublicKey(final KeyInfo keyInfo) {
+        // KMSから公開鍵を取得する
         return kmsAsyncClient.getPublicKey(builder -> builder//
                 .keyId(keyInfo.getKeyId()))//
                 .thenApply(response -> {
@@ -113,9 +117,12 @@ public class AWSKmsKeyManager implements KeyManager {
 
     @Override
     public CertificateSigningRequest createCsr(final KeyInfo keyInfo, final String subject) {
+        // KMSから公開鍵を取得
         PublicKey publicKey = getPublicKey(keyInfo);
+        // サブジェクト情報を設定してCSRを作成
         X500Name subjectName = new X500Name(subject);
         PKCS10CertificationRequestBuilder csrBuilder = new JcaPKCS10CertificationRequestBuilder(subjectName, publicKey);
+        // KMSを使って電子署名したCSRを生成
         PKCS10CertificationRequest csr = csrBuilder
                 .build(new AWSKmsContentSigner(kmsAsyncClient, keyInfo, keyManagementConfigurationProperties));
         try {
@@ -149,29 +156,33 @@ public class AWSKmsKeyManager implements KeyManager {
         } catch (NoSuchAlgorithmException e) {
             throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9001, algorithm);
         }
-        X500Name issuer = subject; // 自己署名なのでIssuerはSubjectと同じ
-        BigInteger serialNumber = BigInteger.valueOf(1);
-        Date notBefore = new Date();
-        Date notAfter = new Date(System.currentTimeMillis()
-                + keyManagementConfigurationProperties.getSelfSignedCertValidityDays() * 24 * 60 * 60 * 1000L);
+        // 自己署名の場合、IssuerはSubjectと同じ
+        X500Name issuer = subject;
+        BigInteger serialNumber = new BigInteger(64, new SecureRandom());
+        Instant now = Instant.now();
+        // 署名の有効期限を設定
+        Date notBefore = Date.from(now);
+        Date notAfter = Date
+                .from(now.plus(keyManagementConfigurationProperties.getSelfSignedCertValidityDays(), ChronoUnit.DAYS));
+        // 証明書を作成
         X509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(issuer, serialNumber, notBefore,
                 notAfter, subject, publicKey);
-        // Subject Key Identifierを取得
+
         try {
+            // Subject Key Identifierを取得
             JcaX509ExtensionUtils extensionUtils = new JcaX509ExtensionUtils();
             certificateBuilder.addExtension(Extension.subjectKeyIdentifier, false,
                     extensionUtils.createSubjectKeyIdentifier(pkcs10Csr.getSubjectPublicKeyInfo()));
-            // certificateBuilder.addExtension(Extension.basicConstraints, true, new
-            // BasicConstraints(false));
             X509CertificateHolder certificateHolder = certificateBuilder
                     .build(new AWSKmsContentSigner(kmsAsyncClient, keyInfo, keyManagementConfigurationProperties));
             return Certificate.builder() //
                     .der(certificateHolder.getEncoded()) // 証明書のDERエンコードされたバイト配列を設定
                     .build();
+            // TODO:削除
         } catch (NoSuchAlgorithmException | IOException e) {
+            // } catch (IOException e) {
             throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9006);
         }
-
     }
 
     @Override
@@ -253,12 +264,26 @@ public class AWSKmsKeyManager implements KeyManager {
     }
 
     @Override
-    public Signature createSignatureFromDigest(final byte[] hasData, final KeyInfo keyInfo) {
+    public Signature createSignatureFromDigest(final byte[] digestData, final KeyInfo keyInfo) {
         SignRequest signRequest = SignRequest.builder()//
                 .keyId(keyInfo.getKeyId())//
-                .message(SdkBytes.fromByteArray(hasData)) // データをバイト配列として設定
+                .message(SdkBytes.fromByteArray(digestData)) // データをバイト配列として設定
                 .signingAlgorithm(keyManagementConfigurationProperties.getAwsKms().getKmsSigningAlgorithmSpec())//
                 .messageType(MessageType.DIGEST) // メッセージタイプをDIGESTに設定
+                .build();
+        return kmsAsyncClient.sign(signRequest)//
+                .thenApply(response -> Signature.builder()//
+                        .value(response.signature().asByteArray()).build())//
+                .join();
+    }
+
+    @Override
+    public Signature createSignatureFromRawData(byte[] rawData, KeyInfo keyInfo) {
+        SignRequest signRequest = SignRequest.builder()//
+                .keyId(keyInfo.getKeyId())//
+                .message(SdkBytes.fromByteArray(rawData)) // データをバイト配列として設定
+                .signingAlgorithm(keyManagementConfigurationProperties.getAwsKms().getKmsSigningAlgorithmSpec())//
+                .messageType(MessageType.RAW) // メッセージタイプをRAWに設定
                 .build();
         return kmsAsyncClient.sign(signRequest)//
                 .thenApply(response -> Signature.builder()//

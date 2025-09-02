@@ -73,6 +73,7 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
         appLogger.debug("pdfTempPath: {}", pdfTempPath);
         // 一時ディレクトリが存在しない場合は作成する
         pdfTempPath.get().toFile().mkdirs();
+        // キーIDの取得
         keyId = digitalSignatureConfigurationProperties.getAwsKms().getKeyId();
         // 証明書の取得
         certificate = keyManager.getCertificateFromObjectStorage(KeyInfo.builder().keyId(keyId).build());
@@ -80,29 +81,23 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
 
     @Override
     public Report sign(Report report) {
-        try (AWSKmsSignatureToken token = new AWSKmsSignatureToken(keyManager, digitalSignatureConfigurationProperties,
-                keyId)) {
-            DSSDocument toSignDocument = null;
-            if (report instanceof DefaultReport defaultReport) {
-                // Fileに対して電子署名付与を実装
-                toSignDocument = new FileDocument(defaultReport.getFile());
-            } else {
-                // InMemoryDocumentに対して電子署名付与を実装
-                toSignDocument = new InMemoryDocument(report.getInputStream());
-            }
+        DSSDocument toSignDocument = null;
+        if (report instanceof DefaultReport defaultReport) {
+            // Fileに対して電子署名付与を実装
+            toSignDocument = new FileDocument(defaultReport.getFile());
+        } else {
+            // InMemoryDocumentに対して電子署名付与を実装
+            toSignDocument = new InMemoryDocument(report.getInputStream());
+        }
+
+        try (AWSKmsSignatureToken token = new AWSKmsSignatureToken(keyManager, keyId)) {
 
             // TODO: 可視署名は現在未対応
             if (digitalSignatureConfigurationProperties.isVisible()) {
                 appLogger.debug("可視署名は現在未対応");
             }
 
-            // 証明書検証機能を初期化
-            CertificateVerifier certificateVerifier = new CommonCertificateVerifier();
-
-            // PAdES署名サービスを作成
-            PAdESService padesService = new PAdESService(certificateVerifier);
-
-            // der形式でエンコードされた証明書データを設定
+            // 証明書をX509Certificate形式で取得
             X509Certificate x509Certificate;
             try {
                 x509Certificate = certificate.getX509Certificate();
@@ -117,21 +112,31 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
             // PAdESSignatureの署名パラメータを作成
             PAdESSignatureParameters signatureParameters = createSignatureParameters(x509Certificate);
 
+            // 証明書検証機能を初期化
+            CertificateVerifier certificateVerifier = new CommonCertificateVerifier();
+            certificateVerifier.setCheckRevocationForUntrustedChains(false);
+
+            // PAdES署名サービスを作成
+            PAdESService padesService = new PAdESService(certificateVerifier);
+
             // 署名対象のハッシュ値を計算
             ToBeSigned dataToSign = padesService.getDataToSign(toSignDocument, signatureParameters);
 
-            // TODO: 引数がダミーのため、ちゃんとした実装にする
+            // 署名対象のハッシュ値を計算
             SignatureValue signatureValue = token.sign(dataToSign,
-                    digitalSignatureConfigurationProperties.getSignatureAlgorithm(), // TODO:現状ダミー
-                    null); // TODO: 現状ダミー
+                    digitalSignatureConfigurationProperties.getSignatureAlgorithm(), null);
+
+            // TODO: 現状、Acrobat Readerの検証器では、「署名は無効です」と表示されてしまう。
+            // 「署名者の証明書から発行者の証明書へのパスを構築中にエラーが発生しました。」
             // 署名をPDFに適用
             DSSDocument signedDocument = padesService.signDocument(toSignDocument, //
                     signatureParameters, signatureValue);
+
+            // 署名済みPDFを一時ファイルに保存しReportオブジェクトを生成して返却
             Path tempFielPath;
             try {
                 tempFielPath = Files.createTempFile(pdfTempPath.get(), ReportsConstants.PDF_TEMP_FILE_PREFIX,
                         ReportsConstants.PDF_FILE_EXTENSION);
-
                 try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(tempFielPath))) {
                     signedDocument.writeTo(bos);
                 }
@@ -175,8 +180,14 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
                 DigestAlgorithm.valueOf(digitalSignatureConfigurationProperties.getHashAlgorithm()));
         CertificateToken certificateToken = new CertificateToken(x509Certificate);
         pAdESSignatureParameters.setSigningCertificate(certificateToken);
-        // TODO
-        // pAdESSignatureParameters.setCertificateChain(certificateToken);
+        // TODO: 証明書チェーンをどうしておくか（いまは自己署名なので）
+        // 「署名者の証明書から発行者の証明書へのパスを構築中にエラーが発生しました。」のメッセージも出てしまう。
+        pAdESSignatureParameters.setCertificateChain(certificateToken);
+        pAdESSignatureParameters.setReason(digitalSignatureConfigurationProperties.getReason());
+        pAdESSignatureParameters.setLocation(digitalSignatureConfigurationProperties.getLocation());
+
+        // TODO: 可視署名は現在未対応
         return pAdESSignatureParameters;
     }
+
 }

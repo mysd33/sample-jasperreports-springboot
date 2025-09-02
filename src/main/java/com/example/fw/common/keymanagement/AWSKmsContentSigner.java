@@ -19,7 +19,7 @@ import software.amazon.awssdk.services.kms.KmsAsyncClient;
 /**
  * Bouncy CastleのContentSignerインターフェースを実装した AWS KMSを使用してコンテンツに署名するためのクラス<br>
  * 
- * CSR（証明書署名要求）や自己署名証明書を作成する際に、各コンテンツに署名するために使用されます。<br>
+ * CSR（証明書署名要求）や自己署名証明書を作成する際に、各コンテンツに署名するために使用される<br>
  */
 public class AWSKmsContentSigner implements ContentSigner {
     private final KmsAsyncClient kmsAsyncClient;
