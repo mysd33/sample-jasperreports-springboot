@@ -15,6 +15,7 @@ import com.example.fw.common.message.CommonFrameworkMessageIds;
 
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.kms.KmsAsyncClient;
+import software.amazon.awssdk.services.kms.model.MessageType;
 
 /**
  * Bouncy CastleのContentSignerインターフェースを実装した AWS KMSを使用してコンテンツに署名するためのクラス<br>
@@ -68,6 +69,7 @@ public class AWSKmsContentSigner implements ContentSigner {
         return kmsAsyncClient.sign(builder -> builder//
                 .keyId(keyInfo.getKeyId()) // キーIDを指定
                 .message(SdkBytes.fromByteArray(hash)) // ハッシュ値をメッセージとして指定
+                .messageType(MessageType.DIGEST) // 署名のメッセージタイプをDIGESTに設定
                 .signingAlgorithm(keyManagementConfigurationProperties.getAwsKms().getKmsSigningAlgorithmSpec())) // 署名アルゴリズムを指定
                 .thenApply(response -> {
                     // 署名の結果を取得

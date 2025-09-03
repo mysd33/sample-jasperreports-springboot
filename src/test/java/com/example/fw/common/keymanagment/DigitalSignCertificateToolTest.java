@@ -50,8 +50,8 @@ class DigitalSignCertificateToolTest {
         // 暗号鍵の作成
         final KeyInfo keyInfo = keyManager.createKey("sign-test-ecdsa");
         // 既存のキーを使う場合
-        // final String existingKeyId = "a9d52165-8223-4c95-9ec3-32e1e6fd2bee";
-        // final KeyInfo keyInfo = KeyInfo.builder().keyId(existingKeyId).build();
+        //final String existingKeyId = "713cdf19-8ad3-4659-be76-6547c0a65f7c";
+        //final KeyInfo keyInfo = KeyInfo.builder().keyId(existingKeyId).build();
         appLogger.debug("作成したKey ID: {}", keyInfo.getKeyId());
 
         // CSRの作成

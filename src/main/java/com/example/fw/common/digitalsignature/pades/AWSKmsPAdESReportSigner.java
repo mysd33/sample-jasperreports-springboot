@@ -121,9 +121,6 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
             // 署名対象のハッシュ値を計算
             ToBeSigned dataToSign = padesService.getDataToSign(toSignDocument, signatureParameters);
 
-            // TODO: Acrobat Readerの検証器で、「署名は無効です」
-            // 「署名者の証明書から発行者の証明書へのパスを構築中にエラーが発生しました。」と表示されてしまう
-
             // 署名を生成
             SignatureValue signatureValue = token.sign(dataToSign,
                     digitalSignatureConfigurationProperties.getSignatureAlgorithm(), null);
