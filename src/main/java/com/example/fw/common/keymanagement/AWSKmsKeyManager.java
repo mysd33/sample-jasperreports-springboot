@@ -48,6 +48,7 @@ import software.amazon.awssdk.services.kms.model.SignRequest;
 @Slf4j
 @RequiredArgsConstructor
 public class AWSKmsKeyManager implements KeyManager {
+    private static final String KEY_ALIAS_PREFIX = "alias/"; // キーエイリアスはalias/で始まる必要がある
     private static final ApplicationLogger appLogger = LoggerFactory.getApplicationLogger(log);
     private final KmsAsyncClient kmsAsyncClient;
     private final ObjectStorageFileAccessor objectStorageFileAccessor;
@@ -63,9 +64,9 @@ public class AWSKmsKeyManager implements KeyManager {
     // https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/kms#code-examples
 
     @Override
-    public KeyInfo createKey() {
+    public KeyInfo createKey(String keyAlias) {
         // KMSを使って暗号鍵を生成する
-        return kmsAsyncClient.createKey(builder -> builder//
+        KeyInfo keyInfo = kmsAsyncClient.createKey(builder -> builder//
                 .keySpec(keyManagementConfigurationProperties.getAwsKms().getKeySpec())//
                 .keyUsage(keyManagementConfigurationProperties.getAwsKms().getKeyUsage())
                 .description(keyManagementConfigurationProperties.getAwsKms().getKeyDescription()))//
@@ -75,6 +76,16 @@ public class AWSKmsKeyManager implements KeyManager {
                         .state(response.keyMetadata().keyStateAsString()) // レスポンスからキーの状態を取得
                         .build())
                 .join();
+        // キーのエイリアスを作成しないと、
+        // Acrobat Readerの検証器では、「署名は無効です」
+        // 「署名者の証明書から発行者の証明書へのパスを構築中にエラーが発生しました。」と表示されたため、
+        // エイリアスを作成する
+        kmsAsyncClient.createAlias(builder -> builder//
+                .aliasName(KEY_ALIAS_PREFIX + keyAlias) // エイリアス名を指定
+                .targetKeyId(keyInfo.getKeyId()) // 作成したキーIDを指定
+        ).join();
+
+        return keyInfo;
     }
 
     @Override

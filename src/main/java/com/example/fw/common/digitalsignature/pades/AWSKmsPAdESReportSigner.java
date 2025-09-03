@@ -125,8 +125,6 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
             SignatureValue signatureValue = token.sign(dataToSign,
                     digitalSignatureConfigurationProperties.getSignatureAlgorithm(), null);
 
-            // TODO: 現状、Acrobat Readerの検証器では、「署名は無効です」と表示されてしまう。
-            // 「署名者の証明書から発行者の証明書へのパスを構築中にエラーが発生しました。」
             // 署名をPDFに適用
             DSSDocument signedDocument = padesService.signDocument(toSignDocument, //
                     signatureParameters, signatureValue);

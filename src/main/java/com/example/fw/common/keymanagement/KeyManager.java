@@ -10,9 +10,10 @@ public interface KeyManager {
     /**
      * 新しい暗号鍵を作成します。
      *
+     * @param keyAlias 作成する暗号鍵のエイリアス
      * @return 作成された暗号鍵の情報
      */
-    KeyInfo createKey();
+    KeyInfo createKey(String keyAlias);
 
     /**
      * 指定された暗号鍵の公開鍵を取得します。

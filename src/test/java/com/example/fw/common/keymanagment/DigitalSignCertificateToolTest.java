@@ -44,9 +44,11 @@ class DigitalSignCertificateToolTest {
         // 認証局から指定されているCSR・証明書の作成に必要な項目を指定すること
         // 参考：https://www.cybertrust.co.jp/ssl/support/csr.html
         final String subject = "CN=www.example.co.jp, O=Example Corp, L=Minato Ctiy, ST=Tokyo, C=JP";
+        // 鍵のエイリアス名を指定する
+        final String keyAlias = "digital-signature-key";
 
         // 暗号鍵の作成
-        final KeyInfo keyInfo = keyManager.createKey();
+        final KeyInfo keyInfo = keyManager.createKey("sign-test-ecdsa");
         // 既存のキーを使う場合
         // final String existingKeyId = "a9d52165-8223-4c95-9ec3-32e1e6fd2bee";
         // final KeyInfo keyInfo = KeyInfo.builder().keyId(existingKeyId).build();

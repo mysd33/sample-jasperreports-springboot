@@ -1,6 +1,8 @@
 package com.example.fw.common.keymanagment;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -46,7 +48,8 @@ class AWSKmsKeyManagerTest {
      */
     @Test
     void testCreateKeyPair() {
-        final KeyInfo keyInfo = sut.createKey();
+        final String keyAlias = "sign-test-ecdsa";
+        final KeyInfo keyInfo = sut.createKey(keyAlias);
         assertNotNull(keyInfo);
         assertNotNull(keyInfo.getKeyId());
         assertNotNull(keyInfo.getState());
@@ -57,7 +60,8 @@ class AWSKmsKeyManagerTest {
      */
     @Test
     void testDeleteKeyPair() {
-        final KeyInfo keyInfo = sut.createKey();
+        final String keyAlias = "sign-test-ecdsa";
+        final KeyInfo keyInfo = sut.createKey(keyAlias);
         assertNotNull(keyInfo);
         assertNotNull(keyInfo.getKeyId());
         assertNotNull(keyInfo.getState());
@@ -75,7 +79,8 @@ class AWSKmsKeyManagerTest {
         // final KeyInfo keyInfo =
         // KeyInfo.builder().keyId("02399398-a986-4898-841f-96f382d8a809").build();
 
-        final KeyInfo keyInfo = sut.createKey();
+        final String keyAlias = "sign-test-ecdsa";
+        final KeyInfo keyInfo = sut.createKey(keyAlias);
         assertNotNull(keyInfo);
         assertNotNull(keyInfo.getKeyId());
         assertNotNull(keyInfo.getState());
@@ -95,7 +100,8 @@ class AWSKmsKeyManagerTest {
         // final KeyInfo keyInfo =
         // KeyInfo.builder().keyId("02399398-a986-4898-841f-96f382d8a809").build();
 
-        final KeyInfo keyInfo = sut.createKey();
+        final String keyAlias = "sign-test-ecdsa";
+        final KeyInfo keyInfo = sut.createKey(keyAlias);
         assertNotNull(keyInfo);
         assertNotNull(keyInfo.getKeyId());
         assertNotNull(keyInfo.getState());
@@ -117,7 +123,8 @@ class AWSKmsKeyManagerTest {
     void testCreateCertficate() throws IOException {
         // final KeyInfo keyInfo =
         // KeyInfo.builder().keyId("02399398-a986-4898-841f-96f382d8a809").build();
-        final KeyInfo keyInfo = sut.createKey();
+        final String keyAlias = "sign-test-ecdsa";
+        final KeyInfo keyInfo = sut.createKey(keyAlias);
         assertNotNull(keyInfo);
         assertNotNull(keyInfo.getKeyId());
         assertNotNull(keyInfo.getState());
