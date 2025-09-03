@@ -89,7 +89,7 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
-        <!--  CSRの生成に必要 -->
+        <!--  CSR・証明書の生成に必要 -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>

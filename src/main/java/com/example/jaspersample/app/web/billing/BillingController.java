@@ -31,6 +31,7 @@ public class BillingController {
     private final InvoiceReportCreator invoiceReportCreatorImpl;
     private final InvoiceReportCreator invoiceReportCreatorImpl2;
     private final InvoiceReportCreatorForCSVImpl invoiceReportCreatorForCSV;
+    private final InvoiceReportCreator invoiceReportCreatorWithSign;
 
     /**
      * 請求書（PDF）を出力する
@@ -81,6 +82,26 @@ public class BillingController {
 
         // CSVデータより請求書の作成
         ReportFile reportFile = invoiceReportCreatorForCSV.createInvoice(csvData);
+        return createResponse(reportFile);
+    }
+
+    /**
+     * 請求書（PDF）を出力する その4
+     * 
+     * 請求書の様式が、単項目含めてすべてJRDataSourceから取得する版<br/>
+     * PDF電子署名ありの例
+     * 
+     * @return 請求書のPDFファイル
+     * @throws IOException
+     */
+    @GetMapping("invoice4/{orderId}")
+    public ResponseEntity<Resource> getInvoice4(@PathVariable String orderId) {
+        // 注文情報の取得の取得
+        Order order = orderService.findOne(orderId);
+        // 請求書の作成
+
+        // 請求書の作成
+        ReportFile reportFile = invoiceReportCreatorWithSign.createInvoice(order);
         return createResponse(reportFile);
     }
 

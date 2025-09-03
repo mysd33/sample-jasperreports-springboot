@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.springframework.util.ResourceUtils;
 
-import com.example.fw.common.digitalsignature.ReportSigner;
 import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportCreator;
@@ -34,16 +33,12 @@ public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Ite
     private static final String REPORT_NAME = "商品一覧";
     private static final String REPORT_FILE_NAME = "商品一覧.pdf";
     private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
-    private final ReportSigner reportSigner;
 
     @Override
     public ReportFile createItemsReport(List<Item> items) {
         // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
         Report report = createPDFReport(items);
-        
-        // TODO: 仮で電子署名付与
-        report = reportSigner.sign(report);
-        
+
         return ReportFile.builder()//
                 .inputStream(report.getInputStream())//
                 .fileName(REPORT_FILE_NAME)//

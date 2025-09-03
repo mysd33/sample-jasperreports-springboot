@@ -49,7 +49,8 @@
                 * [単項目・明細ともにJRDataSourceから取得する様式バージョン](src/main/resources/reports/invoice-report.jrxml)
             * 某帳票製品の帳票サンプルを参考にして、同じようにデザインできるか試してみました。            
         * 出力される帳票のイメージ
-        * 読み取りパスワード「1234」で設定しています。ファイルを開く際にパスワードを入力するようになります。
+        * [PDFセキュリティの設定例](#pdfのセキュリティ設定)として、読み取りパスワード「1234」で設定しています。ファイルを開く際にパスワードを入力するようになります。
+        * [PDF電子署名](#pdfへの電子署名付与)の設定例として、PDFに電子署名を付与した版も用意しています。
         
         ![invoice.pdf](image/invoice-report.png)
 
@@ -89,42 +90,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project …>
     …
-	<properties>
-		<java.version>21</java.version>		
-		<jasperreports.version>7.0.0</jasperreports.version>
-	</properties>
-	<dependencies>	
-		<!-- Jaspter Reports -->
-		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
-			<artifactId>jasperreports</artifactId>
-			<version>${jasperreports.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-logging</artifactId>
-					<groupId>commons-logging</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- ver7.xより、機能ごとExtensionに分離されたので、PDFExtensionの追加定義が必要 -->
-		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
-			<artifactId>jasperreports-pdf</artifactId>
-			<version>${jasperreports.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-logging</artifactId>
-					<groupId>commons-logging</groupId>
-				</exclusion>
-			</exclusions>			
-		</dependency>
-		<!-- PDFのパスワード設定する場合に、bouncycastleを利用するため追加定義が必要 -->
-		<dependency>
+    <properties>
+        <java.version>21</java.version>
+        <jasperreports.version>7.0.3</jasperreports.version>
+    </properties>
+    <dependencies>
+        …
+        <!-- Jaspter Reports -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>${jasperreports.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- ver7.xより、機能ごとExtensionに分離されたので、PDFExtensionの追加定義が必要 -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-pdf</artifactId>
+            <version>${jasperreports.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- PDFのパスワード設定する場合に、bouncycastleを利用するため追加定義が必要 -->
+        <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>${bouncycastle.version}</version>
-        </dependency>        
-   	</dependencies>
+        </dependency>
 </project>        
 ```
 
@@ -191,7 +191,8 @@
 * 上の例では、毎回帳票ごとにJasperReportのAPIを使って帳票を作成することになります。
 * 業務AP側では、JasperReportのAPIをあまり意識せずに簡単に実装可能にしたいため、このサンプルAPでは、帳票出力のフレームワーク機能を実装しています。
     * 帳票出力のフレームワーク機能の実装例は[こちら](src/main/java/com/example/fw/common/reports/)
-    
+
+### JavaBeanをデータソースにした実装例
 * フレームワーク機能を利用した帳票出力の例を示します。
     * JRBeanCollectionDataSource（JavaBeanをデータソース）による[サンプルコード](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorImpl.java)    
 
@@ -254,6 +255,8 @@
     }
     ```
 
+### CSVファイルをデータソースにした実装例
+* JavaBeanだけでなく、CSVファイルもデータソースにすることができます。
     * JRCsvDataSource（CSVファイルをデータソース）による[サンプルAPの例](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorForCSVImpl.java)    
 
     ```java    
@@ -303,10 +306,11 @@
 
             ![CSVデータ](image/csv.png)
 
-    * PDFのセキュリティ設定
-        * 以下、いずれか2つの設定ファイルで全帳票に共通のPDFのセキュリティ設定を行うことができます。
-            * [application.yml](src/main/resources/application.yml)での設定例     
-                * Spring Bootの仕組みの中でできるので、appplication.yml修正後にSpring DevToolsによる自動再起動で設定変更が反映されるので便利です。
+### PDFのセキュリティ設定
+* Jasper ReportsとOpenPDFの機能を用いて、PDFのセキュリティ設定ができるようになっています。 
+    * 以下、いずれか2つの設定ファイルで全帳票に共通のPDFのセキュリティ設定を行うことができます。
+        * [application.yml](src/main/resources/application.yml)での設定例     
+            * Spring Bootの仕組みの中でできるので、appplication.yml修正後にSpring DevToolsによる自動再起動で設定変更が反映されるので便利です。
 
             ```yaml
             report:
@@ -430,8 +434,106 @@
                     * [PKC#12キーストアでのトークン、署名取得](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/snippets/PKCS12Snippet.java)
                     * [PAdESでのPDF署名](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/sign/SignPdfPadesBTest.java)
 
-* 本サンプルAPのでの電子署名付与機能の実装例
+### 電子署名関連ライブラリの利用方法
+* pom.xmlにライブラリの依存関係を追加する必要があります。   
 
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project …>
+    …
+    <properties>		
+        <dss.bom.version>6.2</dss.bom.version>
+        <awssdk.bom.version>2.31.76</awssdk.bom.version>
+    </properties>
+    <dependencies>
+        …
+        <!--  CSR・証明書の生成に必要 -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+        </dependency>
+        <!-- DSS -->
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-token</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-pades</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-pades-openpdf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-utils-apache-commons</artifactId>
+        </dependency>
+        <!-- AWS SDK KMS -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>kms</artifactId>
+        </dependency>        
+   	</dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <!-- DSS -->
+            <dependency>
+                <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+                <artifactId>dss-bom</artifactId>
+                <version>${dss.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- AWS SDK -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${awssdk.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            …
+        </dependencies>
+    </dependencyManagement>    
+</project>        
+```
+
+## PDF署名付与のソフトウェアフレームワーク機能
+
+- ReportSignerインタフェースをDIし、signメソッドを呼び出すことで電子署名付与できます。
+    - [サンプルコード](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorWithSign.java)
+
+```java
+@ReportCreator(id = "R003", name = "請求書")
+@RequiredArgsConstructor
+public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Order> implements InvoiceReportCreator {
+    …        
+    // ReportSinerをDI
+    private final ReportSigner reportSigner;
+
+    // 業務APが定義する帳票出力処理
+    @Override
+    public ReportFile createInvoice(Order order) {
+        // PDF帳票作成
+        Report report = createPDFReport(order);
+
+        // PDFに電子署名を付与
+        Report signedReport = reportSigner.sign(report);
+
+        // 署名済のPDF帳票データを返却
+        return ReportFile.builder()//
+                .inputStream(signedReport.getInputStream())//
+                .fileName(INVOICE_FILE_NAME)//
+                .fileSize(signedReport.getSize())//
+                .build();
+    }
+    …
+}
+```
+
+
+### 本サンプルAPのでの電子署名付与機能の実装例
    
 1. PKCS#12のキーストアに管理した秘密鍵・公開鍵証明書を使用した、サンプルAPの実装例
     * 利用前には、opensslを使って鍵、CSR、証明書、キーストアの作成が必要です。
