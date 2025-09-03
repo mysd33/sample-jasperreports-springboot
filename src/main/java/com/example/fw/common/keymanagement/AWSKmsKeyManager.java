@@ -76,10 +76,7 @@ public class AWSKmsKeyManager implements KeyManager {
                         .state(response.keyMetadata().keyStateAsString()) // レスポンスからキーの状態を取得
                         .build())
                 .join();
-        // キーのエイリアスを作成しないと、
-        // Acrobat Readerの検証器では、「署名は無効です」
-        // 「署名者の証明書から発行者の証明書へのパスを構築中にエラーが発生しました。」と表示されたため、
-        // エイリアスを作成する
+        // キーのエイリアスを作成
         kmsAsyncClient.createAlias(builder -> builder//
                 .aliasName(KEY_ALIAS_PREFIX + keyAlias) // エイリアス名を指定
                 .targetKeyId(keyInfo.getKeyId()) // 作成したキーIDを指定
