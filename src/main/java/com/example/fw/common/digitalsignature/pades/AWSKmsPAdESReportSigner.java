@@ -27,7 +27,6 @@ import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportsConstants;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
 
-import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
@@ -174,15 +173,21 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
      */
     private PAdESSignatureParameters createSignatureParameters(X509Certificate x509Certificate) {
         PAdESSignatureParameters pAdESSignatureParameters = new PAdESSignatureParameters();
+        // 署名レベルをPAdES_BASELINE Bプロファイルに設定
         pAdESSignatureParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+        // 署名のパッケージング形式をENVELOPED（署名をPDF文書に埋め込む）に設定
         pAdESSignatureParameters.setSignaturePackaging(SignaturePackaging.ENVELOPED);
-        pAdESSignatureParameters.setDigestAlgorithm(
-                DigestAlgorithm.valueOf(digitalSignatureConfigurationProperties.getHashAlgorithm()));
         CertificateToken certificateToken = new CertificateToken(x509Certificate);
+        // 証明書の内容からハッシュアルゴリズムの設定
+        pAdESSignatureParameters.setDigestAlgorithm(certificateToken.getSignatureAlgorithm().getDigestAlgorithm());
+        // 証明書の内容から暗号化アルゴリズムの設定
+        pAdESSignatureParameters
+                .setEncryptionAlgorithm(certificateToken.getSignatureAlgorithm().getEncryptionAlgorithm());
+        // 署名に使用する証明書を設定
         pAdESSignatureParameters.setSigningCertificate(certificateToken);
         // TODO: 証明書チェーンをどうしておくか（いまは自己署名なので）
-        // 「署名者の証明書から発行者の証明書へのパスを構築中にエラーが発生しました。」のメッセージも出てしまう。
         pAdESSignatureParameters.setCertificateChain(certificateToken);
+        // 署名の理由、場所を設定
         pAdESSignatureParameters.setReason(digitalSignatureConfigurationProperties.getReason());
         pAdESSignatureParameters.setLocation(digitalSignatureConfigurationProperties.getLocation());
 

@@ -35,9 +35,8 @@ class DigitalSignCertificateToolTest {
     @Autowired
     private KeyManagementConfigurationProperties keyManagementConfigurationProperties;
 
-
     @Test
-    void createKeyAndfCertificate() throws IOException {
+    void createKeyAndCertificate() throws IOException {
         final String certsCsrFileName = keyManagementConfigurationProperties.getCsrPemFileName();
         final String selfSignedCertificateFileName = keyManagementConfigurationProperties
                 .getSelfSignedCertPemFileName();
@@ -45,8 +44,12 @@ class DigitalSignCertificateToolTest {
         // 認証局から指定されているCSR・証明書の作成に必要な項目を指定すること
         // 参考：https://www.cybertrust.co.jp/ssl/support/csr.html
         final String subject = "CN=www.example.co.jp, O=Example Corp, L=Minato Ctiy, ST=Tokyo, C=JP";
+
         // 暗号鍵の作成
         final KeyInfo keyInfo = keyManager.createKey();
+        // 既存のキーを使う場合
+        // final String existingKeyId = "a9d52165-8223-4c95-9ec3-32e1e6fd2bee";
+        // final KeyInfo keyInfo = KeyInfo.builder().keyId(existingKeyId).build();
         appLogger.debug("作成したKey ID: {}", keyInfo.getKeyId());
 
         // CSRの作成
@@ -58,7 +61,7 @@ class DigitalSignCertificateToolTest {
         final Certificate certificate = keyManager.createSelfSignedCertificate(csr, keyInfo);
         // 自己署名証明書をオブジェクトストレージに保存
         keyManager.saveSelfSignedCertificateToObjectStorage(certificate, keyInfo);
-        
+
         // 参考のため、同じものをローカルディレクトリにもファイル保存
         // ディレクトリを作成していない場合は作成する
         String certsBaseDirStr = CERTS_LOCAL_DIR + keyInfo.getKeyId();

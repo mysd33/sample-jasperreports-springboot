@@ -17,10 +17,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -170,17 +168,19 @@ public class AWSKmsKeyManager implements KeyManager {
 
         try {
             // Subject Key Identifierを取得
-            JcaX509ExtensionUtils extensionUtils = new JcaX509ExtensionUtils();
-            certificateBuilder.addExtension(Extension.subjectKeyIdentifier, false,
-                    extensionUtils.createSubjectKeyIdentifier(pkcs10Csr.getSubjectPublicKeyInfo()));
+            /*
+             * JcaX509ExtensionUtils extensionUtils = new JcaX509ExtensionUtils();
+             * certificateBuilder.addExtension(Extension.subjectKeyIdentifier, false,
+             * extensionUtils.createSubjectKeyIdentifier(pkcs10Csr.getSubjectPublicKeyInfo()
+             * ));
+             */
             X509CertificateHolder certificateHolder = certificateBuilder
                     .build(new AWSKmsContentSigner(kmsAsyncClient, keyInfo, keyManagementConfigurationProperties));
             return Certificate.builder() //
                     .der(certificateHolder.getEncoded()) // 証明書のDERエンコードされたバイト配列を設定
                     .build();
-            // TODO:削除
-        } catch (NoSuchAlgorithmException | IOException e) {
-            // } catch (IOException e) {
+            // } catch (NoSuchAlgorithmException | IOException e) {
+        } catch (IOException e) {
             throw new SystemException(e, CommonFrameworkMessageIds.E_FW_KYMG_9006);
         }
     }
