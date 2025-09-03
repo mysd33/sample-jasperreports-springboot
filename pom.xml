@@ -18,7 +18,6 @@
         <java.version>21</java.version>
         <jasperreports.version>7.0.3</jasperreports.version>
         <!--<jasperreports.version>6.21.3</jasperreports.version>-->
-        <bouncycastle.version>1.81</bouncycastle.version>
         <dss.bom.version>6.2</dss.bom.version>
         <awssdk.bom.version>2.31.76</awssdk.bom.version>
         <awsxray.bom.version>2.18.2</awsxray.bom.version>
@@ -151,6 +150,7 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
+            <!-- DSS -->
             <dependency>
                 <groupId>eu.europa.ec.joinup.sd-dss</groupId>
                 <artifactId>dss-bom</artifactId>
