@@ -96,13 +96,12 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
                 appLogger.debug("可視署名は現在未対応");
             }
 
-            // 証明書をX509Certificate形式で取得
+            // 証明書をX.509証明書形式で取得
             X509Certificate x509Certificate;
             try {
                 x509Certificate = certificate.getX509Certificate();
             } catch (CertificateException | IOException e) {
-                // TODO: 適切な例外処理を実装する
-                throw new RuntimeException("Failed to get X509Certificate from Certificate", e);
+                throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9008);
             }
 
             // 証明書の有効性を確認
@@ -140,8 +139,7 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
                 File file = tempFielPath.toFile();
                 return DefaultReport.builder().file(file).build();
             } catch (IOException e) {
-                // TODO：適切な例外処理を実装する
-                throw new RuntimeException("Failed to sign the report", e);
+                throw new SystemException(e, CommonFrameworkMessageIds.E_FW_PDFSGN_9002);
             }
         }
     }
