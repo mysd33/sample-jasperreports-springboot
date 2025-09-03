@@ -24,7 +24,6 @@ import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportsConstants;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
 
-import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
@@ -150,7 +149,10 @@ public class PKCS12PAdESReportSiginer implements ReportSigner {
         PAdESSignatureParameters pAdESSignatureParameters = new PAdESSignatureParameters();
         pAdESSignatureParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
         pAdESSignatureParameters.setSignaturePackaging(SignaturePackaging.ENVELOPED);
-        pAdESSignatureParameters.setDigestAlgorithm(DigestAlgorithm.valueOf(digitalSignatureConfig.getHashAlgorithm()));
+        pAdESSignatureParameters
+                .setEncryptionAlgorithm(privateKey.getCertificate().getSignatureAlgorithm().getEncryptionAlgorithm());
+        pAdESSignatureParameters
+                .setDigestAlgorithm(privateKey.getCertificate().getSignatureAlgorithm().getDigestAlgorithm());
         pAdESSignatureParameters.setSigningCertificate(privateKey.getCertificate());
         pAdESSignatureParameters.setCertificateChain(privateKey.getCertificateChain());
         pAdESSignatureParameters.setReason(digitalSignatureConfig.getReason());

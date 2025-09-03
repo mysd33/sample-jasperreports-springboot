@@ -108,7 +108,8 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
             validateCertificate(x509Certificate);
 
             // PAdESSignatureの署名パラメータを作成
-            PAdESSignatureParameters signatureParameters = createSignatureParameters(x509Certificate);
+            CertificateToken certificateToken = new CertificateToken(x509Certificate);
+            PAdESSignatureParameters signatureParameters = createSignatureParameters(certificateToken);
 
             // 証明書検証機能を初期化
             CertificateVerifier certificateVerifier = new CommonCertificateVerifier();
@@ -121,8 +122,7 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
             ToBeSigned dataToSign = padesService.getDataToSign(toSignDocument, signatureParameters);
 
             // 署名を生成
-            SignatureValue signatureValue = token.sign(dataToSign,
-                    digitalSignatureConfigurationProperties.getSignatureAlgorithm(), null);
+            SignatureValue signatureValue = token.sign(dataToSign, certificateToken.getSignatureAlgorithm(), null);
 
             // 署名をPDFに適用
             DSSDocument signedDocument = padesService.signDocument(toSignDocument, //
@@ -167,13 +167,13 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
      * @param privateKey 署名に使用する秘密鍵
      * @return PAdESSignatureParameters
      */
-    private PAdESSignatureParameters createSignatureParameters(X509Certificate x509Certificate) {
+    private PAdESSignatureParameters createSignatureParameters(CertificateToken certificateToken) {
         PAdESSignatureParameters pAdESSignatureParameters = new PAdESSignatureParameters();
         // 署名レベルをPAdES_BASELINE Bプロファイルに設定
         pAdESSignatureParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
         // 署名のパッケージング形式をENVELOPED（署名をPDF文書に埋め込む）に設定
         pAdESSignatureParameters.setSignaturePackaging(SignaturePackaging.ENVELOPED);
-        CertificateToken certificateToken = new CertificateToken(x509Certificate);
+
         // 証明書の内容からハッシュアルゴリズムの設定
         pAdESSignatureParameters.setDigestAlgorithm(certificateToken.getSignatureAlgorithm().getDigestAlgorithm());
         // 証明書の内容から暗号化アルゴリズムの設定
