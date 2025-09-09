@@ -2,6 +2,7 @@ package com.example.fw.common.keymanagment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -53,6 +54,8 @@ class AWSKmsKeyManagerTest {
         assertNotNull(keyInfo);
         assertNotNull(keyInfo.getKeyId());
         assertNotNull(keyInfo.getState());
+        sut.deleteKeyAlias(keyAlias);
+        sut.deleteKey(keyInfo);
     }
 
     /**
@@ -66,17 +69,38 @@ class AWSKmsKeyManagerTest {
         assertNotNull(keyInfo.getKeyId());
         assertNotNull(keyInfo.getState());
         sut.addKeyAlias(keyInfo, keyAlias);
-        // 追加の成否は特に確認しない
+        sut.deleteKeyAlias(keyAlias);
+        sut.deleteKey(keyInfo);
     }
 
     /**
-     * キーのエイリアス削除のテスト
+     * キーのエイリアスからの検索のテスト
      */
     @Test
-    void testDeleteKeyAlias() {
+    void testFindKeyByAlias01() {
         final String keyAlias = "sign-test-ecdsa";
         sut.deleteKeyAlias(keyAlias);
-        // 削除の成否は特に確認しない
+        final KeyInfo createdKeyInfo = sut.createKey(keyAlias);
+        assertNotNull(createdKeyInfo);
+        assertNotNull(createdKeyInfo.getKeyId());
+        assertNotNull(createdKeyInfo.getState());
+        final KeyInfo foundKeyInfo = sut.findKeyByAlias(keyAlias);
+        assertNotNull(foundKeyInfo);
+        assertEquals(createdKeyInfo.getKeyId(), foundKeyInfo.getKeyId());
+        assertEquals(createdKeyInfo.getState(), foundKeyInfo.getState());
+        sut.deleteKeyAlias(keyAlias);
+        sut.deleteKey(createdKeyInfo);
+    }
+
+    /**
+     * キーのエイリアスが存在しない場合での検索のテスト
+     */
+    @Test
+    void testFindKeyByAlias02() {
+        final String keyAlias = "sign-test-ecdsa";
+        sut.deleteKeyAlias(keyAlias);
+        final KeyInfo actual = sut.findKeyByAlias(keyAlias);
+        assertNull(actual);
     }
 
     /**
@@ -114,6 +138,8 @@ class AWSKmsKeyManagerTest {
         assertEquals("EC", publicKey.getAlgorithm());
         assertEquals("X.509", publicKey.getFormat());
         assertNotNull(publicKey.getEncoded());
+        sut.deleteKeyAlias(keyAlias);
+        sut.deleteKey(keyInfo);
     }
 
     /**
@@ -138,6 +164,8 @@ class AWSKmsKeyManagerTest {
         System.out.println(pem);
         assertTrue(pem.contains("-----BEGIN CERTIFICATE REQUEST-----"));
         assertTrue(pem.contains("-----END CERTIFICATE REQUEST-----"));
+        sut.deleteKeyAlias(keyAlias);
+        sut.deleteKey(keyInfo);
     }
 
     /**
@@ -162,6 +190,8 @@ class AWSKmsKeyManagerTest {
         System.out.println(pem);
         assertTrue(pem.contains("-----BEGIN CERTIFICATE-----"));
         assertTrue(pem.contains("-----END CERTIFICATE-----"));
+        sut.deleteKeyAlias(keyAlias);
+        sut.deleteKey(keyInfo);
     }
 
 }
