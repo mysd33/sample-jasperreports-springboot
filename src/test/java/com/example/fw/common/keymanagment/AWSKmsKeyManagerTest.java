@@ -56,6 +56,30 @@ class AWSKmsKeyManagerTest {
     }
 
     /**
+     * キーのエイリアス追加のテスト
+     */
+    @Test
+    void testAddKeyAlias() {
+        final String keyAlias = "sign-test-ecdsa";
+        final KeyInfo keyInfo = sut.createKey();
+        assertNotNull(keyInfo);
+        assertNotNull(keyInfo.getKeyId());
+        assertNotNull(keyInfo.getState());
+        sut.addKeyAlias(keyInfo, keyAlias);
+        // 追加の成否は特に確認しない
+    }
+
+    /**
+     * キーのエイリアス削除のテスト
+     */
+    @Test
+    void testDeleteKeyAlias() {
+        final String keyAlias = "sign-test-ecdsa";
+        sut.deleteKeyAlias(keyAlias);
+        // 削除の成否は特に確認しない
+    }
+
+    /**
      * キーの削除のテスト
      */
     @Test

@@ -1,4 +1,4 @@
-package com.example.fw.common.keymanagment;
+package com.example;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import com.example.fw.common.keymanagement.CertificateSigningRequest;
 import com.example.fw.common.keymanagement.KeyInfo;
 import com.example.fw.common.keymanagement.KeyManager;
 import com.example.fw.common.keymanagement.config.KeyManagementConfigurationProperties;
+import com.example.fw.common.keymanagment.DigitalSignCertificateToolTestConfig;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
 
@@ -47,11 +48,14 @@ class DigitalSignCertificateToolTest {
         // 鍵のエイリアス名を指定する
         final String keyAlias = "digital-signature-key";
 
+        // 既存のエイリアスを削除
+        keyManager.deleteKeyAlias(keyAlias);
+
         // 暗号鍵の作成
-        final KeyInfo keyInfo = keyManager.createKey("sign-test-ecdsa");
+        final KeyInfo keyInfo = keyManager.createKey(keyAlias);
         // 既存のキーを使う場合
-        //final String existingKeyId = "713cdf19-8ad3-4659-be76-6547c0a65f7c";
-        //final KeyInfo keyInfo = KeyInfo.builder().keyId(existingKeyId).build();
+        // final String existingKeyId = "713cdf19-8ad3-4659-be76-6547c0a65f7c";
+        // final KeyInfo keyInfo = KeyInfo.builder().keyId(existingKeyId).build();
         appLogger.debug("作成したKey ID: {}", keyInfo.getKeyId());
 
         // CSRの作成
