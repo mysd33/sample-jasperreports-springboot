@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+#Metadata: 
+
+Parameters:
+  StackPrefix:
+    Description: Stack Resource Name Prefix
+    Type: String
+    Default: Demo
+  KeyAliasName:
+    Type: String
+    Description: "KMS Key Alias"
+    Default: "alias/digital-signature-key"
+  PendingWindowInDaysValue:
+    Type: Number
+    Description: "KMS Key Pending Window In Days"
+    Default: 7
+    AllowedValues: [7, 30]        
+  IsMultiRegion:
+    Type: String
+    Description: "KMS Key MultiRegion"
+    Default: "true"
+    AllowedValues: ["true", "false"]
+  DeletionPolicyValue:
+    Type: String
+    Description: "KMS Key Deletion Policy"
+    Default: "Delete" #開発用
+    AllowedValues: ["Delete", "Retain"]
+  UpdateReplacePolicyValue:
+    Type: String
+    Description: "KMS Key Update Replace Policy"
+    Default: "Delete" #開発用
+    AllowedValues: ["Delete", "Retain"]
+
+#Mappings: 
+
+#Conditions: 
+
+Resources:
+  # KMS Key
+  KMSKey:
+    Type: AWS::KMS::Key
+    Properties:     
+      Description: "電子署名用の暗号鍵"
+      KeySpec: "ECC_NIST_P256"
+      KeyUsage: "SIGN_VERIFY"
+      Enabled: true
+      MultiRegion: !Ref IsMultiRegion
+      PendingWindowInDays: !Ref PendingWindowInDaysValue
+      #KeyPolicy: TBD
+      #EnableKeyRotation: TBD
+    UpdateReplacePolicy: !Ref UpdateReplacePolicyValue
+    DeletionPolicy: !Ref DeletionPolicyValue
+
+  # KMS Key Alias
+  KMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Ref KeyAliasName
+      TargetKeyId: !Ref KMSKey
+
+Outputs:
+  KMSKeyId:
+    Description: "KMS Key ID"
+    Value: !Ref KMSKey
+    Export:
+      Name: !Sub "${StackPrefix}-KMSKeyId"
+  KMSKeyArn:
+    Description: "KMS Key ARN"
+    Value: !GetAtt KMSKey.Arn
+    Export:
+      Name: !Sub "${StackPrefix}-KMSKeyArn"
+  KMSKeyAliasName:
+    Description: "KMS Key Alias Name"
+    Value: !Ref KMSKeyAlias
+    Export:
+      Name: !Sub "${StackPrefix}-KMSKeyAliasName"
