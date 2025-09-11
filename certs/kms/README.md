@@ -12,5 +12,5 @@
 - 以下に作成ツールがあり、JUnitを実行することで、AWS KMSでキーペア・CSR・自己署名の証明書の作成する。
     - [DigitalSignCertificateToolTest.java](../../src/test/java/com/example/DigitalSignCertificateToolTest.java)
     - SpringBootTestの形式で作成されてて、JUnitを実行することで、AWS KMSでキーペア・CSR・自己署名の証明書の作成するようになっている。
-- CloudFormationと違い、都度、ユーザがアプリケーション内で制御してキーペアも作成する場合には便利である。
+- CloudFormationと違い、都度、ユーザがアプリケーション内で制御してキーペアも作成する場合には便利である。また、スタックを作らず、APIと叩くだけなので、非常に高速にキーが作成される。
     - ただし、キーは手動で削除する必要があるのと、猶予期間最低7日間までは削除されないので、開発時は注意。
