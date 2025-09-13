@@ -558,6 +558,7 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
             * `digitalsignature.type`プロパティを`aws-kms-pades`に設定します。また、`digitalsignature.aws-kms.key-id`に署名に使用するAWS KMSのキーIDを設定します。
     * [application-dev.yaml](src/main/resources/application-dev.yml)の設定で、`digitalsignature.type`プロパティを`aws-kms-pades`に設定することで実装の切り替えが可能です。
     * 現状、可視署名には対応していません。
+    * KMSをマルチリージョンキーに対応して作成しておくと、[application-dev.yaml](src/main/resources/application-dev.yml)の設定で、`keymanagement.aws-kms.region`プロパティを`ap-northeast-3`に設定することでDRサイトの鍵での署名が可能です。
 
 ## 参考情報
 * [Jaspersoft community editionの公式サイト](https://www.jaspersoft.com/products/jaspersoft-community)

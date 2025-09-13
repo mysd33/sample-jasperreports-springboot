@@ -1,8 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: KMS Template for CloudFormation Demo.
-#Metadata: 
+Description: KMS Replica Key Template for CloudFormation Demo.
+#Metadata:
 
-Parameters:
+Parameters: 
+  PrimaryKeyArn:
+    Description: "KMS Primary Key ARN"
+    Type: String
   StackPrefix:
     Description: Stack Resource Name Prefix
     Type: String
@@ -10,12 +13,7 @@ Parameters:
   KeyAliasName:
     Type: String
     Description: "KMS Key Alias"
-    Default: "alias/digital-signature-key"    
-  IsMultiRegion:
-    Type: String
-    Description: "KMS Key MultiRegion"
-    Default: "true"
-    AllowedValues: ["true", "false"]
+    Default: "alias/digital-signature-key"
   PendingWindowInDaysValue:
     Type: Number
     Description: "KMS Key Pending Window In Days"
@@ -40,16 +38,13 @@ Parameters:
 
 #Conditions: 
 
-Resources:
-  # KMS Key
-  KMSKey:
-    Type: AWS::KMS::Key
-    Properties:     
-      Description: "KMS Key for Digital Signature"
-      KeySpec: "ECC_NIST_P256"
-      KeyUsage: "SIGN_VERIFY"
-      Enabled: true
-      MultiRegion: !Ref IsMultiRegion
+Resources: 
+  # KMS Replica Key
+  KMSReplicaKey:
+    Type: AWS::KMS::ReplicaKey
+    Properties:
+      Description: "KMS Replica Key for Digital Signature"
+      PrimaryKeyArn: !Ref PrimaryKeyArn        
       PendingWindowInDays: !Ref PendingWindowInDaysValue
       # 適宜修正すること
       KeyPolicy:
@@ -69,28 +64,25 @@ Resources:
             Action: 'kms:*'
             Resource: '*'
     UpdateReplacePolicy: !Ref UpdateReplacePolicyValue
-    DeletionPolicy: !Ref DeletionPolicyValue
+    DeletionPolicy: !Ref DeletionPolicyValue 
+
 
   # KMS Key Alias
   KMSKeyAlias:
     Type: AWS::KMS::Alias
     Properties:
       AliasName: !Ref KeyAliasName
-      TargetKeyId: !Ref KMSKey
-        
+      TargetKeyId: !Ref KMSReplicaKey
+
 Outputs:
   KMSKeyId:
-    Description: "KMS Key ID"
-    Value: !Ref KMSKey
-    Export:
-      Name: !Sub "${StackPrefix}-KMSKeyId"
-  KMSKeyArn:
-    Description: "KMS Key ARN"
-    Value: !GetAtt KMSKey.Arn
-    Export:
-      Name: !Sub "${StackPrefix}-KMSKeyArn"
+    Description: "ID of the KMS Replica Key"
+    Value: !Ref KMSReplicaKey
+  KMSReplicaKeyArn:
+    Description: "ARN of the KMS Replica Key"
+    Value: !GetAtt KMSReplicaKey.Arn
   KMSKeyAliasName:
     Description: "KMS Key Alias Name"
     Value: !Ref KMSKeyAlias
     Export:
-      Name: !Sub "${StackPrefix}-KMSKeyAliasName"
+      Name: !Sub "${StackPrefix}-KMSKeyAliasName"    
