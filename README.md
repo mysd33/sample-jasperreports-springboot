@@ -43,14 +43,17 @@
     * 請求書
         * 「請求書.pdf」という名前のPDFファイルがダウンロードされます。
             * 実際の[PDFファイル](pdf/請求書.pdf)
+                * [PDFセキュリティの設定例](#pdfのセキュリティ設定)として、読み取りパスワード「1234」で設定しています。ファイルを開く際にパスワードを入力するようになります。
+            * [PDF電子署名](#pdfへの電子署名付与)の設定例として、PDFに電子署名を付与した版も用意しています。（ただし、公開鍵に対する証明書が自己署名証明書を使っているため、Acrobat Readerで開くと署名の検証で完全性が不明のため、「少なくとも１つの署名に問題があります。」の表示が出ます。）
+                * [署名付与PDFファイル（基本署名での可視署名付き）](pdf/請求書_基本_可視署名.pdf)
+                * [署名付与PDFファイル（PAdES署名での不可視署名付き）](pdf/請求書_PAdES_不可視署名.pdf)
+
         * 自分でゼロから作成した様式ファイルです。
             * 実際の帳票様式(jrml)ファイル
                 * [単項目をパラメータで設定した様式バージョン](src/main/resources/reports/invoice-report.jrxml)
                 * [単項目・明細ともにJRDataSourceから取得する様式バージョン](src/main/resources/reports/invoice-report.jrxml)
             * 某帳票製品の帳票サンプルを参考にして、同じようにデザインできるか試してみました。            
         * 出力される帳票のイメージ
-        * [PDFセキュリティの設定例](#pdfのセキュリティ設定)として、読み取りパスワード「1234」で設定しています。ファイルを開く際にパスワードを入力するようになります。
-        * [PDF電子署名](#pdfへの電子署名付与)の設定例として、PDFに電子署名を付与した版も用意しています。
         
         ![invoice.pdf](image/invoice-report.png)
 
@@ -519,8 +522,16 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
         Report report = createPDFReport(order);
 
         // PDFに電子署名を付与
-        Report signedReport = reportSigner.sign(report);
-
+        Report signedReport = reportSigner.sign(report, SignOptions.builder()//
+                // 署名に関するオプションの設定
+                .reason("署名理由")//
+                .location("署名場所")//                
+                .visible(true)// 可視署名の有効化
+                .visibleSignImagePath("certs/stamp.png")// 可視署名の画像
+                .visibleSignText("署名者")// 可視署名のテキスト
+                .visibleSignRect(new float[] { 475, 650, 575, 750 })//可視署名の表示位置
+                .visibleSignPage(1)//可視署名の表示ページ
+                .build());
         // 署名済のPDF帳票データを返却
         return ReportFile.builder()//
                 .inputStream(signedReport.getInputStream())//
@@ -545,7 +556,6 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
             * [PKCS12BasicReportSignerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12BasicReportSigner.java)
                 * `digitalsignature.type`プロパティを`pkcs12-basic`に設定します。
             * 可視署名にも対応しています。[application-dev.yaml](src/main/resources/application-dev.yml)の設定`digitalsignature.type`プロパティをを切り替えることで、実装の切り替えが可能です。
-                * `digitalsignature.visible`プロパティを`true`に設定します。また、`digitalsignature.stamp-image-path`に可視署名の画像（印影等）のファイルパスを設定します。
         * PAdES-B-B（署名のみ、タイムスタンプなし）
             * [PKCS12PAdESReportSiginerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12PAdESReportSiginer.java)
                 * `digitalsignature.type`プロパティを`pkcs12-pades`に設定します。

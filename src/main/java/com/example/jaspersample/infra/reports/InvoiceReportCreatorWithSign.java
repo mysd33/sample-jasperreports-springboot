@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.util.ResourceUtils;
 
 import com.example.fw.common.digitalsignature.ReportSigner;
+import com.example.fw.common.digitalsignature.SignOptions;
 import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportCreator;
@@ -46,8 +47,16 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
         Report report = createPDFReport(order);
 
         // PDFに電子署名を付与
-        Report signedReport = reportSigner.sign(report);
-
+        Report signedReport = reportSigner.sign(report, SignOptions.builder()//
+                // 署名に関するオプションの設定
+                .reason("署名理由")//
+                .location("署名場所")//
+                .visible(true)// 可視署名の有効化
+                .visibleSignImagePath("certs/stamp.png")// 可視署名の画像
+                .visibleSignText("署名者")// 可視署名のテキスト
+                .visibleSignRect(new float[] { 475, 650, 575, 750 })// 可視署名の表示位置
+                .visibleSignPage(1)// 可視署名の表示ページ
+                .build());
         return ReportFile.builder()//
                 .inputStream(signedReport.getInputStream())//
                 .fileName(INVOICE_FILE_NAME)//

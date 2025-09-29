@@ -99,8 +99,6 @@ public class BillingController {
         // 注文情報の取得の取得
         Order order = orderService.findOne(orderId);
         // 請求書の作成
-
-        // 請求書の作成
         ReportFile reportFile = invoiceReportCreatorWithSign.createInvoice(order);
         return createResponse(reportFile);
     }
