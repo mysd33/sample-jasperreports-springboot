@@ -1,11 +1,7 @@
 package com.example.jaspersample.infra.reports;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.util.ResourceUtils;
 
 import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.fw.common.reports.PDFOptions;
@@ -32,7 +28,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 @RequiredArgsConstructor
 public class InvoiceReportCreatorImpl2 extends AbstractJasperReportCreator<Order> implements InvoiceReportCreator {
     private static final String INVOICE_FILE_NAME = "請求書.pdf";
-    private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report2.jrxml";
+    private static final String JRXML_FILE_PATH = "reports/invoice-report2.jrxml";
     // InvoiceReportDataMapperをDI
     private final InvoiceReportDataMapper mapper;
 
@@ -65,8 +61,8 @@ public class InvoiceReportCreatorImpl2 extends AbstractJasperReportCreator<Order
 
     // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
     @Override
-    protected File getMainJRXMLFile() throws FileNotFoundException {
-        return ResourceUtils.getFile(JRXML_FILE_PATH);
+    protected String getMainJRXMLFile() {
+        return JRXML_FILE_PATH;
     }
 
     // AbstractJasperReportCreatorのabstractメソッドgetDataSourceを実装して、データソースを返す

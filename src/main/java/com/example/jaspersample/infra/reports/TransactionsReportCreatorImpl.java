@@ -1,12 +1,8 @@
 package com.example.jaspersample.infra.reports;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.util.ResourceUtils;
 
 import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.fw.common.reports.Report;
@@ -28,8 +24,8 @@ public class TransactionsReportCreatorImpl extends AbstractJasperReportCreator<L
         implements TransactionsReportCreator {
     private static final String TITLE = "title";
     private static final String REPORT_NAME = "取引一覧";
-    private static final String REPORT_FILE_NAME = "取引一覧.pdf";    
-    private static final String JRXML_FILE_PATH = "classpath:reports/transaction-report.jrxml";
+    private static final String REPORT_FILE_NAME = "取引一覧.pdf";
+    private static final String JRXML_FILE_PATH = "reports/transaction-report.jrxml";
 
     @Override
     public ReportFile createTransactionsReport(List<Transaction> items) {
@@ -42,8 +38,8 @@ public class TransactionsReportCreatorImpl extends AbstractJasperReportCreator<L
     }
 
     @Override
-    protected File getMainJRXMLFile() throws FileNotFoundException {
-        return ResourceUtils.getFile(JRXML_FILE_PATH);
+    protected String getMainJRXMLFile() {
+        return JRXML_FILE_PATH;
     }
 
     @Override

@@ -1,12 +1,8 @@
 package com.example.jaspersample.infra.reports;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.util.ResourceUtils;
 
 import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.fw.common.reports.Report;
@@ -32,7 +28,7 @@ public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Ite
     private static final String TITLE = "title";
     private static final String REPORT_NAME = "商品一覧";
     private static final String REPORT_FILE_NAME = "商品一覧.pdf";
-    private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
+    private static final String JRXML_FILE_PATH = "reports/item-report.jrxml";
 
     @Override
     public ReportFile createItemsReport(List<Item> items) {
@@ -49,8 +45,8 @@ public class ItemsReportCreatorImpl extends AbstractJasperReportCreator<List<Ite
 
     // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
     @Override
-    protected File getMainJRXMLFile() throws FileNotFoundException {
-        return ResourceUtils.getFile(JRXML_FILE_PATH);
+    protected String getMainJRXMLFile() {
+        return JRXML_FILE_PATH;
     }
 
     // AbstractJasperReportCreatorのメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す

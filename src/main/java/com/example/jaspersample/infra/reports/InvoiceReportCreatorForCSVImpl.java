@@ -1,10 +1,6 @@
 package com.example.jaspersample.infra.reports;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
-
-import org.springframework.util.ResourceUtils;
 
 import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.reports.AbstractJasperReportCreator;
@@ -31,7 +27,7 @@ import net.sf.jasperreports.engine.data.JRCsvDataSource;
 public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<InvoiceReportCSVData>
         implements InvoiceReportCreatorForCSV {
     private static final String INVOICE_FILE_NAME = "請求書.pdf";
-    private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report2.jrxml";
+    private static final String JRXML_FILE_PATH = "reports/invoice-report2.jrxml";
 
     // 業務APが定義する帳票出力処理
     @Override
@@ -62,8 +58,8 @@ public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<
 
     // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
     @Override
-    protected File getMainJRXMLFile() throws FileNotFoundException {
-        return ResourceUtils.getFile(JRXML_FILE_PATH);
+    protected String getMainJRXMLFile() {
+        return JRXML_FILE_PATH;
     }
 
     // AbstractJasperReportCreatorのabstractメソッドgetDataSourceを実装して、データソースを返す
