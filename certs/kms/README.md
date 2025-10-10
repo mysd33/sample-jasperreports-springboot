@@ -3,6 +3,7 @@
 1. 鍵だけCloudFormationで作成しておく場合（おすすめ）
     - キーペアのみCloudFormationで作成するようになっている
     - CloudFormationの利点として、スタック管理されるので、開発時等、KMSのキーのスタックを消せば、リソース＝キーも消えるので便利である。
+        - スタックを消しても、結局、削除保留期間（7日間以上）までは削除されない模様
     - [cfn](../../cfn/)のフォルダにCloudFormationTemplateがある。
     - 鍵を作成後は、[DigitalSignCertificateToolByExistingTest.java](../../src/test/java/com/example/DigitalSignCertificateToolByExistingKeyTest.java.java)でJUnitを実行することで、AWS KMSでCSR・自己署名の証明書の作成する。
     使い方は[README.md](../../cfn/README.md)を参照すること。
