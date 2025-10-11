@@ -1,13 +1,14 @@
 package com.example.jaspersample.infra.reports;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ResourceUtils;
 
 import com.example.jaspersample.domain.model.Item;
@@ -36,7 +37,7 @@ public class ItemsReportCreatorImplByJasperAPISimple implements ItemsReportCreat
     private static final String TITLE = "title";
     private static final String REPORT_NAME = "商品一覧";
     private static final String REPORT_FILE_NAME = "商品一覧.pdf";
-    private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
+    private static final String JRXML_FILE_PATH = "reports/item-report.jrxml";
     private static final String JASPER_FILE_PATH = "item-report.jasper";
 
     @Override
@@ -48,12 +49,12 @@ public class ItemsReportCreatorImplByJasperAPISimple implements ItemsReportCreat
             jasperReport = (JasperReport) JRLoader.loadObject(ResourceUtils.getFile(JASPER_FILE_PATH));
         } catch (FileNotFoundException | JRException e) {
             try {
-                // コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルする
-                File jrxmlFile = ResourceUtils.getFile(JRXML_FILE_PATH);
-                jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+                // コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルす
+                jasperReport = JasperCompileManager
+                        .compileReport(new ClassPathResource(JRXML_FILE_PATH).getInputStream());
                 // コンパイル済の帳票様式を保存する
                 JRSaver.saveObject(jasperReport, JASPER_FILE_PATH);
-            } catch (FileNotFoundException | JRException e1) {
+            } catch (IOException | JRException e1) {
                 // TODO: 実際にはSystemExceptionでスロー
                 throw new RuntimeException("帳票テンプレートの読み込みに失敗しました", e1);
             }

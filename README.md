@@ -143,7 +143,7 @@
     private static final String TITLE = "title";	
     private static final String REPORT_NAME = "商品一覧";
     private static final String REPORT_FILE_NAME = "商品一覧.pdf";
-    private static final String JRXML_FILE_PATH = "classpath:reports/item-report.jrxml";
+    private static final String JRXML_FILE_PATH = "reports/item-report.jrxml";
     private static final String JASPER_FILE_PATH = "item-report.jasper";
 
     // 商品一覧の帳票の作成例    
@@ -155,9 +155,9 @@
             jasperReport = (JasperReport) JRLoader.loadObject(ResourceUtils.getFile(JASPER_FILE_PATH));
         } catch (FileNotFoundException | JRException e) {
             try {
-                // コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルする
-                File jrxmlFile = ResourceUtils.getFile(JRXML_FILE_PATH);
-                jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+                // コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルす
+                jasperReport = JasperCompileManager
+                        .compileReport(new ClassPathResource(JRXML_FILE_PATH).getInputStream());
                 // コンパイル済の帳票様式を保存する
                 JRSaver.saveObject(jasperReport, JASPER_FILE_PATH);
             } catch (FileNotFoundException | JRException e1) {
@@ -205,7 +205,7 @@
     // AbstractJasperReportCreatorを継承
     // 型パラメータに帳票作成に必要なデータの型を指定
     public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order> implements BillingReportCreator {
-        private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report.jrxml";
+        private static final String JRXML_FILE_PATH = "reports/invoice-report.jrxml";
 
         // 業務APが定義する帳票出力処理
         @Override
@@ -226,8 +226,8 @@
 
         // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
         @Override
-        protected File getJRXMLFile() throws FileNotFoundException {
-            return ResourceUtils.getFile(JRXML_FILE_PATH);
+        protected String getJRXMLFile() {
+            return JRXML_FILE_PATH;
         }
 
         // AbstractJasperReportCreatorのabstractメソッドgetParametersを実装して、帳票作成に必要なパラメータを返す
@@ -265,7 +265,7 @@
     ```java    
     @ReportCreator(id = "R003", name = "請求書")    
     public class InvoiceReportCreatorForCSVImpl extends AbstractJasperReportCreator<InvoiceReportCSVData> implements InvoiceReportCreatorForCSV {
-        private static final String JRXML_FILE_PATH = "classpath:reports/invoice-report2.jrxml";
+        private static final String JRXML_FILE_PATH = "reports/invoice-report2.jrxml";
         
         @Override
         public ReportFile createInvoice(InvoiceReportCSVData csvData) {
@@ -281,8 +281,8 @@
         }
 
         @Override
-        protected File getMainJRXMLFile() throws FileNotFoundException {
-            return ResourceUtils.getFile(JRXML_FILE_PATH);
+        protected String getMainJRXMLFile()  {
+            return JRXML_FILE_PATH;
         }
 
         @Override
