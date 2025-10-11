@@ -2,6 +2,12 @@
 * Jasper Reportsを使って、帳票出力を行うためのサンプルAPです。Jasper Reportsの勉強するために作成しています。
 
 ## サンプルAPの起動方法
+* [署名付きPDF帳票](#pdfへの電子署名付与)を試すには、デフォルトで動作する機能では、PKCS#12形式の秘密鍵と証明書のファイルを用意しておく必要があります。
+    * サンプルAPでは、[README](certs/pkcs12/ecdsa/README.md)の通りに自己署名証明書を作成し、配置しておきます。
+        * サンプルではありますが、キーストアをGitに置くとセキュリティ上まずくGit Guardianから検知され指摘されるので、Gitには置かないようにしていますので、自分で作成してください。
+    * 署名付きPDFを試さない場合は、なくても動作します。
+    * また、KMS等を利用する場合は、[後述の記載](#pdfへの電子署名付与)を参考に適切な設定を行ってください。
+
 * Spring Boot APを起動します。
     * Spring Tool Suite（Eclipse）の場合
         * `JasperReportsSampleApplication.java`を右クリックして、`Run As` -> `Spring Boot Application`（または`Java Application`）を選択します。
@@ -16,6 +22,65 @@
     * http://localhost:8080/
 
 * トップ画面より、帳票名のリンクをクリックすると、PDFがダウンロード、表示されます。
+
+
+## Spring Bootの実行可能jarでのサンプルAP実行時の注意点
+* 本番では、Spring Bootの実行可能jarで起動することが多いと思いますが、Jasper Reportsを使った帳票出力機能を実装している場合、以下の点に注意が必要です。
+
+* Mavenビルドを行い、以下のコマンドで実行可能jarを作成します。
+
+    ```sh
+    mvnw clean package -DskipTests=true
+    ```
+
+* targetフォルダに、sample-bff-0.0.1-SNAPSHOT.jarが作成されるので、通常は、以下のコマンドで実行します。ですが、以下のコマンドだと、エラーがでます。
+
+    ```sh
+    cd target    
+    java … sample-jasperreports-springboot-0.0.1-SNAPSHOT.jar
+
+    # エラー例
+    2025-10-11T11:54:51.989+09:00 ERROR 38012 --- [sample-jasperreports-springboot] [           main] c.e.f.c.r.AbstractJasperReportCreator    : ERROR_CODE:e.fw.rprt.9001 MESSAGE:帳票ID[R003]請求書の様式のコンパイルに失敗しました
+    
+    net.sf.jasperreports.engine.JRException: Errors were encountered when compiling report expressions class file:
+    C:\Users\masas\AppData\Local\Temp\invoice45report_96ed58cc8fb553751c71991d1c05829f3869fc525527037cb73dd4e4c066ef50.java:18: エラー: シンボルを見つけられません
+    public class invoice45report_96ed58cc8fb553751c71991d1c05829f3869fc525527037cb73dd4e4c066ef50 extends JREvaluator
+                                                                                                        ^
+    シンボル: クラス JREvaluator
+    C:\Users\masas\AppData\Local\Temp\invoice45report_96ed58cc8fb553751c71991d1c05829f3869fc525527037cb73dd4e4c066ef50.java:25: エラー: シンボルを見つけられません
+        private JRFillParameter parameter_orderId = null;
+                ^
+    シンボル:   クラス JRFillParameter
+    場所: クラス invoice45report_96ed58cc8fb553751c71991d1c05829f3869fc525527037cb73dd4e4c066ef50
+    C:\Users\masas\AppData\Local\Temp\invoice45report_96ed58cc8fb553751c71991d1c05829f3869fc525527037cb73dd4e4c066ef50.java:26: エラー: シンボルを見つけられません
+        private JRFillParameter parameter_customerZip = null;
+                ^
+    
+    ```
+
+* 原因は、本サンプルAPが、Jasper Reportsを使ったPDF帳票出力機能を実装しているのですが、Jasper Reportsのライブラリ（JasperReportsのJRJdk13Compilerクラス）がjrxmlの様式コンパイルする際、JasperReportsのライブラリが実行可能jarにしてしまうと、クラスパスからJasperReportsのライブラリを見つけられず、上記のようなエラーになるためです。
+
+* 回避策として、Spring Bootのマニュアルの手順にある[実行可能jarを解凍して実行する](https://spring.pleiades.io/spring-boot/reference/packaging/efficient.html)方法を利用して、実行します。
+    * これで、JasperReportsのライブラリをクラスパスから見つけられるようになり、正常に起動します。
+    * なお、本題とは関係ないですが、この例では、-Ddigitalsignature.pkcs12.keystore-file-pathオプションを指定しています。これは、targetフォルダにあるjarを実行すると、PKCS#12形式の秘密鍵と証明書のファイルパスがずれてエラーになるので明示的に指定しています。
+
+    ```sh
+    cd target
+    java -Djarmode=tools -jar java -Djarmode=tools -jar sample-jasperreports-springboot-0.0.1-SNAPSHOT.jar extract
+
+    java -Ddigitalsignature.pkcs12.keystore-file-path=../certs/pkcs12/ecdsa/keystore.p12 -jar sample-jasperreports-springboot-0.0.1-SNAPSHOT/sample-jasperreports-springboot-0.0.1-SNAPSHOT.jar
+    ```
+    
+    * バージョン番号が入っているので、Dockerfile等では、app.jarのような名前にリネームしてからやったほうが良いです。
+
+    ```dockerfile
+    COPY target/*.jar app.jar
+    RUN java -Djarmode=tools -jar app.jar extract
+
+    ENTRYPOINT [ "java" ]
+    CMD [ "-jar", "app/app.jar" ]
+    EXPOSE 8080
+    ```
 
 ## 帳票の例
 * 今後、帳票を追加していく予定です
