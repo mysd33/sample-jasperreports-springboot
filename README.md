@@ -496,11 +496,11 @@
             * [Signature creation](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/signature-creation.adoc)
             * [Specificities of signature creation in different signature formats](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/signature-creation-different-formats.adoc)
             * [dss-pades-openpdf](https://github.com/esig/dss/tree/master/dss-pades-openpdf)
-                * DSS PAdESでのOpenPDF統合機能。可視署名の実現に利用する模様ですが、サンプルAPでは利用できていません。
             * サンプルコードのリンク
                 * [Annex](https://github.com/esig/dss/blob/master/dss-cookbook/src/main/asciidoc/_chapters/annex.adoc)
                     * [PKC#12キーストアでのトークン、署名取得](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/snippets/PKCS12Snippet.java)
                     * [PAdESでのPDF署名](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/sign/SignPdfPadesBTest.java)
+                    * [PAdESでの可視署名の例](https://github.com/esig/dss/blob/master/dss-cookbook/src/test/java/eu/europa/esig/dss/cookbook/example/sign/SignPdfPadesBVisibleTest.java)
 
 ### 電子署名関連ライブラリの利用方法
 * pom.xmlにライブラリの依存関係を追加する必要があります。   
@@ -583,6 +583,12 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
     // 業務APが定義する帳票出力処理
     @Override
     public ReportFile createInvoice(Order order) {
+        // PDFのセキュリティ設定のオプション例
+        PDFOptions options = PDFOptions.builder()//
+                // 読み取りパスワード
+                .userPassword(order.getCustomer().getPdfPassword())//
+                .build();
+
         // PDF帳票作成
         Report report = createPDFReport(order);
 
@@ -596,6 +602,7 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
                 .visibleSignText("署名者")// 可視署名のテキスト
                 .visibleSignRect(new float[] { 475, 650, 575, 750 })//可視署名の表示位置
                 .visibleSignPage(1)//可視署名の表示ページ
+                .password((order.getCustomer().getPdfPassword())// パスワード保護されたPDFの場合のパスワード                
                 .build());
         // 署名済のPDF帳票データを返却
         return ReportFile.builder()//
@@ -624,7 +631,6 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
         * PAdES-B-B（署名のみ、タイムスタンプなし）
             * [PKCS12PAdESReportSiginerクラス](src/main/java/com/example/fw/common/digitalsignature/PKCS12PAdESReportSiginer.java)
                 * `example.digitalsignature.type`プロパティを`pkcs12-pades`に設定します。
-            * 現状、可視署名には対応していません。            
 2. AWS KMSに管理した秘密鍵・公開鍵証明書を使用した、サンプルAPの実装例
     * 利用前には、独自作成ツールを使って、鍵、CSR、証明書、キーストアの作成が必要です。
         * [SHA-256 with ECDSA](certs/kms/README.md)
@@ -632,7 +638,6 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
         * [AWSKmsPAdESReportSignerクラス](src/main/java/com/example/fw/common/digitalsignature/AWSKmsPAdESReportSigner.java)
             * `example.digitalsignature.type`プロパティを`aws-kms-pades`に設定します。また、`example.digitalsignature.aws-kms.key-alias`に署名に使用するAWS KMSのキーエイリアスを設定します。
     * [application-dev.yaml](src/main/resources/application-dev.yml)の設定で、`example.digitalsignature.type`プロパティを`aws-kms-pades`に設定することで実装の切り替えが可能です。
-    * 現状、可視署名には対応していません。
     * KMSをマルチリージョンキーに対応して作成しておくと、[application-dev.yaml](src/main/resources/application-dev.yml)の設定で、`example.keymanagement.aws-kms.region`プロパティを`ap-northeast-3`に設定することでDRサイトの鍵での署名が可能です。
 
 ## 参考情報

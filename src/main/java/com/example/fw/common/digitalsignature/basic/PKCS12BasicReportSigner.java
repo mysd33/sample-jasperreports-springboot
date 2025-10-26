@@ -162,6 +162,7 @@ public class PKCS12BasicReportSigner implements ReportSigner {
      */
     private void createVisbleSignatureImage(PdfSignatureAppearance sap, SignOptions options) {
         float[] rect = options.getVisibleSignRect();
+        // TODO: SignOptionsのY軸の位置調整がPKCS12BasicReportSignerに合わせたものになってしまっているのでパラメータの値を見直し後、ロジック修正
         sap.setVisibleSignature(new Rectangle(rect[0], rect[1], rect[2], rect[3]), options.getVisibleSignPage());
         sap.setLayer2Text(options.getVisibleSignText());
         String imagePath = options.getVisibleSignImagePath();
