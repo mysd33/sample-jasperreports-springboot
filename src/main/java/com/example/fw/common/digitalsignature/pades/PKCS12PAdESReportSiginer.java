@@ -193,9 +193,11 @@ public class PKCS12PAdESReportSiginer implements ReportSigner {
             imageParameters.setImage(new FileDocument(options.getVisibleSignImagePath()));
             SignatureFieldParameters fieldParameters = new SignatureFieldParameters();
             imageParameters.setFieldParameters(fieldParameters);
+            fieldParameters.setPage(options.getVisibleSignPage());
             fieldParameters.setOriginX(options.getVisibleSignRect()[0]);
-            // TODO: Y軸の位置調整がPKCS12BasicReportSignerに合わせたものになってしまっているのでパラメータの値を見直し後、ロジック修正
-            fieldParameters.setOriginY(options.getVisibleSignRect()[3] - options.getVisibleSignRect()[1]);
+            fieldParameters.setOriginY(options.getVisibleSignRect()[1]);
+            fieldParameters.setWidth(options.getVisibleSignRect()[2] - options.getVisibleSignRect()[0]);
+            fieldParameters.setHeight(options.getVisibleSignRect()[3] - options.getVisibleSignRect()[1]);
             SignatureImageTextParameters textParameters = new SignatureImageTextParameters();
             textParameters.setText(options.getVisibleSignText());
             pAdESSignatureParameters.setImageParameters(imageParameters);

@@ -66,9 +66,7 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
                 .visible(true)// 可視署名の有効化
                 .visibleSignImagePath("certs/stamp.png")// 可視署名の画像
                 .visibleSignText("署名者")// 可視署名のテキスト
-                // TODO:
-                // SignOptionsのY軸の位置調整がPKCS12BasicReportSignerに合わせたものになってしまっているのでパラメータの値を見直し検討
-                .visibleSignRect(new float[] { 475, 650, 575, 750 })// 可視署名の表示位置
+                .visibleSignRect(new float[] { 475, 90, 575, 190 })// 可視署名の表示位置（左上を原点とした座標）
                 .visibleSignPage(1)// 可視署名の表示ページ
                 .password((order.getCustomer().getPdfPassword())// パスワード保護されたPDFの場合のパスワード
                 )//
