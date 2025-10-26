@@ -219,6 +219,11 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
         pAdESSignatureParameters.setReason(options.getReason());
         pAdESSignatureParameters.setLocation(options.getLocation());
 
+        // パスワード保護されたPDFの場合のパスワード設定
+        if (StringUtils.isNotEmpty(options.getPassword())) {
+            pAdESSignatureParameters.setPasswordProtection(options.getPassword().toCharArray());
+        }
+
         // TODO: 可視署名は現在未対応
         return pAdESSignatureParameters;
     }

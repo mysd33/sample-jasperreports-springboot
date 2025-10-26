@@ -6,6 +6,7 @@ import java.util.List;
 import com.example.fw.common.digitalsignature.ReportSigner;
 import com.example.fw.common.digitalsignature.SignOptions;
 import com.example.fw.common.reports.AbstractJasperReportCreator;
+import com.example.fw.common.reports.PDFOptions;
 import com.example.fw.common.reports.Report;
 import com.example.fw.common.reports.ReportCreator;
 import com.example.jaspersample.domain.model.Order;
@@ -39,8 +40,23 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
     // 業務APが定義する帳票出力処理
     @Override
     public ReportFile createInvoice(Order order) {
+        // PDFのセキュリティ設定のオプション例
+        PDFOptions options = PDFOptions.builder()//
+                // 読み取りパスワード
+                .userPassword(order.getCustomer().getPdfPassword())//
+                // 権限パスワード
+                // .ownerPassword("admin")//
+                // 特定の処理個別の暗号化レベル設定
+                // .is128bitKey(false)
+                // 特定の処理個別の権限設定
+                // .permissionsDenied(List.of(
+                // PdfPermissionsEnum.COPY,
+                // PdfPermissionsEnum.PRINTING,
+                // PdfPermissionsEnum.MODIFY_CONTENTS
+                // ))//
+                .build();
         // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
-        Report report = createPDFReport(order);
+        Report report = createPDFReport(order, options);
 
         // PDFに電子署名を付与
         Report signedReport = reportSigner.sign(report, SignOptions.builder()//
@@ -52,6 +68,8 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
                 .visibleSignText("署名者")// 可視署名のテキスト
                 .visibleSignRect(new float[] { 475, 650, 575, 750 })// 可視署名の表示位置
                 .visibleSignPage(1)// 可視署名の表示ページ
+                .password((order.getCustomer().getPdfPassword())// パスワード保護されたPDFの場合のパスワード
+                )//
                 .build());
         return ReportFile.builder()//
                 .inputStream(signedReport.getInputStream())//

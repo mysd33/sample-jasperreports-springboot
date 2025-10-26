@@ -11,6 +11,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 import com.example.fw.common.digitalsignature.ReportSigner;
@@ -181,6 +182,11 @@ public class PKCS12PAdESReportSiginer implements ReportSigner {
         // 署名の理由、場所を設定
         pAdESSignatureParameters.setReason(options.getReason());
         pAdESSignatureParameters.setLocation(options.getLocation());
+
+        // パスワード保護されたPDFの場合のパスワード設定
+        if (StringUtils.isNotEmpty(options.getPassword())) {
+            pAdESSignatureParameters.setPasswordProtection(options.getPassword().toCharArray());
+        }
 
         // TODO: 可視署名は現在未対応
         return pAdESSignatureParameters;
