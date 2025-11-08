@@ -228,8 +228,8 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
         pAdESSignatureParameters.setDigestAlgorithm(
                 DigestAlgorithm.forJavaName(keyManagementConfigurationProperties.getHashAlgorithm()));
 
-        // TODO: PublicKeyの情報をもとにすればいいので削除できないか検討(RSASS-PSSの場合にうまくいってないため暫定対応)
         // 署名に使用する暗号化アルゴリズムを設定
+        // 例えば公開鍵の暗号化アルゴリズムから取得するとrsaEncryption（RSA）となるが、rsassaPss(RSASSA-PSS)にするには、明示的に設定が必要。
         pAdESSignatureParameters.setEncryptionAlgorithm(
                 EncryptionAlgorithm.forName(keyManagementConfigurationProperties.getKeyFactoryAlgorithm()));
 
