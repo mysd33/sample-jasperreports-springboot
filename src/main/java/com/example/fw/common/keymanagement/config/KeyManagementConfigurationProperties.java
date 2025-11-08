@@ -18,7 +18,7 @@ public class KeyManagementConfigurationProperties {
     // 鍵管理機能のプロパティのプレフィックス
     static final String PROPERTY_PREFIX = FrameworkConstants.PROPERTY_BASE_NAME + "keymanagement";
     // 暗号化アルゴリズム。java.securityのKeyFactoryで指定するアルゴリズム（デフォルト: EC = 楕円曲線暗号）
-    // 公開鍵情報作成時やPDF署名の暗号化アルゴリズムの指定として使用
+    // CSR/自己署名証明書作成時公開鍵情報作成時やPDF署名の暗号化アルゴリズムの指定として使用
     // RSASSA-PSSの場合は、「RSASSA-PSS」を指定
     // 参考：https://docs.oracle.com/javase/jp/21/docs/specs/security/standard-names.html#keyfactory-algorithms
     private String keyFactoryAlgorithm = "EC";
