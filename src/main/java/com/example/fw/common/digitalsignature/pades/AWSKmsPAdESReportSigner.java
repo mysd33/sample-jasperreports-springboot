@@ -31,7 +31,6 @@ import com.example.fw.common.reports.ReportsConstants;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
@@ -223,16 +222,9 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
         // 署名のパッケージング形式をENVELOPED（署名をPDF文書に埋め込む）に設定
         pAdESSignatureParameters.setSignaturePackaging(SignaturePackaging.ENVELOPED);
 
-        // 注：公開鍵の証明書内に含まれる、署名の暗号化アルゴリズムは、
-        // 鍵を用いてPDF署名に使用する際の暗号化アルゴリズムとは異なるケースあるため間違って設定しないこと。
-        // 例：PDF署名に使用する鍵がECDSAを想定した鍵であっても、公開鍵証明書はRSAで署名されている場合など。
-
         // 署名に使用するハッシュアルゴリズムの設定
         pAdESSignatureParameters.setDigestAlgorithm(
                 DigestAlgorithm.valueOf(digitalSignatureConfigurationProperties.getHashAlgorithm()));
-        // 署名に使用する暗号化アルゴリズムを設定
-        pAdESSignatureParameters.setEncryptionAlgorithm(
-                EncryptionAlgorithm.valueOf(digitalSignatureConfigurationProperties.getEncryptionAlgorithm()));
         // 署名の理由、場所を設定
         pAdESSignatureParameters.setReason(options.getReason());
         pAdESSignatureParameters.setLocation(options.getLocation());

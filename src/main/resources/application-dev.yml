@@ -24,16 +24,24 @@ example:
     # オブジェクトストレージで管理されているKMSの署名鍵の証明書
     # 開発時は自己署名証明書のpemファイルを使用するように設定している
     cert-pem-file-name: self-certificate.pem
+    # 公開鍵情報作成時にjava.securityのKeyFactoryで指定するアルゴリズム(RSASSA-PSSに設定変更する場合に指定）
+    #key-factory-algorithm: RSASSA-PSS
+    # CSR/自己署名証明書作成時の署名アルゴリズム(RSASSA-PSSに設定変更する場合に指定）
+    #signature-algorithm: SHA256WITHRSAANDMGF1
     aws-kms:
       # 鍵が管理されているAWS KMSのリージョンを設定
       region: ap-northeast-1
       #region: ap-northeast-3
-
+      # KMSにキー作成する場合のキー仕様(RSASSA-PSSに設定変更する場合に指定）
+      #key-spec: RSA_2048
+      # KMSの署名アルゴリズム名(RSASSA-PSSに設定変更する場合に指定）
+      #kms-signing-algorithm-spec: RSASSA_PSS_SHA_256
 
 # 電子署名機能の設定
   digitalsignature:
 # PKCS#12のキーストアを使用して基本署名を行う場合に設定
 #    type: pkcs12-basic
+# PAdES署名の場合の設定
 # PKCS#12のキーストアを使用してPADES署名(PADES-B-B)を行う場合に設定
     type: pkcs12-pades
     pkcs12:
@@ -51,6 +59,7 @@ example:
       #key-id: 713cdf19-8ad3-4659-be76-6547c0a65f7c
       # 署名に使用するAWS KMSのキーエイリアス（alias/は除く）を設定
       key-alias: digital-signature-key
+
 
 # オブジェクトストレージの設定
   s3:

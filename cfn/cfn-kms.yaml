@@ -10,7 +10,17 @@ Parameters:
   KeyAliasName:
     Type: String
     Description: "KMS Key Alias"
-    Default: "alias/digital-signature-key"    
+    Default: "alias/digital-signature-key"
+  KeySpec:
+    Type: String
+    Description: "KMS Key Spec"
+    Default: "ECC_NIST_P256"
+    AllowedValues: ["ECC_NIST_P256", "ECC_NIST_P384", "ECC_NIST_P521", "ECC_SECG_P256K1", "SYMMETRIC_DEFAULT", "RSA_2048", "RSA_3072", "RSA_4096"]
+  KeyUsage:
+    Type: String
+    Description: "KMS Key Usage"
+    Default: "SIGN_VERIFY"
+    AllowedValues: ["SIGN_VERIFY", "ENCRYPT_DECRYPT"]
   IsMultiRegion:
     Type: String
     Description: "KMS Key MultiRegion"
@@ -20,7 +30,12 @@ Parameters:
     Type: Number
     Description: "KMS Key Pending Window In Days"
     Default: 7
-    AllowedValues: [7, 30]        
+    AllowedValues: [7, 30]
+  DeletionPolicyValue:
+    Type: String
+    Description: "KMS Key Deletion Policy"
+    Default: "Delete" #開発用
+    AllowedValues: ["Delete", "Retain"]        
   UpdateReplacePolicyValue:
     Type: String
     Description: "KMS Key Update Replace Policy"
@@ -41,8 +56,8 @@ Resources:
     Type: AWS::KMS::Key
     Properties:     
       Description: "KMS Key for Digital Signature"
-      KeySpec: "ECC_NIST_P256"
-      KeyUsage: "SIGN_VERIFY"
+      KeySpec: !Ref KeySpec
+      KeyUsage: !Ref KeyUsage
       Enabled: true
       MultiRegion: !Ref IsMultiRegion
       PendingWindowInDays: !Ref PendingWindowInDaysValue
@@ -64,7 +79,7 @@ Resources:
             Action: 'kms:*'
             Resource: '*'
     UpdateReplacePolicy: !Ref UpdateReplacePolicyValue
-    DeletionPolicy: Retain
+    DeletionPolicy: !Ref DeletionPolicyValue
 
   # KMS Key Alias
   KMSKeyAlias:

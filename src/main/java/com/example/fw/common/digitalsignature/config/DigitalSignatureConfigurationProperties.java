@@ -11,10 +11,9 @@ import lombok.Data;
 public class DigitalSignatureConfigurationProperties {
     // 電子署名の設定を保持するプロパティのプレフィックス
     static final String PROPERTY = FrameworkConstants.PROPERTY_BASE_NAME + "digitalsignature";
-    // 署名に使用するハッシュアルゴリズム（デフォルト: SHA256）
+    // 電子署名に使用するハッシュアルゴリズム（デフォルト: SHA256）
+    // eu.europa.esig.dss.enumerations.DigestAlgorithmクラス参照
     private String hashAlgorithm = "SHA256";
-    // 署名に使用する暗号化アルゴリズム（デフォルト: ECDSA）
-    private String encryptionAlgorithm = "ECDSA";
     // PKCS#12固有の設定(digitalsignature.pkcs12.*)
     private PKCS12Properties pkcs12 = new PKCS12Properties();
     // AWS KMS固有の設定(digitalsignature.aws-kms.*)

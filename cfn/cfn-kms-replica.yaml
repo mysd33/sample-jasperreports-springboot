@@ -19,6 +19,11 @@ Parameters:
     Description: "KMS Key Pending Window In Days"
     Default: 7
     AllowedValues: [7, 30]
+  DeletionPolicyValue:
+    Type: String
+    Description: "KMS Key Deletion Policy"
+    Default: "Delete" #開発用
+    AllowedValues: ["Delete", "Retain"]
   UpdateReplacePolicyValue:
     Type: String
     Description: "KMS Key Update Replace Policy"
@@ -59,8 +64,7 @@ Resources:
             Action: 'kms:*'
             Resource: '*'
     UpdateReplacePolicy: !Ref UpdateReplacePolicyValue
-    DeletionPolicy: Retain
-
+    DeletionPolicy: !Ref DeletionPolicyValue
 
   # KMS Key Alias
   KMSKeyAlias:
