@@ -27,7 +27,6 @@ import com.example.fw.common.reports.ReportsConstants;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
@@ -167,8 +166,7 @@ public class PKCS12PAdESReportSiginer implements ReportSigner {
         pAdESSignatureParameters.setSignaturePackaging(SignaturePackaging.ENVELOPED);
         // 署名に使用するハッシュアルゴリズムの設定
         pAdESSignatureParameters.setDigestAlgorithm(
-                DigestAlgorithm.valueOf(digitalSignatureConfigurationProperties.getHashAlgorithm()));
-
+                DigestAlgorithm.valueOf(digitalSignatureConfigurationProperties.getPkcs12().getHashAlgorithm()));
 
         // 署名の理由、場所を設定
         pAdESSignatureParameters.setReason(options.getReason());

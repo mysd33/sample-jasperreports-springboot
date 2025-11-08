@@ -22,6 +22,7 @@ import com.example.fw.common.exception.SystemException;
 import com.example.fw.common.keymanagement.Certificate;
 import com.example.fw.common.keymanagement.KeyInfo;
 import com.example.fw.common.keymanagement.KeyManager;
+import com.example.fw.common.keymanagement.config.KeyManagementConfigurationProperties;
 import com.example.fw.common.logging.ApplicationLogger;
 import com.example.fw.common.logging.LoggerFactory;
 import com.example.fw.common.message.CommonFrameworkMessageIds;
@@ -31,6 +32,7 @@ import com.example.fw.common.reports.ReportsConstants;
 import com.example.fw.common.reports.config.ReportsConfigurationProperties;
 
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.EncryptionAlgorithm;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.model.DSSDocument;
@@ -64,6 +66,7 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
     private final KeyManager keyManager;
     private final ReportsConfigurationProperties reportsConfigurationProperties;
     private final DigitalSignatureConfigurationProperties digitalSignatureConfigurationProperties;
+    private final KeyManagementConfigurationProperties keyManagementConfigurationProperties;
 
     // PDFの一時保存ファイルのディレクトリ（パスを初期化設定後、定期削除のための別スレッドで参照されるためAtomicReferenceにしておく）
     private final AtomicReference<Path> pdfTempPath = new AtomicReference<>();
@@ -221,10 +224,15 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
         pAdESSignatureParameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
         // 署名のパッケージング形式をENVELOPED（署名をPDF文書に埋め込む）に設定
         pAdESSignatureParameters.setSignaturePackaging(SignaturePackaging.ENVELOPED);
-
         // 署名に使用するハッシュアルゴリズムの設定
         pAdESSignatureParameters.setDigestAlgorithm(
-                DigestAlgorithm.valueOf(digitalSignatureConfigurationProperties.getHashAlgorithm()));
+                DigestAlgorithm.forJavaName(keyManagementConfigurationProperties.getHashAlgorithm()));
+
+        // TODO: PublicKeyの情報をもとにすればいいので削除できないか検討(RSASS-PSSの場合にうまくいってないため暫定対応)
+        // 署名に使用する暗号化アルゴリズムを設定
+        pAdESSignatureParameters.setEncryptionAlgorithm(
+                EncryptionAlgorithm.forName(keyManagementConfigurationProperties.getKeyFactoryAlgorithm()));
+
         // 署名の理由、場所を設定
         pAdESSignatureParameters.setReason(options.getReason());
         pAdESSignatureParameters.setLocation(options.getLocation());
