@@ -111,6 +111,12 @@
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
             <artifactId>dss-utils-apache-commons</artifactId>
         </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-validation</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- AWS SDK KMS -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
