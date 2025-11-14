@@ -17,6 +17,7 @@ import com.example.jaspersample.domain.reports.ReportFile;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.pdf.type.PdfPermissionsEnum;
 
 /**
  * InvoiceReportCreatorの実装クラスその3<br>
@@ -45,16 +46,14 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
                 // 読み取りパスワード
                 .userPassword(order.getCustomer().getPdfPassword())//
                 // 権限パスワード
-                // .ownerPassword("admin")//
+                .ownerPassword("admin")//
                 // 特定の処理個別の暗号化レベル設定
                 // .is128bitKey(false)
                 // 特定の処理個別の権限設定
-                // .permissionsDenied(List.of(
-                // PdfPermissionsEnum.COPY,
-                // PdfPermissionsEnum.PRINTING,
-                // PdfPermissionsEnum.MODIFY_CONTENTS
-                // ))//
-                .build();
+                .permissionsDenied(List.of(PdfPermissionsEnum.COPY //
+                        , PdfPermissionsEnum.PRINTING //
+                // , PdfPermissionsEnum.MODIFY_CONTENTS // PAdESの場合、MODIFY_CONTENTSを署名作成時エラーになる
+                )).build();
         // AbstractJasperReportCreatorが提供するcreatePDFReportメソッドをを呼び出すとPDF帳票作成する
         Report report = createPDFReport(order, options);
 
@@ -68,7 +67,8 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
                 .visibleSignText("署名者")// 可視署名のテキスト
                 .visibleSignRect(new float[] { 475, 90, 575, 190 })// 可視署名の表示位置（左上を原点とした座標）
                 .visibleSignPage(1)// 可視署名の表示ページ
-                .password(order.getCustomer().getPdfPassword())// パスワード保護されたPDFの場合のパスワード
+                .userPassword(order.getCustomer().getPdfPassword())// パスワード保護されたPDFの場合のパスワード
+                // .ownerPassword("admin")// セキュリティ設定したPDFの場合のオーナーパスワード
                 .build());
         return ReportFile.builder()//
                 .inputStream(signedReport.getInputStream())//
