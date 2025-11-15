@@ -68,7 +68,7 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
                 .visibleSignRect(new float[] { 475, 90, 575, 190 })// 可視署名の表示位置（左上を原点とした座標）
                 .visibleSignPage(1)// 可視署名の表示ページ
                 .userPassword(order.getCustomer().getPdfPassword())// パスワード保護されたPDFの場合のパスワード
-                // .ownerPassword("admin")// セキュリティ設定したPDFの場合のオーナーパスワード
+                .ownerPassword("admin")// セキュリティ設定したPDFの場合のオーナーパスワード(PKCS12BasicReportSignerの場合のみ必要)
                 .build());
         return ReportFile.builder()//
                 .inputStream(signedReport.getInputStream())//
