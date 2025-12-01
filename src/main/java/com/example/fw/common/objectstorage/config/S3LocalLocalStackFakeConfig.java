@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import com.amazonaws.xray.interceptors.TracingInterceptor;
 import com.example.fw.common.objectstorage.BucketCreateInitializer;
 import com.example.fw.common.objectstorage.ObjectStorageFileAccessor;
 import com.example.fw.common.objectstorage.S3ObjectStorageFileAccessor;
@@ -15,6 +16,7 @@ import com.example.fw.common.objectstorage.S3ObjectStorageFileAccessor;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -59,7 +61,7 @@ public class S3LocalLocalStackFakeConfig {
                 .region(region)       
                 .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                 .endpointOverride(URI.create("http://localhost:" + s3ConfigurationProperties.getLocalfake().getPort()))
-                //MinIOはデフォルトPath-Styleのため
+                //Path-Styleの設定
                 .serviceConfiguration(S3Configuration.builder()
                         .pathStyleAccessEnabled(true).build())
                 .build();        
@@ -69,7 +71,6 @@ public class S3LocalLocalStackFakeConfig {
     /**
      * S3クライアント（X-Rayトレースあり）
      */
-    /*
     @Profile("xray")
     @Bean
     S3Client s3ClientWithXRay() {
@@ -94,7 +95,7 @@ public class S3LocalLocalStackFakeConfig {
                 .build();        
         // @formatter:on
     }
-    */
+
     /**
      * バケット初期作成クラス
      * 
