@@ -492,7 +492,7 @@
                 * [OpenPDF issue #86 PAdES signatures support](https://github.com/LibrePDF/OpenPDF/issues/86)
                 * PAdESに対応するには、次に説明するライブラリDSSを使用する必要がある。
 
-    2. [DSS（Digital Signature Service）](https://github.com/esig/dss/)
+    2. [DSS（Digital Signature Service）](https://github.com/esig/dss/)のライブラリを利用する
         * 欧州委員会（European Commission）が作成する電子署名の作成と検証のためのオープンソースソフトウェアライブラリです。
         * PDFの電子署名においては、PAdESにも対応しています。
         * 本サンプルAPの実装例
