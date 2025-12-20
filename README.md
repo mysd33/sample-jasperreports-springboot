@@ -1,5 +1,9 @@
-# Jasper Reportsによる帳票出力のSpring Boot APサンプル
+# Jasper Reportsによる帳票出力・電子署名のSpring Boot APサンプル
 * Jasper Reportsを使って、帳票出力を行うためのサンプルAPです。Jasper Reportsの勉強するために作成しています。
+
+* 実装イメージ
+
+    ![実装イメージ](./image/architecture.png)
 
 ## サンプルAPの起動方法
 * [署名付きPDF帳票](#pdfへの電子署名付与)を試すには、デフォルトで動作する機能では、PKCS#12形式の秘密鍵と証明書のファイルを用意しておく必要があります。
