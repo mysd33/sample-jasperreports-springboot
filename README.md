@@ -459,7 +459,7 @@
 
 * Jasper Reportsでは、帳票様式の中でサブレポートを利用することができます。
 * サブレポートを利用する場合、メインの帳票様式ファイル(jrxml)の中で、サブレポート要素を配置し、`Expression`でサブレポートのjasperファイルを指定します。
-    * サブレポートのjasperファイルの配置場所を絶対パスで指定する必要があるため、パラメータ（例：`$P{SUBREPORT_DIR}`）を定義して、そのパラメータをAPから渡すようにします。
+    * サブレポートのjasperファイルの配置場所を絶対パスで指定する必要があるため、パラメータ（例：`$P{SUBREPORT_DIR}`）を定義して、そのパラメータをgetJasperDirPath()メソッドを使ってJasperファイルがコンパイルされるフォルダを指定して、APから渡すようにします。
 * また、`DataSource Expression`で、JRBeanCollectionDataSource等のデータソースを指定して、メインの帳票様式に受け渡したデータをトップとしたプロパティパスをフィールドデータ（`$F`）を指定します。
 
     ![サブレポートの設定例](image/subreport.jpg) 
@@ -472,8 +472,8 @@
         Map<String, Object> parameters = new HashMap<>();
         …
         // サブレポートの配置場所をパラメータで指定
-        Path jasperFilePath = getJasperFilePath();
-        parameters.put("SUBREPORT_DIR", jasperFilePath.toAbsolutePath().toString() + "/");
+        Path jasperDirPath = getJasperDirPath();
+        parameters.put("SUBREPORT_DIR", jasperDirPath.toAbsolutePath().toString() + "/");
          …
         return parameters;
     }

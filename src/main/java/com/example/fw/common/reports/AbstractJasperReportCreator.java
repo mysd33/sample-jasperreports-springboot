@@ -62,7 +62,7 @@ public abstract class AbstractJasperReportCreator<T> {
 
     // コンパイル済の帳票様式を保存する一時ディレクトリ
     @Getter(AccessLevel.PROTECTED)
-    private Path jasperFilePath;
+    private Path jasperDirPath;
 
     // 帳票ID
     private String reportId;
@@ -93,10 +93,10 @@ public abstract class AbstractJasperReportCreator<T> {
         reportName = annotation.name();
 
         // コンパイル済の帳票様式を保存する一時ディレクトリを作成する
-        jasperFilePath = Path.of(ReportsConstants.TMP_DIR, config.getJasperFileTmpdir());
-        appLogger.debug("jasperPath: {}", jasperFilePath);
+        jasperDirPath = Path.of(ReportsConstants.TMP_DIR, config.getJasperFileTmpdir());
+        appLogger.debug("jasperPath: {}", jasperDirPath);
         // 一時ディレクトリが存在しない場合は作成する
-        jasperFilePath.toFile().mkdirs();
+        jasperDirPath.toFile().mkdirs();
 
         // あらかじめ帳票様式ファイルをコンパイルする
         try {
@@ -257,7 +257,7 @@ public abstract class AbstractJasperReportCreator<T> {
         String jasperFileName = path.getFileName().toString().replace(ReportsConstants.JRXML_FILE_EXTENSION,
                 ReportsConstants.JASPER_FILE_EXTENSION);
         // 一時フォルダにあるファイルパスを返却
-        return jasperFilePath.resolve(jasperFileName).toFile();
+        return jasperDirPath.resolve(jasperFileName).toFile();
     }
 
     /**
