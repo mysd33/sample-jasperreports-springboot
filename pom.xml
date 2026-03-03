@@ -18,7 +18,7 @@
         <java.version>21</java.version>
         <jasperreports.version>7.0.3</jasperreports.version>
         <!--<jasperreports.version>6.21.3</jasperreports.version>-->
-        <dss.bom.version>6.2</dss.bom.version>
+        <dss.bom.version>6.3</dss.bom.version>
         <awssdk.bom.version>2.31.76</awssdk.bom.version>
         <awsxray.bom.version>2.18.2</awsxray.bom.version>
         <!-- MapStruct -->
@@ -109,6 +109,10 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-cms-object</artifactId>
+       </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
             <artifactId>dss-utils-apache-commons</artifactId>
         </dependency>
         <dependency>
@@ -116,7 +120,6 @@
             <artifactId>dss-validation</artifactId>
             <scope>test</scope>
         </dependency>
-
         <!-- AWS SDK KMS -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
