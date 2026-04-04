@@ -20,7 +20,7 @@ import jakarta.xml.bind.Marshaller;
  */
 class DigitalSignatureVerifyTool {
 
-    public static void main(String[] args) throws JAXBException {
+    void main() throws JAXBException {
         String filePath = "pdf/請求書_PAdES_可視署名_ECDSA.pdf";
         String password = "1234";
         // 検証対象署名済 PDFファイル の読み込み
@@ -46,7 +46,7 @@ class DigitalSignatureVerifyTool {
 
         StringWriter sw = new StringWriter();
         mSimple.marshal(root, sw);
-        System.out.println("=== Simple Report ===\n" + sw.toString());
+        IO.println("=== Simple Report ===\n" + sw.toString());
 
         // 出力：Detailed Report
         XmlDetailedReport xmlDetailed = reports.getDetailedReport().getJAXBModel();
@@ -57,7 +57,7 @@ class DigitalSignatureVerifyTool {
         mDetailed.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         StringWriter swDetailed = new StringWriter();
         mDetailed.marshal(rootDetailed, swDetailed);
-        System.out.println("=== Detailed Report ===\n" + swDetailed.toString());
+        IO.println("=== Detailed Report ===\n" + swDetailed.toString());
 
     }
 

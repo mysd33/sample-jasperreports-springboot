@@ -47,7 +47,7 @@ public class ItemsReportCreatorImplByJasperAPISimple implements ItemsReportCreat
         try {
             // コンパイル済の帳票様式がある場合はそれを利用する
             jasperReport = (JasperReport) JRLoader.loadObject(ResourceUtils.getFile(JASPER_FILE_PATH));
-        } catch (FileNotFoundException | JRException e) {
+        } catch (FileNotFoundException | JRException _) {
             try {
                 // コンパイル済の帳票様式が見つからない場合は、jrxmlの帳票様式ファイルをコンパイルす
                 jasperReport = JasperCompileManager

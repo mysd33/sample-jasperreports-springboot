@@ -161,7 +161,7 @@ class AWSKmsKeyManagerTest {
         StringWriter stringWriter = new StringWriter();
         csr.exportPemTo(stringWriter);
         String pem = stringWriter.toString();
-        System.out.println(pem);
+        IO.println(pem);
         assertTrue(pem.contains("-----BEGIN CERTIFICATE REQUEST-----"));
         assertTrue(pem.contains("-----END CERTIFICATE REQUEST-----"));
         sut.deleteKeyAlias(keyAlias);
@@ -187,7 +187,7 @@ class AWSKmsKeyManagerTest {
         StringWriter stringWriter = new StringWriter();
         certificate.exportPemTo(stringWriter);
         String pem = stringWriter.toString();
-        System.out.println(pem);
+        IO.println(pem);
         assertTrue(pem.contains("-----BEGIN CERTIFICATE-----"));
         assertTrue(pem.contains("-----END CERTIFICATE-----"));
         sut.deleteKeyAlias(keyAlias);
