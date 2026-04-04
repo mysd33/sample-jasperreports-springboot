@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.3</version>
+        <version>4.0.5</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
@@ -18,42 +18,57 @@
         <java.version>21</java.version>
         <jasperreports.version>7.0.3</jasperreports.version>
         <!--<jasperreports.version>6.21.3</jasperreports.version>-->
-        <dss.bom.version>6.3</dss.bom.version>
-        <awssdk.bom.version>2.31.76</awssdk.bom.version>
+        <dss.bom.version>6.4</dss.bom.version>
+        <spring-cloud-aws.version>4.0.0</spring-cloud-aws.version>
         <awsxray.bom.version>2.18.2</awsxray.bom.version>
+        <terasoluna.version>5.11.0.RELEASE</terasoluna.version>
         <!-- MapStruct -->
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     </properties>
     <dependencies>
+        <!-- Spring Boot Starter WebMVC -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
+        <!-- Spring Boot Starter Thymeleaf -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+        <!-- Spring Boot Starter AspectJ -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
         </dependency>
+        <!-- TERASOLUNA Web (for TransactionToken Check) -->
         <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
+            <groupId>org.terasoluna.gfw</groupId>
+            <artifactId>terasoluna-gfw-web</artifactId>
+            <version>${terasoluna.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <!-- Spring Boot Devtools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
+        <!-- Spring Boot Starter Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -159,6 +174,14 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
+            <!-- JUnit Bom (Spring BootのJUnitバージョンが6にならないので回避策 -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
             <!-- DSS -->
             <dependency>
                 <groupId>eu.europa.ec.joinup.sd-dss</groupId>
@@ -167,19 +190,19 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- AWS SDK -->
-            <dependency>
-                <groupId>software.amazon.awssdk</groupId>
-                <artifactId>bom</artifactId>
-                <version>${awssdk.bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- AWS X-Ray -->
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-xray-recorder-sdk-bom</artifactId>
                 <version>${awsxray.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring Cloud for AWS -->
+            <dependency>
+                <groupId>io.awspring.cloud</groupId>
+                <artifactId>spring-cloud-aws-dependencies</artifactId>
+                <version>${spring-cloud-aws.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
