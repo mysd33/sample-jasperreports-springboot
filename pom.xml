@@ -15,7 +15,7 @@
     <name>sample-jasperreports-springboot</name>
     <description>Jasper Reports Demo project for Spring Boot</description>
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <jasperreports.version>7.0.3</jasperreports.version>
         <!--<jasperreports.version>6.21.3</jasperreports.version>-->
         <dss.bom.version>6.4</dss.bom.version>
