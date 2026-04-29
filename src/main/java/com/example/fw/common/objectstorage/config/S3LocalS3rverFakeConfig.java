@@ -24,9 +24,12 @@ import software.amazon.awssdk.services.s3.S3Configuration;
 
 /**
  * 
- * S3が開発環境上でのローカルサーバFake（s3rver）実行に置き換える設定クラス
+ * S3が開発環境上でのローカルサーバFake（s3rver）実行に置き換える設定クラス<br>
+ * 
+ * s3verは、現在、Public archiveとなっており、メンテナンスされていないため非推奨とする
  *
  */
+@Deprecated(forRemoval = true)
 @Profile("dev")
 @ConditionalOnProperty(prefix = S3ConfigurationProperties.LOCALFAKE_PROPERTY_PREFIX, name = "type", havingValue = "s3rver")
 @EnableConfigurationProperties({ S3ConfigurationProperties.class })
@@ -39,17 +42,18 @@ public class S3LocalS3rverFakeConfig {
     /**
      * オブジェクトストレージアクセスクラス
      */
+    @Deprecated(forRemoval = true)
     @Bean
     ObjectStorageFileAccessor objectStorageFileAccessor(S3Client s3Client) {
         return new S3ObjectStorageFileAccessor(s3Client, s3ConfigurationProperties.getBucket());
     }
 
     /**
-     * S3クライアント（X-Rayトレースなし）
+     * S3クライアント
      */
+    @Deprecated(forRemoval = true)
     @Profile("!xray")
-    @Bean
-    S3Client s3ClientWithoutXRay() {
+    S3Client s3Client() {
         // ダミーのクレデンシャル
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(S3RVER, S3RVER);
 
@@ -68,8 +72,11 @@ public class S3LocalS3rverFakeConfig {
     }
 
     /**
-     * S3クライアント（X-Rayトレースあり）
+     * S3クライアント（X-Ray SDK）<br>
+     * 
+     * X-Ray SDKは 2027 年 2 月 25 日にサポート終了となるため削除予定
      */
+    @Deprecated(forRemoval = true)
     @Profile("xray")
     @Bean
     S3Client s3ClientWithXRay() {
@@ -97,6 +104,7 @@ public class S3LocalS3rverFakeConfig {
      * バケット初期作成クラス
      * 
      */
+    @Deprecated(forRemoval = true)
     @Bean
     BucketCreateInitializer bucketCreateInitializer(S3Client s3Client) {
         return new BucketCreateInitializer(s3Client, s3ConfigurationProperties.getBucket());
