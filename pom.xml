@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.5</version>
+        <version>4.0.6</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
@@ -16,7 +16,7 @@
     <description>Jasper Reports Demo project for Spring Boot</description>
     <properties>
         <java.version>25</java.version>
-        <jasperreports.version>7.0.3</jasperreports.version>
+        <jasperreports.version>7.0.6</jasperreports.version>
         <!--<jasperreports.version>6.21.3</jasperreports.version>-->
         <dss.bom.version>6.4</dss.bom.version>
         <spring-cloud-aws.version>4.0.0</spring-cloud-aws.version>
