@@ -386,11 +386,8 @@ public class AWSKmsKeyManager implements KeyManager {
         final String certsBassPrefix = keyManagementConfigurationProperties.getCertsBasePrefix();
         final String certifacatePrefix = certsBassPrefix + keyInfo.getKeyId() + "/" + certificateFileName;
         final List<Certificate> certificates = new ArrayList<>();
-        // オブジェクトストレージの取得先の証明書パスをINFOログで出力
-        appLogger.info(CommonFrameworkMessageIds.I_FW_KYMG_0001, certifacatePrefix);
         // オブジェクトストレージからファイルダウンロード
         DownloadObject downloadObject = objectStorageFileAccessor.download(certifacatePrefix);
-
         // PKCS#7形式の証明書チェーンのファイル（拡張子がp7b）の場合
         if (downloadObject.getFileName().endsWith(".p7b")) {
             // PKCS#7形式の証明書チェーンとして処理
