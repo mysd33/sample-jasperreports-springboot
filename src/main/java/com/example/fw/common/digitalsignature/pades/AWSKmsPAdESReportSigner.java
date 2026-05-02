@@ -231,8 +231,10 @@ public class AWSKmsPAdESReportSigner implements ReportSigner {
                 options.getVisibleSignRect()[2] - options.getVisibleSignRect()[0]);
             fieldParameters.setHeight(
                 options.getVisibleSignRect()[3] - options.getVisibleSignRect()[1]);
-            SignatureImageTextParameters textParameters = new SignatureImageTextParameters();
-            textParameters.setText(options.getVisibleSignText());
+            // Image with Text visual signature is not supported for OpenPDF module
+            //SignatureImageTextParameters textParameters = new SignatureImageTextParameters();
+            //textParameters.setText(options.getVisibleSignText());
+            //imageParameters.setTextParameters(textParameters);
             pAdESSignatureParameters.setImageParameters(imageParameters);
         }
 

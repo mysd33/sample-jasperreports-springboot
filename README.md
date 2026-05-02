@@ -569,6 +569,10 @@
             <artifactId>dss-pades-openpdf</artifactId>
         </dependency>
         <dependency>
+          <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+          <artifactId>dss-cms-object</artifactId>
+        </dependency>        
+        <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
             <artifactId>dss-utils-apache-commons</artifactId>
         </dependency>
@@ -634,7 +638,7 @@ public class InvoiceReportCreatorWithSign extends AbstractJasperReportCreator<Or
                 .location("署名場所")//
                 .visible(true)// 可視署名の有効化
                 .visibleSignImagePath("certs/stamp.png")// 可視署名の画像
-                .visibleSignText("署名者")// 可視署名のテキスト
+                //.visibleSignText("署名者")// 可視署名のテキスト(OpenPDFは未サポート)
                 .visibleSignRect(new float[] { 475, 90, 575, 190 })// 可視署名の表示位置（左上を原点とした座標）
                 .visibleSignPage(1)// 可視署名の表示ページ
                 .password(order.getCustomer().getPdfPassword())// パスワード保護されたPDFの場合のパスワード
