@@ -1,19 +1,16 @@
 package com.example.fw.common.objectstorage.config;
 
+import com.amazonaws.xray.interceptors.TracingInterceptor;
+import com.example.fw.common.objectstorage.BucketCreateInitializer;
+import com.example.fw.common.objectstorage.ObjectStorageFileAccessor;
+import com.example.fw.common.objectstorage.S3ObjectStorageFileAccessor;
 import java.net.URI;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
-import com.amazonaws.xray.interceptors.TracingInterceptor;
-import com.example.fw.common.objectstorage.BucketCreateInitializer;
-import com.example.fw.common.objectstorage.ObjectStorageFileAccessor;
-import com.example.fw.common.objectstorage.S3ObjectStorageFileAccessor;
-
-import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
@@ -28,10 +25,11 @@ import software.amazon.awssdk.services.s3.S3Configuration;
 @Deprecated(forRemoval = true)
 @Profile("dev")
 @ConditionalOnProperty(prefix = S3ConfigurationProperties.LOCALFAKE_PROPERTY_PREFIX, name = "type", havingValue = "s3rver")
-@EnableConfigurationProperties({ S3ConfigurationProperties.class })
+@EnableConfigurationProperties({S3ConfigurationProperties.class})
 @Configuration
 @RequiredArgsConstructor
 public class S3LocalS3rverFakeConfig {
+
     private static final String S3RVER = "S3RVER";
     private final S3ConfigurationProperties s3ConfigurationProperties;
 
