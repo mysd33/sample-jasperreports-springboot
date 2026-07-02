@@ -324,6 +324,7 @@
             parameters.put("billingSourceAddress", data.getBillingSource().getAddress());
             parameters.put("billingSourceTel", data.getBillingSource().getTel());
             parameters.put("billingSourceManager", data.getBillingSource().getManager());
+            parameters.put("barcode", data.getBarcode());
             return parameters;
         }
 
@@ -336,6 +337,69 @@
 
     }
     ```
+
+* 上のサンプルでは、鏡部分の項目をパラメータとして定義して値を設定していますが、フィールドで定義することもできます。
+    * JRBeanCollectionDataSource（JavaBeanをデータソース）による[サンプルコード2](src/main/java/com/example/jaspersample/infra/reports/InvoiceReportCreatorImpl2.java)    
+    * その場合は、帳票の鏡部分は、CSVと同じで、データソースのリストの最初の要素のデータのみ指定するか、全要素同じデータをしてすればよい。
+    * 帳票の明細一覧部分は、明細の数の行データを繰り返し指定すればよい。
+
+    ```java
+    /**
+     * InvoiceReportCreatorの実装クラスその2<br>
+     * 
+     * 単項目も含めて、JRDataSourceを使用して帳票を作成する例
+     */
+    // @ReportCreatorを付与し、Bean定義
+    @ReportCreator(id = "R003", name = "請求書")
+    // AbstractJasperReportCreatorを継承
+    // 型パラメータに帳票作成に必要なデータの型を指定
+    @RequiredArgsConstructor
+    public class InvoiceReportCreatorImpl2 extends AbstractJasperReportCreator<Order> implements InvoiceReportCreator {
+        private static final String INVOICE_FILE_NAME = "請求書.pdf";
+        private static final String JRXML_FILE_PATH = "reports/invoice-report2.jrxml";
+        // InvoiceReportDataMapperをDI
+        private final InvoiceReportDataMapper mapper;
+
+        // 業務APが定義する帳票出力処理
+        @Override
+        public ReportFile createInvoice(Order order) {
+            …　// 上のサンプルと同じ
+        }
+
+        // AbstractJasperReportCreatorのabstractメソッドgetJRXMLFileを実装して様式ファイルのパスを返す
+        @Override
+        protected String getMainJRXMLFile() {
+            …　// 上のサンプルと同じ
+        }
+
+        // getParametersメソッドのオーバライド不要
+        
+        // AbstractJasperReportCreatorのabstractメソッドgetDataSourceを実装して、データソースを返す
+        @Override
+        protected JRDataSource getDataSource(Order data) {
+            List<InvoiceReportData> invoiceReportDataList = new ArrayList<>();
+            
+            // 帳票の一覧部分に出力する注文明細のデータを設定した例
+            // int count = 0;
+            for (OrderItem item : data.getOrderItems()) {
+                // 鏡部分も明細部分も帳票出力用のデータのリストに全行コピー
+                invoiceReportDataList.add(mapper.modelToReportData(data, item));
+
+                // 明細の一行目だけに鏡（ヘッダー）データがコピーされる実装でもOK
+                /*
+                * if (count == 0) {
+                * invoiceReportDataList.add(mapper.modelToReportHeaderAndItemData(data, item));
+                * } else { invoiceReportDataList.add(mapper.modelToReportItemData(item)); }
+                * count++;
+                */
+            }
+
+            return new JRBeanCollectionDataSource(invoiceReportDataList);
+        }
+
+    }
+    ``` 
+
 
 ### CSVファイルをデータソースにした実装例
 * JavaBeanだけでなく、CSVファイルもデータソースにすることができます。
