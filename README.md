@@ -124,7 +124,7 @@
         * 自分でゼロから作成した様式ファイルです。
             * 実際の帳票様式(jrml)ファイル
                 * [単項目をパラメータで設定した様式バージョン](src/main/resources/reports/invoice-report.jrxml)
-                * [単項目・明細ともにJRDataSourceから取得する様式バージョン](src/main/resources/reports/invoice-report.jrxml)
+                * [単項目・明細ともにJRDataSourceから取得する様式バージョン](src/main/resources/reports/invoice-report2.jrxml)
             * 某帳票製品の帳票サンプルを参考にして、同じようにデザインできるか試してみました。            
         * 出力される帳票のイメージ
         
