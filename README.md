@@ -196,6 +196,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- バーコードの出力には追加定義が必要 -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-barcode4j</artifactId>
+            <version>${jasperreports.version}</version>
+        </dependency>
         <!-- PDFのパスワード設定する場合に、bouncycastleを利用するため追加定義が必要 -->
         <dependency>
             <groupId>org.bouncycastle</groupId>

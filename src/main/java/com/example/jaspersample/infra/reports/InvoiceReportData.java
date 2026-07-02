@@ -27,6 +27,8 @@ public class InvoiceReportData {
     private String billingSourceTel;
     // 請求元担当者名
     private String billingSourceManager;
+    // バーコード番号
+    private String barcode;
 
     // 明細（繰り返し）項目
     // 商品コード
