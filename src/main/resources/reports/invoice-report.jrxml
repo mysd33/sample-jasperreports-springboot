@@ -1,4 +1,4 @@
-<!-- Created with Jaspersoft Studio version 7.0.0.final using JasperReports Library version 7.0.0-b478feaa9aab4375eba71de77b4ca138ad2f62aa  -->
+<!-- Created with Jaspersoft Studio version 7.0.2.final using JasperReports Library version 7.0.2-31532122640f516c6d17238ae0e41a08113d5ac0  -->
 <jasperReport name="invoice-report" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="10bc742c-841a-4f47-a8e6-7bb02718a0cc">
 	<parameter name="orderId" class="java.lang.String"/>
 	<parameter name="customerZip" class="java.lang.String"/>
@@ -9,6 +9,7 @@
 	<parameter name="billingSourceAddress" class="java.lang.String"/>
 	<parameter name="billingSourceManager" class="java.lang.String"/>
 	<parameter name="billingSourceTel" class="java.lang.String"/>
+	<parameter name="barcode" class="java.lang.String"/>
 	<query language="sql"><![CDATA[]]></query>
 	<field name="itemCode" class="java.lang.String"/>
 	<field name="itemName" class="java.lang.String"/>
@@ -66,6 +67,11 @@
 		</element>
 		<element kind="textField" uuid="ede35ec2-dd1c-4d0c-95ed-7ed577a0ee0e" x="341" y="151" width="206" height="16" fontName="ipaexm">
 			<expression><![CDATA["担当者："+$P{billingSourceManager}]]></expression>
+		</element>
+		<element kind="component" uuid="1fbe705f-5a80-422b-b9bb-7b5f7af22489" x="200" y="20" width="100" height="30">
+			<component kind="barcode4j:EAN13">
+				<codeExpression><![CDATA[$P{barcode}]]></codeExpression>
+			</component>
 		</element>
 	</title>
 	<columnHeader height="20" splitType="Stretch">

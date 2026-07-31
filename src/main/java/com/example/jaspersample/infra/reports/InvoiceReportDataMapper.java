@@ -1,11 +1,10 @@
 package com.example.jaspersample.infra.reports;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
-
 import com.example.jaspersample.domain.model.Order;
 import com.example.jaspersample.domain.model.OrderItem;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = ComponentModel.SPRING)
 public interface InvoiceReportDataMapper {
@@ -13,7 +12,7 @@ public interface InvoiceReportDataMapper {
     /**
      * 請求書の帳票出力用データの鏡部分、明細部分を一緒にマッピングする
      * 
-     * @param order     注文
+     * @param order 注文
      * @param orderItem 注文明細
      * @return 請求書の帳票出力用データ
      */
@@ -26,6 +25,7 @@ public interface InvoiceReportDataMapper {
     @Mapping(target = "billingSourceAddress", source = "order.billingSource.address")
     @Mapping(target = "billingSourceTel", source = "order.billingSource.tel")
     @Mapping(target = "billingSourceManager", source = "order.billingSource.manager")
+    @Mapping(target = "barcode", source = "order.barcode")
     InvoiceReportData modelToReportData(Order order, OrderItem orderItem);
 
     /**
@@ -34,6 +34,7 @@ public interface InvoiceReportDataMapper {
      * @param orderItem 注文明細
      * @return 請求書の帳票出力用データ
      */
+    @Mapping(target = "barcode", ignore = true)
     @Mapping(target = "orderId", ignore = true)
     @Mapping(target = "customerName", ignore = true)
     @Mapping(target = "customerZip", ignore = true)

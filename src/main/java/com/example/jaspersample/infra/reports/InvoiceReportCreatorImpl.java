@@ -2,7 +2,6 @@ package com.example.jaspersample.infra.reports;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import com.example.fw.common.reports.AbstractJasperReportCreator;
 import com.example.fw.common.reports.PDFOptions;
 import com.example.fw.common.reports.Report;
@@ -10,7 +9,6 @@ import com.example.fw.common.reports.ReportCreator;
 import com.example.jaspersample.domain.model.Order;
 import com.example.jaspersample.domain.reports.InvoiceReportCreator;
 import com.example.jaspersample.domain.reports.ReportFile;
-
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
@@ -23,7 +21,8 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 @ReportCreator(id = "R003", name = "請求書")
 // AbstractJasperReportCreatorを継承
 // 型パラメータに帳票作成に必要なデータの型を指定
-public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order> implements InvoiceReportCreator {
+public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order>
+        implements InvoiceReportCreator {
     private static final String INVOICE_FILE_NAME = "請求書.pdf";
     private static final String JRXML_FILE_PATH = "reports/invoice-report.jrxml";
 
@@ -74,6 +73,7 @@ public class InvoiceReportCreatorImpl extends AbstractJasperReportCreator<Order>
         parameters.put("billingSourceAddress", data.getBillingSource().getAddress());
         parameters.put("billingSourceTel", data.getBillingSource().getTel());
         parameters.put("billingSourceManager", data.getBillingSource().getManager());
+        parameters.put("barcode", data.getBarcode());
         return parameters;
     }
 

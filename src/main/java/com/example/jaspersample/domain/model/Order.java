@@ -1,7 +1,6 @@
 package com.example.jaspersample.domain.model;
 
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +20,8 @@ public class Order {
     private Customer customer;
     // 請求元
     private BillingSource billingSource;
-
+    // バーコード番号
+    private String barcode;
     // 注文明細
     private List<OrderItem> orderItems;
 
