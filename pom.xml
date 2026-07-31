@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.6</version>
+    <version>4.1.0</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.example</groupId>
@@ -16,11 +16,11 @@
   <description>Jasper Reports Demo project for Spring Boot</description>
   <properties>
     <java.version>25</java.version>
-    <jasperreports.version>7.0.6</jasperreports.version>
+    <jasperreports.version>7.0.7</jasperreports.version>
     <!--<jasperreports.version>6.21.3</jasperreports.version>-->
     <dss.bom.version>6.4</dss.bom.version>
-    <spring-cloud-aws.version>4.0.0</spring-cloud-aws.version>
-    <awsxray.bom.version>2.18.2</awsxray.bom.version>
+    <spring-cloud-aws.version>4.1.0</spring-cloud-aws.version>
+    <awsxray.bom.version>2.20.0</awsxray.bom.version>
     <terasoluna.version>5.11.0.RELEASE</terasoluna.version>
     <!-- MapStruct -->
     <m2e.apt.activation>jdt_apt</m2e.apt.activation>
